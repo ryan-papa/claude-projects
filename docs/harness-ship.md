@@ -43,6 +43,7 @@ CI 통과 대기 → gh pr merge --merge --auto
 - `git log [target-branch] --oneline -3`으로 커밋 반영 확인
 - 배포 워크플로우 상태 확인: `gh run list --limit 1`
 - 배포 완료 시 라이브 URL 사용자에게 전달
+- **배포 완료 메시지 직후 `/rp-retro` 자동 진입** (생략 불가)
 
 ## 최종 산출물
 

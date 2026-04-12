@@ -105,7 +105,9 @@ claude-projects/
 - 산출물 보고 없이 커밋/PR/배포 진행 금지
 - **CI 통과 전 머지 금지** (예외 없음)
 - "급해서", "간단해서", "나중에" 등 어떤 이유로도 단계 스킵 불가
+- **배포 완료 직후 회고(`/rp-retro`) 자동 시작** — 생략 불가
 - 워크플로우 위반 발견 시 즉시 중단하고 빠진 단계부터 재진행
+
 
 **코드리뷰 상세:** [`harness-code-review.md`](docs/harness-code-review.md)
 **디자인 원칙:** [`harness-design.md`](docs/harness-design.md)

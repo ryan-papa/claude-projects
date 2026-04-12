@@ -43,5 +43,6 @@ PR 생성 시점에 .github/workflows/ 확인
 - PR 머지 완료
 - 배포 워크플로우 성공
 - 라이브 URL 사용자에게 전달
+- **배포 완료 메시지 직후 `/rp-retro` 자동 진입** (생략 불가)
 
 → 배포 상세: [`../harness-ship.md`](../harness-ship.md)
