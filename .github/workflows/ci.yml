@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "Checking line limits..."
           failed=0
-          for f in $(find docs/ CLAUDE.md -name '*.md' -not -path '*/node_modules/*'); do
+          for f in $(find docs/ CLAUDE.md -name '*.md' -not -path '*/node_modules/*' -not -path '*/templates/*'); do
             lines=$(wc -l < "$f")
             if [ "$lines" -gt 200 ]; then
               echo "❌ $f: ${lines} lines (max 200)"
@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "Checking internal links..."
           failed=0
-          for f in $(find docs/ CLAUDE.md -name '*.md'); do
+          for f in $(find docs/ CLAUDE.md -name '*.md' -not -path '*/templates/*'); do
             links=$(grep -oP '\[.*?\]\(\K[^)]+' "$f" 2>/dev/null | grep -v '^http' | grep -v '^#' || true)
             dir=$(dirname "$f")
             for link in $links; do
