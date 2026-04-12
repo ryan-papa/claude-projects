@@ -6,9 +6,16 @@
 
 ## 왜 이 프로젝트인가?
 
-AI 코딩 에이전트에게 "그냥 만들어줘"라고 하면 결과물의 품질이 들쭉날쭉하다.
-Harness는 PRD 작성부터 코드리뷰까지 10단계 워크플로우를 규칙으로 정의해서,
+> **핵심 비전: 사람의 코딩 한 줄 없이 프로젝트를 완성한다.**
+
+AI 코딩 에이전트가 기획 → 개발 → 테스트 → 배포까지 전 과정을 자동으로 수행한다.
+하지만 "그냥 만들어줘"라고 하면 결과물의 품질이 들쭉날쭉하다.
+
+**하네스 엔지니어링**은 이 과정에서 품질을 보장하기 위한 규칙 체계다.
+PRD 작성부터 코드리뷰까지 10단계 워크플로우를 규칙으로 정의해서,
 에이전트가 일관된 품질의 코드를 산출하도록 한다.
+
+이 레포의 모든 하위 프로젝트는 **사람이 직접 코드를 작성하지 않고, AI에게 지시하여 완성**되었다.
 
 ### 핵심 특징
 
@@ -86,11 +93,27 @@ claude-projects/
 
 ## 하위 프로젝트
 
-| 프로젝트 | 설명 | 링크 |
-|----------|------|------|
-| naver-cafe-monitor | 네이버 카페 모니터링 봇 | private |
-| math-adventure | 수학 문제 풀이 웹서비스 | [ryan-papa.github.io/math-adventure](https://ryan-papa.github.io/math-adventure) |
-| ai-guide | AI 학습 가이드 사이트 | [ryan-papa.github.io/ai-guide](https://ryan-papa.github.io/ai-guide) |
+### ai-guide
+
+AI 학습 가이드 사이트 — [ryan-papa.github.io/ai-guide](https://ryan-papa.github.io/ai-guide)
+
+![AI Guide 메인](repositories/ai-guide/docs/images/home.png)
+
+AI 활용법을 단계별로 안내하는 학습 가이드 웹사이트. 비개발자도 AI를 실무에 적용할 수 있도록 구성했다.
+
+### math-adventure
+
+수학 문제 풀이 웹서비스 — [ryan-papa.github.io/math-adventure](https://ryan-papa.github.io/math-adventure)
+
+![Math Adventure 메인](repositories/math-adventure/docs/images/home.png)
+
+초등학생 대상 수학 문제 풀이 게임. 단계별 난이도와 보상 시스템으로 학습 동기를 유지한다.
+
+### naver-cafe-monitor
+
+네이버 카페 모니터링 봇 (private)
+
+네이버 카페의 새 글을 감지하여 알림을 보내는 자동화 봇. 화면 UI 없이 백그라운드에서 동작한다.
 
 ---
 
