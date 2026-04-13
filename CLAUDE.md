@@ -43,7 +43,7 @@
 ```
 claude-projects/
 ├── docs/                       # 공통 문서·규칙
-│   ├── harness-workflow.md     # 전체 플로우 (9단계)
+│   ├── harness-workflow.md     # 전체 플로우 (10단계)
 │   ├── harness-prd.md          # PRD 작성 + 2단계 리뷰
 │   ├── harness-dev.md          # 개발 + QA + 코드리뷰
 │   ├── harness-code-review.md  # 코드리뷰 상세 기준 (8항목)
@@ -71,17 +71,11 @@ claude-projects/
 | 단계 | 내용 | 상세 |
 |------|------|------|
 | 1~5 | 초기화 → 구체화(도메인→기술→**외부API인증점검**) → PRD → 기획리뷰 → 엔지니어링리뷰 | [`harness-prd.md`](docs/harness-prd.md) |
-| 6~10 | 태스크 분해 → 개발 → QA → 코드리뷰(8항목) → 산출물 | [`harness-dev.md`](docs/harness-dev.md) |
+| 6~10 | 태스크 분해 → 개발 → 코드리뷰(태스크 머지 시) → QA(최종 통합 후) → 산출물 | [`harness-dev.md`](docs/harness-dev.md) |
 
 **리뷰 통과 시 사용자 승인 없이 바로 개발 진입**
 
-**⛔ 하네스 절대 규칙 (예외 없음):**
-- 기능 변경 시 코드 전에 PRD 문서 먼저 업데이트 + 리뷰
-- 테스트 코드 없이 커밋/머지 절대 금지
-- 테스트·빌드 미통과 시 다음 단계 진행 금지
-- QA·코드 리뷰 단계 생략 금지
-- "급해서", "간단해서", "나중에" 등 어떤 이유로도 단계 스킵 불가
-- 워크플로우 위반 발견 시 즉시 중단하고 빠진 단계부터 재진행
+**⛔ 하네스 절대 규칙:** → [`harness-dev.md` §절대 규칙](docs/harness-dev.md) (단일 원천)
 
 **코드리뷰 상세:** [`harness-code-review.md`](docs/harness-code-review.md)
 **디자인 원칙:** [`harness-design.md`](docs/harness-design.md)
