@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(rp-init)",
+      "Skill(rp-spec)",
+      "Skill(rp-prd)",
+      "Skill(rp-plan-review)",
+      "Skill(rp-eng-review)",
+      "Skill(rp-tasks)",
+      "Skill(rp-dev)",
+      "Skill(rp-code-review)",
+      "Skill(rp-qa)",
+      "Skill(rp-ship)"
+    ]
+  }
+}
