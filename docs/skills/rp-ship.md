@@ -13,13 +13,16 @@
 1. **커밋**: 변경 파일만 `git add` + `git commit`
 2. **README 검증**: 푸시 전 README.md 점검 (아래 참조)
 3. **푸시**: `git push -u origin [branch]`
-4. **PR 생성**: `gh pr create` (제목 + 변경 요약 + 테스트 계획)
-5. **CI 확인**: CI 통과 대기
+4. **PR 상태 확인**: `gh pr list --head [branch] --state all --json number,state`
+   - OPEN PR 존재 → 해당 PR 재사용 (신규 생성 금지)
+   - MERGED/CLOSED만 존재하거나 PR 없음 → 신규 PR 생성
+5. **PR 생성/재사용**: `gh pr create` (제목 + 변경 요약 + 테스트 계획)
+6. **CI 확인**: CI 통과 대기
 
 ### ⏸ 사용자 승인 대기
-6. **배포 승인 요청**: PR URL + CI 결과를 사용자에게 보고, 배포 승인 대기
-7. **머지**: 승인 후 `gh pr merge --merge`
-8. **배포 확인**: 배포 워크플로우 완료 대기 + 결과 보고
+7. **배포 승인 요청**: PR URL + CI 결과를 사용자에게 보고, 배포 승인 대기
+8. **머지**: 승인 후 `gh pr merge --merge`
+9. **배포 확인**: 배포 워크플로우 완료 대기 + 결과 보고
 
 ## README 검증
 
@@ -53,6 +56,7 @@ PR 생성 시점에 .github/workflows/ 확인
 - **CI 통과 전 머지 금지** (예외 없음)
 - `--admin` 플래그로 강제 머지 **금지**
 - **배포(머지) 전 사용자 승인 필수** — 커밋·PR까지는 자동, 머지는 승인 후
+- **동일 브랜치 재PR**: MERGED/CLOSED된 PR이 있어도 신규 PR을 생성 (OPEN PR이 있을 때만 재사용)
 - **feat·통합 브랜치 직접 배포 금지**: 프로덕션 프로세스(서버 재기동, 트래픽 수신) 는 **main 머지 이후**에만. 로컬 개발 서버(dev/`--reload`)는 예외.
 - **QA·코드리뷰 이수 확인 게이트**: PR 생성 직전 `rp-qa` 와 `rp-code-review` 가 모두 완료 상태인지 체크. 하나라도 미완이면 ship 중단하고 해당 단계로 복귀.
 
