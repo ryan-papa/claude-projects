@@ -23,7 +23,16 @@
 
 ## 검증
 
-- [ ] 수정 후 `rp-plan-review`, `rp-eng-review`, `rp-code-review` 스킬 문서에 "Agent 툴 필수" 문구 포함 확인
-- [ ] `CLAUDE.md` "⛔ 하네스 절대 규칙" 블록에 신규 항목 포함
+- [ ] 수정 후 `rp-plan-review`, `rp-eng-review`, `rp-code-review` 스킬 문서에 "Agent 툴 필수 + 역할 경계 + Fallback" 3요소 모두 포함 확인
+- [ ] `CLAUDE.md` "⛔ 하네스 절대 규칙" 블록에 신규 항목(역할 분리 + Fallback + 증거 저장) 포함
 - [ ] Codex 리뷰 1회 통과 (High/Critical 없음)
-- [ ] 최소 1건의 실제 하네스 워크플로 실행 시 리뷰가 서브에이전트로 수행되는지 육안 확인 (museum-finder 엔지 리뷰 재시도에서 확인 가능)
+- [ ] 다음 실제 하네스 워크플로에서 `review-claude-{plan,eng,code}.md` 파일이 **실제 생성**되는지 확인 (증거 기반 검증, 육안 아님)
+- [ ] 다음 `rp-retro` 회고에 "셀프 채점 재발 여부" 점검 항목 포함 확인
+
+## 리스크·Tradeoff (부작용)
+
+| 리스크 | 대응 |
+|--------|------|
+| 서브에이전트 반복 호출로 토큰 비용 증가 (재시도 3회 × 3단계 = 최대 9회) | 정당화: 이해충돌 방지 가치 > 비용. retro에서 실 비용 관측 후 재조정 |
+| 서브에이전트 자체 장애 시 워크플로 중단 | Fallback 절차 2회 재호출 + 사용자 보고. 메인 우회 **금지** |
+| 매 회차 PRD·CLAUDE.md 재로드 | 향후 공통 프롬프트 템플릿 `docs/templates/review-subagent-prompt.md` 분리로 감축 검토 |
