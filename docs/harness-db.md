@@ -12,6 +12,7 @@
 | FK | `fk_<자식>_<부모>` | `fk_refresh_user` |
 | UNIQUE | `uk_<의미>` | `uk_email_hmac` |
 | INDEX | `idx_<컬럼|의미>` | `idx_created_at`, `idx_board_post` |
+| VIEW | `<base>_view` 접미사 필수 | `museum_parking_view`, `user_active_view` |
 | ENUM 값 | snake_case 소문자 | `login_ok`, `refresh_reuse_detected` |
 
 ## 2. COMMENT 규칙 (예외 없음)
