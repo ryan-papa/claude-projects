@@ -32,6 +32,17 @@
 - `rtk rg "pattern" docs`
 - `rtk pytest -q`
 
+## Codex 스킬
+
+프로젝트 로컬 Codex 스킬은 `.codex/skills/rp-*/SKILL.md`에 둔다.
+
+관리 규칙:
+- 원본은 `docs/skills/rp-*.md`
+- 변환본은 `scripts/sync-codex-skills.py`로 생성
+- Claude hook은 `docs/skills/rp-*.md` 변경 시 `.claude/commands/`와 `.codex/skills/`를 함께 갱신
+- Codex에서 직접 수정했다면 `rtk python3 scripts/sync-codex-skills.py --check`로 동기화 확인
+- 로컬 Codex discovery가 필요하면 `rtk python3 scripts/sync-codex-skills.py --install-user`로 `$CODEX_HOME/skills`에 심링크 설치
+
 ## 기준 문서
 
 하네스 규칙에 영향이 있는 변경 전 아래 문서를 확인한다.
@@ -63,6 +74,8 @@ Claude 전용 요소는 Codex에서 아래처럼 해석한다.
 | `/codex:review --wait` | Codex에서는 findings-first 리뷰 결과를 직접 작성한다 |
 
 실제로 실행하지 않은 Claude 전용 명령은 실행했다고 기록하지 않는다.
+
+Codex도 `spawn_agent` 기반 서브에이전트 실행은 가능하다. 단, Claude Agent tool과 동일한 hook·slash command 런타임은 아니므로 결과는 Codex-led 독립 검토로 기록한다.
 
 ## 작성 모드
 
