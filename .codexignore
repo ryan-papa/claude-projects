@@ -1,7 +1,7 @@
 # ============================================
-# 공통 .claudeignore
-# 프로젝트별 추가 규칙: repositories/[project]/.claudeignore
-# 공통 + 프로젝트 규칙 합산 적용
+# 공통 .codexignore (Codex CLI / AGENTS.md 어댑터)
+# .claudeignore와 동일 규칙 유지 (수동 동기화 권장)
+# 프로젝트별 추가 규칙: repositories/[project]/.codexignore
 # ============================================
 
 # === Node.js / Frontend ===
