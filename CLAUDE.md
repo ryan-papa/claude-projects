@@ -108,7 +108,7 @@ claude-projects/
 **오케스트레이터:**
 - `rp-workflow` — 신규 프로젝트·기능 (init부터 전 단계)
 - `rp-amend` — 기존 프로젝트 기능 수정·추가 (init 스킵, specify부터 전 단계 Full PRD)
-**자동 전환:** 모든 단계 완료 시 다음 단계 자동 진입. 사용자 확인 없이 즉시 진행. 커밋·PR까지 자동. **배포[11]만 사용자 승인 대기.**
+**자동 전환:** 모든 단계 완료 시 다음 단계 자동 진입. 사용자 확인 없이 즉시 진행. 커밋·PR·**머지(자동 머지 가드 4종 AND 충족 시)까지 자동**. 배포[11] 완료 후 회고[12]는 **사용자 명령 시에만 실행** (자동 진입 없음).
 - 구체화 완료 → PRD 작성 자동 진입 (확인 질문 금지)
 - PRD 완료 → 기획 리뷰 자동 진입
 - 각 단계 완료 시 "다음 단계로 갈까요?" 질문 금지 — 바로 진행
@@ -131,12 +131,13 @@ claude-projects/
 - **프런트엔드 변경 시 Playwright E2E + axe(접근성) 검사 필수**: `rp-qa` 단계에서 둘 다 실행, 실패 시 진행 차단. E2E 테스트가 없는 UI 태스크는 완료 불가.
 - **백엔드 변경 시 4-게이트 의무**: [`harness-backend-test-policy.md`](docs/harness-backend-test-policy.md) — (1) 단위 항상 (2) 읽기 endpoint API 응답 테스트 (3) SQL/JPA/마이그레이션 변경 시 `@SpringBootTest+@Transactional` ROLLBACK 통합 테스트 (4) 컨트롤러·DI·Flyway 변경 시 로컬 `bootRun` + 헬스 + Flyway 로그 + OAuth 인증 endpoint 응답 캡처. 미준수 머지 차단.
 - "급해서", "간단해서", "나중에" 등 어떤 이유로도 단계 스킵 불가
-- **배포 완료 직후 회고(`/rp-retro`) 자동 시작** — 생략 불가
+- **회고(`/rp-retro`)는 사용자 명시 명령 시에만 실행** — 자동 진입 없음. 필요 시 사용자가 직접 `/rp-retro` 호출
+- **`rp-ship` 자동 머지 가드 4종 AND**: (a) CI 모든 체크 SUCCESS (b) 리뷰 증거 게이트 통과 (c) PR base 정상 감지 (d) `gh pr view --json mergeable` = `MERGEABLE`. 모두 충족 시에만 자동 머지. 하나라도 실패 → 중단 + OPEN 유지 + 사용자 보고. `--admin`·`--no-verify` 우회 금지. 비상 탈출구 `RP_SHIP_MANUAL=1` 환경변수만 자동 머지 비활성 허용
 - 워크플로우 위반 발견 시 즉시 중단하고 빠진 단계부터 재진행
 - **하네스 메타 변경 단축 경로**: `rp-init`·`rp-specify`·`rp-task`·`rp-dev` 스킵 + feat 브랜치 + `rp-prd` 간소(변경 이유·영향 파일·롤백·검증 4섹션) + 리뷰 + `rp-ship`. 완전 생략은 금지
 - **`main` 직접 수정 금지**: `main` 브랜치에서 docs·CLAUDE.md·스킬·settings 수정 감지 시 즉시 중단 + feat 브랜치 전환 요구
 - **`rp-ship` 스킬 호출 필수**: 커밋·PR·머지·배포는 수동 `git`/`gh` 우회 없이 `rp-ship` 스킬 경유. 단, `rp-ship` 스킬 내부 절차로 명시된 명령은 예외
-- **`rp-ship` PR base 자동 감지 게이트**: PR 생성/리타깃 시 프로젝트 `docs/tasks.md` → 프로젝트 `CLAUDE.md` 의 `^[\s\-\*|]*통합 브랜치:\s*`?([A-Za-z0-9/_\-]+)`?` 앵커를 순차 감지해 정확히 1건 매칭되는 값을 `--base` 로 주입. 전부 0건이면 레포 default branch. **Fail-closed**: 2건+ 매칭·공백 포함·원격 부재·detached HEAD·프로젝트 루트 미확인 시 중단. 느슨한 `feat/*` 추론 금지. 수동 오버라이드 `--base <X>` 만 감지 우회 허용. base 리타깃 시 CI 재실행 + 사용자 재승인 필수
+- **`rp-ship` PR base 자동 감지 게이트**: 메타 변경 분기(선검사 — PRD 폴더에 `review-claude-meta-r*.md` 또는 `review-codex-meta.md` 존재 시 자동 `--base main`) → 프로젝트 `docs/tasks.md` → 프로젝트 `CLAUDE.md` 의 `^[\s\-\*|]*통합 브랜치:\s*`?([A-Za-z0-9/_\-]+)`?` 앵커를 순차 감지해 정확히 1건 매칭되는 값을 `--base` 로 주입. 전부 0건이면 레포 default branch. **Fail-closed**: 2건+ 매칭·공백 포함·원격 부재·detached HEAD·프로젝트 루트 미확인 시 중단. 느슨한 `feat/*` 추론 금지. 수동 오버라이드 `--base <X>`·메타 분기만 감지 우회 허용. base 리타깃 시 CI 재실행 후 자동 머지 가드 재확인
 
 **코드리뷰 상세:** [`harness-code-review.md`](docs/harness-code-review.md)
 **Codex 추가 리뷰:** [`harness-codex-review.md`](docs/harness-codex-review.md) — 플러그인 `openai/codex-plugin-cc` (루트에 1회 설치, settings.json 선언)

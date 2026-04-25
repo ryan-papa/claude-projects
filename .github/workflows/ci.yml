@@ -44,7 +44,7 @@ jobs:
             links=$(grep -oP '\[.*?\]\(\K[^)]+' "$f" 2>/dev/null | grep -v '^http' | grep -v '^#' || true)
             dir=$(dirname "$f")
             for link in $links; do
-              target="$dir/$link"
+              target="$dir/${link%%#*}"
               if [ ! -f "$target" ] && [ ! -d "$target" ]; then
                 echo "❌ $f → $link (not found)"
                 failed=1
