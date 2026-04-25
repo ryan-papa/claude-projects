@@ -129,6 +129,7 @@ claude-projects/
 - **CI 통과 전 머지 금지** (예외 없음)
 - **feat 브랜치 직행 배포 금지**: 모든 배포는 `rp-ship` 경유 (PR → CI → main 머지 → 배포). feat/통합 브랜치 상태로 프로덕션 프로세스 기동·노출 금지. 단, 로컬 개발 서버(`uvicorn --reload`) 는 예외.
 - **프런트엔드 변경 시 Playwright E2E + axe(접근성) 검사 필수**: `rp-qa` 단계에서 둘 다 실행, 실패 시 진행 차단. E2E 테스트가 없는 UI 태스크는 완료 불가.
+- **백엔드 변경 시 4-게이트 의무**: [`harness-backend-test-policy.md`](docs/harness-backend-test-policy.md) — (1) 단위 항상 (2) 읽기 endpoint API 응답 테스트 (3) SQL/JPA/마이그레이션 변경 시 `@SpringBootTest+@Transactional` ROLLBACK 통합 테스트 (4) 컨트롤러·DI·Flyway 변경 시 로컬 `bootRun` + 헬스 + Flyway 로그 + OAuth 인증 endpoint 응답 캡처. 미준수 머지 차단.
 - "급해서", "간단해서", "나중에" 등 어떤 이유로도 단계 스킵 불가
 - **배포 완료 직후 회고(`/rp-retro`) 자동 시작** — 생략 불가
 - 워크플로우 위반 발견 시 즉시 중단하고 빠진 단계부터 재진행
@@ -143,6 +144,7 @@ claude-projects/
 **README 규칙:** [`harness-readme.md`](docs/harness-readme.md)
 **시크릿 관리:** [`security-guide.md`](docs/security-guide.md) / [`security/secrets-management.md`](docs/security/secrets-management.md)
 **DB 스타일:** [`harness-db.md`](docs/harness-db.md) — 테이블/컬럼/인덱스/ENUM COMMENT 규칙
+**백엔드 테스트 정책:** [`harness-backend-test-policy.md`](docs/harness-backend-test-policy.md) — 4-게이트 (단위·GET API·DB 통합·bootRun)
 
 ## Token Efficiency
 
