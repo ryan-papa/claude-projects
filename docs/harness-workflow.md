@@ -5,40 +5,30 @@
 ```
 사용자 기능 전달
   ↓
-▶ [1] 프로젝트 초기화              → /rp-init           [Sonnet]
+▶ [1] 프로젝트 초기화              → /rp-init
   ↓
-▶ [2] 구체화 (도메인 → 기술, 질문)  → /rp-specify        [Opus]
+▶ [2] 구체화 (도메인 → 기술, 질문)  → /rp-specify
   ↓
-▶ [3] PRD 작성                     → /rp-prd            [Opus]
+▶ [3] PRD 작성                     → /rp-prd
   ↓
-▶ [4] 기획 리뷰 ← 최대 3회         → /rp-plan-review  → /codex:review --wait (1회)   [Sonnet]
+▶ [4] 기획 리뷰 ← 최대 3회         → /rp-plan-review  → /codex:review --wait (1회)
   ↓
-▶ [5] 엔지니어링 리뷰 ← 최대 3회   → /rp-eng-review   → /codex:review --wait (1회)   [Sonnet]
+▶ [5] 엔지니어링 리뷰 ← 최대 3회   → /rp-eng-review   → /codex:review --wait (1회)
   ↓ 점수 만족 시 바로 개발 진입 (사용자 승인 생략)
-▶ [6] 태스크 분해                   → /rp-task          [Sonnet]
+▶ [6] 태스크 분해                   → /rp-task
   ↓
-▶ [7] 개발 (태스크별 반복)           → /rp-dev           [Sonnet]
+▶ [7] 개발 (태스크별 반복)           → /rp-dev
   ↓
-▶ [8] QA / 콘텐츠 검수              → /rp-qa            [Sonnet]
+▶ [8] QA / 콘텐츠 검수              → /rp-qa
   ↓
-▶ [9] 코드 리뷰 (7항목)             → /rp-code-review  → /codex:review --wait --base main (1회)  [Sonnet]
+▶ [9] 코드 리뷰 (7항목)             → /rp-code-review  → /codex:review --wait --base main (1회)
   ↓
-▶ [10] 산출물 보고 (자동 진행)                          [Sonnet]
+▶ [10] 산출물 보고 (자동 진행)
   ↓
-▶ [11] 커밋 → PR → CI → **자동 머지(가드 4종 AND)** → 배포 → /rp-ship    [Sonnet]
+▶ [11] 커밋 → PR → CI → **자동 머지(가드 4종 AND)** → 배포 → /rp-ship
   ↓
-(선택) [12] 회고 — 사용자 명시 명령 시에만 실행 → /rp-retro             [Sonnet]
+(선택) [12] 회고 — 사용자 명시 명령 시에만 실행 → /rp-retro
 ```
-
-**모델 선택 정책 (권장):**
-
-| 단계 | 모델 | 이유 |
-|:-:|:--:|---|
-| 2 (rp-specify) | **Opus** | 신규 도메인 추론, 질문 설계, 사용자 의도 정합 |
-| 3 (rp-prd) | **Opus** | 비목표·리스크·테스트 매트릭스 종합 사고, 하나라도 빠지면 후공정 손실 큼 |
-| 그 외 전부 | **Sonnet** | 채점·코드 패턴·자동화·문서 — Sonnet 의 속도·비용·일관성 우위 |
-
-사용자가 `/model sonnet` 또는 `/model opus` 슬래시로 단계 진입 시 직접 전환. 강제 전환 자동화는 별도 후속.
 
 **상태 메시지:** 진입 `▶ [N] 단계명...`, 완료 `✓ [N] 단계명 완료`
 
