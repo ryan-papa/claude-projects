@@ -95,15 +95,24 @@ claude-projects/
 
 → [`docs/harness-workflow.md`](docs/harness-workflow.md)
 
-| 단계 | 스킬 | 내용 |
-|:----:|------|------|
-| 1~5 | `rp-init` ~ `rp-eng-review` | 초기화 → 구체화 → PRD → 기획리뷰 → 엔지니어링리뷰 (**4·5 Codex 추가 리뷰 1회**) | [`harness-prd.md`](docs/harness-prd.md) |
-| 6~7 | `rp-task`, `rp-dev` | 태스크 분해 → 개발 | [`harness-dev.md`](docs/harness-dev.md) |
-| 8 | `rp-qa` | QA / 콘텐츠 검수 | [`harness-qa.md`](docs/harness-qa.md) |
-| 9 | `rp-code-review` | 코드 리뷰 (7항목, 최저 점수제, **Codex 추가 리뷰 1회**) | [`harness-code-review.md`](docs/harness-code-review.md) |
-| 10 | — | 산출물 보고 → 커밋·PR 자동 진행 | [`harness-ship.md`](docs/harness-ship.md) |
-| 11 | `rp-ship` | 커밋 → PR → CI → 머지 → 배포 | [`harness-ship.md`](docs/harness-ship.md) |
-| 12 | `rp-retro` | 회고 (절차 준수 + 효율성 + 규칙 개선) | [`skills/rp-retro.md`](docs/skills/rp-retro.md) |
+| 단계 | 스킬 | 권장 모델 | 내용 |
+|:----:|------|:--:|------|
+| 1 | `rp-init` | Sonnet | 초기화 |
+| 2 | `rp-specify` | **Opus** | 구체화 (신규 도메인 추론) |
+| 3 | `rp-prd` | **Opus** | PRD 작성 (종합 사고) |
+| 4 | `rp-plan-review` | Sonnet | 기획 리뷰 (**Codex 추가 1회**) |
+| 5 | `rp-eng-review` | Sonnet | 엔지니어링 리뷰 (**Codex 추가 1회**) |
+| 6 | `rp-task` | Sonnet | 태스크 분해 |
+| 7 | `rp-dev` | Sonnet | 개발 |
+| 8 | `rp-qa` | Sonnet | QA / 콘텐츠 검수 |
+| 9 | `rp-code-review` | Sonnet | 코드 리뷰 (7항목, **Codex 추가 1회**) |
+| 10 | — | Sonnet | 산출물 보고 → 커밋·PR 자동 진행 |
+| 11 | `rp-ship` | Sonnet | 커밋 → PR → CI → 머지 → 배포 |
+| 12 | `rp-retro` | Sonnet | 회고 |
+
+**모델 선택 정책:** `rp-specify`·`rp-prd` 만 **Opus**, 그 외 모든 단계는 **Sonnet** 권장. 비용·속도 절감 + Opus 의 추론 우위는 신규 도메인 구체화·PRD 초안에 집중. 사용자가 `/model sonnet` 또는 `/model opus` 슬래시 커맨드로 단계 전환 시 즉시 전환. 본 정책은 **권장**이며 강제 전환 자동화는 별도 후속.
+
+**상세 표·근거:** [`docs/harness-workflow.md`](docs/harness-workflow.md)
 
 **오케스트레이터:**
 - `rp-workflow` — 신규 프로젝트·기능 (init부터 전 단계)
