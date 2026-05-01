@@ -32,9 +32,25 @@
 
 **상태 메시지:** 진입 `▶ [N] 단계명...`, 완료 `✓ [N] 단계명 완료`
 
+**스킬 인덱스:**
+
+| # | 단계 | 스킬 파일 |
+|:-:|------|----------|
+| 1 | 프로젝트 초기화 | [`skills/rp-init.md`](skills/rp-init.md) |
+| 2 | 구체화 | [`skills/rp-specify.md`](skills/rp-specify.md) |
+| 3 | PRD 작성 | [`skills/rp-prd.md`](skills/rp-prd.md) |
+| 4 | 기획 리뷰 | [`skills/rp-plan-review.md`](skills/rp-plan-review.md) |
+| 5 | 엔지니어링 리뷰 | [`skills/rp-eng-review.md`](skills/rp-eng-review.md) |
+| 6 | 태스크 분해 | [`skills/rp-task.md`](skills/rp-task.md) |
+| 7 | 개발 | [`skills/rp-dev.md`](skills/rp-dev.md) |
+| 8 | QA / 콘텐츠 검수 | [`skills/rp-qa.md`](skills/rp-qa.md) |
+| 9 | 코드 리뷰 | [`skills/rp-code-review.md`](skills/rp-code-review.md) |
+| 11 | 커밋·PR·머지·배포 | [`skills/rp-ship.md`](skills/rp-ship.md) |
+| 12 | 회고 | [`skills/rp-retro.md`](skills/rp-retro.md) |
+
 **오케스트레이터:**
-- `/rp-workflow` — 신규 프로젝트·기능 (init부터 전 단계)
-- `/rp-amend` — 기존 프로젝트에 기능 수정·추가 (init 스킵, specify부터)
+- [`skills/rp-workflow.md`](skills/rp-workflow.md) — 신규 프로젝트·기능 (init부터 전 단계)
+- [`skills/rp-amend.md`](skills/rp-amend.md) — 기존 프로젝트에 기능 수정·추가 (init 스킵, specify부터)
 
 ---
 
