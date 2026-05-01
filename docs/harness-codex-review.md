@@ -1,6 +1,6 @@
 # Harness Codex Review
 
-Claude 리뷰 이후 Codex 플러그인(`openai/codex-plugin-cc`)으로 **추가 리뷰 1회**를 포그라운드에서 순차 실행한다.
+Claude 리뷰와 Codex 플러그인(`openai/codex-plugin-cc`) 추가 리뷰를 **1차 병렬**로 실행한다. Codex는 1회만 호출되며, Claude는 미달 시 최대 2회 추가 재실행(총 3회).
 
 ## 적용 단계
 
@@ -19,9 +19,9 @@ Claude 리뷰 이후 Codex 플러그인(`openai/codex-plugin-cc`)으로 **추가
 
 | 항목 | 규칙 |
 |------|------|
-| 실행 순서 | Claude 리뷰 **완료 후** Codex 실행 (직렬) |
-| 모드 | `--wait` 포그라운드, 완료까지 동기 대기 |
-| 회차 | **1회만** 실행 (재시도 없음) |
+| 실행 순서 | Claude 리뷰 서브에이전트와 Codex를 **1차 병렬** 실행 (메인이 동일 메시지에서 Agent 툴 + Bash `codex review`를 두 tool_use로 동시 발사). Claude 미달 시 2·3차 재실행은 Claude만 (Codex 재호출 금지) |
+| 모드 | `--wait` 포그라운드 또는 `codex review --uncommitted`, 완료까지 동기 대기 |
+| 회차 | Codex는 **1차 1회만** 실행 (재시도 없음). Claude는 최대 3회 |
 | 점수화 | **없음** — Codex는 점수 산출·통과 판정 안 함 |
 | 반영 규칙 | 지적 심각도 **High / Critical**만 수동 반영. Medium 이하는 참고용 |
 | 결과 저장 | Codex stdout 전체를 경로에 그대로 기록 |
@@ -31,26 +31,36 @@ Claude 리뷰 이후 Codex 플러그인(`openai/codex-plugin-cc`)으로 **추가
 | 실행 후 cwd 복귀 | Codex 종료 직후(정상/SKIPPED/중단 무관) `cd "$SAVED_CWD"` + `pwd` 검증. 복귀 실패(원래 디렉터리 삭제 등) 시 중단 + 사용자 보고. 누락 시 다음 단계 진행 금지 |
 | Hang 타임아웃 | wall-clock **300초** 초과 시 SIGTERM → 비-스킵 = 중단 (사용자 보고). 회고에서 조정 가능 |
 
-## 직렬 실행 패턴
+## 병렬 실행 패턴
 
 ```
 [단계 N 진입]
-  ↓
-Claude 리뷰 서브에이전트 실행 (기존 점수제 판정)
-  ↓
-Claude 통과 확인
   ↓
 SAVED_CWD=$(pwd)  ← 시작 cwd 캡처
   ↓
 PRD 프로젝트 루트로 cd (이미 일치 시 생략)
   ↓
-Codex 포그라운드 실행 (1회, 300초 타임아웃)
+1차 병렬 발사 (메인이 동일 메시지에서 두 tool_use 동시 호출):
+  ├─ Agent 툴: Claude 서브에이전트 (기존 점수제 채점)
+  └─ Bash: codex review --uncommitted (300초 타임아웃)
   ↓
-exit code + stderr/stdout 분석
-  ├─ 정상 종료 → stdout 저장 → cd "$SAVED_CWD" → High/Critical 반영 → 다음 단계
-  ├─ 토큰/기능 신호 패턴 매칭 → SKIPPED 헤더로 저장 → cd "$SAVED_CWD" → 다음 단계
-  └─ 그 외 비정상 종료 → cd "$SAVED_CWD" → 워크플로우 중단 → 사용자 보고
+양쪽 결과 수신 → cd "$SAVED_CWD"
+  ↓
+1차 결과 매트릭스 판정 (아래 표)
+  ├─ 통과 → 다음 단계
+  └─ 미달 → 통합 반영(Codex High/Critical + Claude 지적) → Claude 재실행 (Codex 재호출 금지, 최대 2회 추가)
 ```
+
+### 1차 결과 매트릭스 (6분기)
+
+| Claude | Codex 정상 | Codex SKIP (토큰/기능) | Codex 비-스킵 비정상 |
+|--------|-----------|----------------------|--------------------|
+| **통과** (평균 ≥8.0 / 최저 ≥7) | High/Critical 반영 → 다음 단계 | SKIPPED 헤더 저장 → 다음 단계 | 워크플로우 중단 + 사용자 보고 (Claude 결과는 회차 카운트로 저장) |
+| **미달** | Codex High/Critical + Claude 지적 통합 반영 → Claude 재실행 (Codex 재호출 금지) | Claude 지적만 반영 → Claude 재실행 | 워크플로우 중단 + 사용자 보고 |
+
+통과 조건: **Claude 점수 통과 AND Codex High/Critical 반영 완료** (Codex SKIP 시 Claude 점수만으로 판정).
+
+2·3차 재실행 원칙: Codex는 **1차 1회만**. 메인은 재실행 PRD/코드에 1차 Codex High/Critical 반영이 포함되었는지 검증 후 새 서브에이전트 호출.
 
 ## High / Critical 반영 절차
 

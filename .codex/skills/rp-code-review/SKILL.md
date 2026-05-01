@@ -85,14 +85,15 @@ Codex-led 코드 리뷰는 **반드시 `spawn_agent` 서브에이전트로 실�
 - 3회 후 < 7.0 → 사용자에게 추가 사이클 여부 확인
 - 3회 후 7.0~8.0 → 통과 처리
 
-## Codex 추가 리뷰 (Codex-led 리뷰 통과 후 1회)
+## Codex 추가 리뷰 (Claude와 1차 병렬 1회)
 
-Codex-led 코드 리뷰로 수행:
+Claude 코드 리뷰 서브에이전트와 **동시** 발사 (메인이 동일 메시지에서 두 tool_use):
 
-1. **Codex 실행 전 `pwd` 확인 필수**: 출력이 해당 PRD 프로젝트 루트와 다르면 `cd`로 이동 후 재확인
-2. `Codex-led findings-first code review against main` 실행 (wall-clock 300초 타임아웃)
-3. **종료 분기**: [`../harness-codex-review.md`](../harness-codex-review.md) "직렬 실행 패턴" SSOT 참조 (정상/SKIPPED/중단 3분기 동일 적용). 본 스킬의 저장 경로는 단계 9 = `review-codex-code.md` (메타 변경은 `review-codex-meta.md`)
-4. 반영 완료(또는 SKIPPED 저장) 후 산출물 보고[10] 진입
+1. **사전 `SAVED_CWD=$(pwd)` 캡처** + PRD 루트로 `cd`
+2. `codex review --base main` 실행 (wall-clock 300초 타임아웃). 종료 후 `cd "$SAVED_CWD"`
+3. **매트릭스 판정**: [`../harness-codex-review.md`](../harness-codex-review.md) "1차 결과 매트릭스" SSOT 참조. 저장 경로는 단계 9 = `review-codex-code.md` (메타 변경은 `review-codex-meta.md`)
+4. **통과**: Claude 점수제 통과 AND Codex High/Critical 반영 완료 → 산출물 보고[10] 진입
+5. **미달**: 통합 반영 → Claude만 재실행 (Codex 재호출 금지, 최대 2회 추가)
 
 ## 이슈 처리
 
