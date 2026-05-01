@@ -23,10 +23,7 @@ argument-hint: '[대상 PRD 경로]'
 6. **Claude 통과 후 Codex 추가 리뷰 (1회)**:
    - **Codex 실행 전 `pwd` 확인 필수**: 출력이 해당 PRD 프로젝트 루트와 다르면 `cd`로 이동 후 재확인
    - `/codex:review --wait` 실행 (wall-clock 300초 타임아웃)
-   - **종료 분기**:
-     - 정상 종료 → stdout을 `<project-root>/docs/prd/[feature]/review-codex-eng.md`에 저장 (하네스 메타 변경은 `review-codex-meta.md`). High/Critical 반영 후 동일 파일 `## 반영` 섹션 기록
-     - **토큰/기능 신호 매칭 (AND 조건 충족)** → SKIPPED 헤더 + 7항목으로 동일 경로 저장. 반영 대상 없음. 패턴 표·판정 규칙은 [`../harness-codex-review.md`](../harness-codex-review.md) "토큰/기능 이슈 스킵" 섹션 SSOT 참조
-     - 그 외 비정상 종료 (네트워크·login·플러그인·hang·매칭 0건) → 워크플로우 중단 + 사용자 보고. 자동 재시도 금지
+   - **종료 분기**: [`../harness-codex-review.md`](../harness-codex-review.md) "직렬 실행 패턴" SSOT 참조 (정상/SKIPPED/중단 3분기 동일 적용). 본 스킬의 저장 경로는 단계 5 = `review-codex-eng.md` (메타 변경은 `review-codex-meta.md`)
 7. 반영 완료(또는 SKIPPED 저장) 후 다음 단계 진입
 
 ## 평가 항목
