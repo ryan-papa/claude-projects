@@ -54,12 +54,10 @@ CI 통과 대기
 |------|------|
 | CI 없을 때 | PR 생성 시점에 "CI가 없습니다. 추가할까요?" 추천 |
 | 추가 여부 | 사용자 선택 시에만 추가 |
-| 강제 머지 | `--admin` 플래그 사용 **금지** |
-| **머지 조건** | **CI 통과 전 머지 금지** (예외 없음) |
 | CI 없이 머지 | 사용자에게 수동 머지 안내 |
 | **동일 브랜치 재작업** | 기존 PR이 MERGED/CLOSED면 **신규 PR 생성** (OPEN PR만 재사용) |
-| **리뷰 증거 파일 게이트** | `rp-ship` 사전 체크에서 `review-claude-*-r*.md` · `review-codex-*.md` 전부 존재 확인. 하나라도 누락 시 ship 중단 |
-| **PR base 자동 감지** | 감지 우선순위: (1) `--base <X>` 수동 오버라이드 (2) 프로젝트 `docs/tasks.md` 의 앵커 `^[\s\-\*|]*통합 브랜치:` 1건 (3) 프로젝트 `CLAUDE.md` 의 동일 앵커 1건 (4) 레포 default branch. Fail-closed: 2건+ 매칭·원격 부재·detached HEAD·프로젝트 루트 미확인. 느슨한 `feat/*` 추론 금지. base 리타깃 시 CI 재실행 + 재승인 필수 |
+
+> CI 통과 전 머지 금지 · `--admin`/`--no-verify` 우회 금지 · 자동 머지 가드 4종 AND · 리뷰 증거 게이트 · PR base 자동 감지(fail-closed) → 본문은 [`harness-absolute-rules.md`](harness-absolute-rules.md) SSOT 참조
 
 ## 머지 후 검증
 
