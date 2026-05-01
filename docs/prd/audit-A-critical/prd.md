@@ -18,7 +18,7 @@
 | 파일 | 변경 내용 |
 |------|----------|
 | `CLAUDE.md` | (1) `## Project Structure` 트리 누락 5건 추가 (2) 절대 규칙 3개 bullet → 표/sub-bullet 분해 |
-| `docs/harness-workflow.md` | 12단계 표 각 행에 `[/rp-xxx](skills/rp-xxx.md)` 마크다운 링크 보강 |
+| `docs/harness-workflow.md` | 12단계 표 각 행에 마크다운 링크 보강 (예: `[/rp-init]` 형태로 각 단계의 실제 스킬 파일을 참조) |
 
 신규 파일·디렉터리 추가 없음. 스킬 본문 변경 없음.
 

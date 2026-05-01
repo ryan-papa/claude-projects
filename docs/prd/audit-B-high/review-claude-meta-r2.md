@@ -17,7 +17,7 @@
 | 3 | 200줄 한도 | 10 | 전 파일 ≤ 200. CLAUDE.md 151, absolute-rules 60, workflow 151, ship 110, rp-ship 157, rp-qa 72, plan-review 54, eng-review 50, code-review 111, codex-review 150 |
 | 4 | 정보 보존 | 9 | HEAD 원본 CLAUDE.md L130~150 → `harness-absolute-rules.md` 항목별 비교. 리뷰 서브에이전트·증거 저장·QA 게이트·Codex 필수·README 검증·CI 게이트·feat 직행 금지·main 보호·rp-ship 필수·자동 머지 4종 AND·base 감지·메타 단축·회고 명시 호출 모두 보존. 일부 줄바꿈 구조 변경 있으나 의미 손실 없음 |
 | 5 | Surgical | 10 | PRD 영향 파일 표(L20~31)와 실 변경 파일 일치. 무관 리팩터·재포맷·인접 코드 개선 없음. CLAUDE.md 트리 신규 1행 + 절대 규칙 섹션 압축만 |
-| 6 | 진입점 가시성 | 9 | CLAUDE.md L136 `**⛔ 하네스 절대 규칙:** [harness-absolute-rules.md](docs/harness-absolute-rules.md) (SSOT, 예외 없음)` 명시 노출. `harness-workflow.md` L77 핵심 규칙명(QA/머지/메타/rp-ship/main 보호) 단어 단위로 잔류해 검색 가능. 트리에 신규 파일 1행 추가 |
+| 6 | 진입점 가시성 | 9 | CLAUDE.md L136 절대 규칙 SSOT 링크 명시 노출 (`harness-absolute-rules.md` 참조). `harness-workflow.md` L77 핵심 규칙명(QA/머지/메타/rp-ship/main 보호) 단어 단위로 잔류해 검색 가능. 트리에 신규 파일 1행 추가 |
 
 ## 핵심 지적
 
