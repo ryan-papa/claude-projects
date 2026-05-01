@@ -142,15 +142,12 @@ PR 생성 시점에 .github/workflows/ 확인
 
 ## 절대 규칙
 
-- **CI 통과 전 머지 금지** (예외 없음)
-- `--admin`·`--no-verify` 플래그로 강제 머지 **금지**
-- **자동 머지 가드 4종 AND**: 위 "자동 머지 (가드 4종 AND)" 의 (a)~(d) 모두 충족 시에만 머지. 하나라도 실패 → 중단 + OPEN 유지 + 사용자 보고. 머지 전략 `--merge` 고정.
-- **비상 탈출구**: `RP_SHIP_MANUAL=1` 환경변수만 자동 머지 비활성 우회 허용
-- **동일 브랜치 재PR**: MERGED/CLOSED된 PR이 있어도 신규 PR을 생성 (OPEN PR이 있을 때만 재사용)
-- **feat·통합 브랜치 직접 배포 금지**: 프로덕션 프로세스(서버 재기동, 트래픽 수신) 는 **main 머지 이후**에만. 로컬 개발 서버(dev/`--reload`)는 예외.
-- **QA·코드리뷰 이수 확인 게이트**: PR 생성 직전 `rp-qa` 와 `rp-code-review` 가 모두 완료 상태인지 체크. 하나라도 미완이면 ship 중단하고 해당 단계로 복귀. (메타 변경 단축 경로는 본 규칙 적용 외)
-- **리뷰 증거 파일 게이트**: 위 "사전 체크 게이트" 통과 없이 커밋 금지. 생략·우회 금지.
-- **PR base 자동 감지 게이트**: 위 "PR base 자동 감지" 순서·fail-closed 조건을 모두 적용. 감지 생략·느슨한 브랜치 추론 금지. 수동 오버라이드(`--base <X>`)·메타 분기(자동 `--base main`) 만 예외. base 리타깃 후에는 CI 재실행 후 자동 머지 가드 재확인.
+→ **SSOT**: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) — CI 통과 전 머지 금지, 자동 머지 가드 4종 AND, 리뷰 증거 게이트, PR base 자동 감지(fail-closed), feat 브랜치 직행 배포 금지, rp-ship 필수 호출, 비상 탈출구 `RP_SHIP_MANUAL=1`. 본문 중복 금지.
+
+**본 스킬 한정 보조 규칙:**
+- **머지 전략**: `--merge` 고정 (squash/rebase 금지)
+- **동일 브랜치 재PR**: MERGED/CLOSED된 PR이 있어도 신규 PR 생성 (OPEN PR만 재사용)
+- **QA·코드리뷰 이수 확인**: PR 생성 직전 `rp-qa`·`rp-code-review` 완료 상태 체크. 미완이면 ship 중단 후 해당 단계 복귀 (메타 단축 경로는 본 규칙 적용 외)
 
 ## 머지 후 검증
 

@@ -180,3 +180,5 @@
 ## 자동화 분리
 
 린트·포맷팅·빌드 → **CI 자동화**. 리뷰어 시간은 설계·정확성·테스트 품질에 집중.
+
+**관련 스킬:** [`skills/rp-code-review.md`](skills/rp-code-review.md)

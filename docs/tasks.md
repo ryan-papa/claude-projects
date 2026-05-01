@@ -1,6 +1,6 @@
 # Tasks: SECURITY 가이드 + rp-init sops 자동화
 
-PRD: `docs/prd/20260417_182747_security-guide_478d1984.md`
+PRD: [`docs/prd/security-guide-init/prd.md`](prd/security-guide-init/prd.md)
 통합 브랜치: `feat/security-guide`
 
 ## 태스크 목록

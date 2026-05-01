@@ -14,7 +14,7 @@ argument-hint: '[대상 PRD 경로]'
 
 ## 절차
 
-1. **⛔ Claude 엔지 리뷰는 반드시 Agent 툴의 서브에이전트로 실행** (`subagent_type=general-purpose`). 메인 에이전트의 셀프 채점 **금지**. 서브에이전트 프롬프트: (a) PRD + 상위 CLAUDE.md·harness-db.md 참고 파일 경로, (b) 5항목 채점 기준, (c) 독립 판정 지시, (d) **역할 경계: Claude 채점만. Codex 실행·저장 금지**
+1. **⛔ Claude 엔지 리뷰는 반드시 Agent 툴의 서브에이전트로 실행** (`subagent_type=general-purpose`). 메인 셀프 채점 **금지**. 서브에이전트 프롬프트 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) PRD + 상위 CLAUDE.md·harness-db.md 참고 (b) 5항목 (c)·(d) SSOT 그대로
 2. 메인 에이전트가 서브에이전트 응답(점수·기술 리스크·대안)을 수신
 3. 메인 에이전트: **결과를 `<project-root>/docs/prd/[feature]/review-claude-eng-r{N}.md`로 저장** (N=회차, 덮어쓰기 금지) 후 판정
    - **하네스 메타 변경(간소 PRD)**: 파일명은 `review-claude-meta-r{N}.md` 단일 리뷰로 대체. Codex 저장도 `review-codex-meta.md`
@@ -23,10 +23,7 @@ argument-hint: '[대상 PRD 경로]'
 6. **Claude 통과 후 Codex 추가 리뷰 (1회)**:
    - **Codex 실행 전 `pwd` 확인 필수**: 출력이 해당 PRD 프로젝트 루트와 다르면 `cd`로 이동 후 재확인
    - `/codex:review --wait` 실행 (wall-clock 300초 타임아웃)
-   - **종료 분기**:
-     - 정상 종료 → stdout을 `<project-root>/docs/prd/[feature]/review-codex-eng.md`에 저장 (하네스 메타 변경은 `review-codex-meta.md`). High/Critical 반영 후 동일 파일 `## 반영` 섹션 기록
-     - **토큰/기능 신호 매칭 (AND 조건 충족)** → SKIPPED 헤더 + 7항목으로 동일 경로 저장. 반영 대상 없음. 패턴 표·판정 규칙은 [`../harness-codex-review.md`](../harness-codex-review.md) "토큰/기능 이슈 스킵" 섹션 SSOT 참조
-     - 그 외 비정상 종료 (네트워크·login·플러그인·hang·매칭 0건) → 워크플로우 중단 + 사용자 보고. 자동 재시도 금지
+   - **종료 분기**: [`../harness-codex-review.md`](../harness-codex-review.md) "직렬 실행 패턴" SSOT 참조 (정상/SKIPPED/중단 3분기 동일 적용). 본 스킬의 저장 경로는 단계 5 = `review-codex-eng.md` (메타 변경은 `review-codex-meta.md`)
 7. 반영 완료(또는 SKIPPED 저장) 후 다음 단계 진입
 
 ## 평가 항목

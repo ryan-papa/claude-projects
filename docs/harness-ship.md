@@ -1,5 +1,7 @@
 # Harness: 산출물 보고 + 배포
 
+본 문서는 **정책·이유** SSOT. 실행 절차(커밋·PR·CI·머지·README 검증·머지 후 검증)는 [`skills/rp-ship.md`](skills/rp-ship.md) SSOT.
+
 ## 산출물 보고 → 사용자 승인
 
 QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 보고한다.
@@ -12,94 +14,40 @@ QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 
 
 **⛔ 사용자 승인 없이 배포(머지) 진행 금지** — 커밋·PR은 산출물 보고 후 자동 수행
 
-## 커밋 → PR → 배포
+## 커밋 → PR → 배포 (실행 절차)
 
-산출물 보고 후 `/rp-ship` 자동 진입:
+→ [`skills/rp-ship.md`](skills/rp-ship.md) "절차" 섹션 SSOT (사전 체크 게이트, PR base 결정, 자동 머지 가드 4종 AND, 비상 탈출구 포함)
 
-```
-⛔ 사전 체크 게이트: docs/prd/[feature]/review-claude-*-r*.md + review-codex-*.md 존재 검증
-  ├── 누락 → ship 중단, 해당 리뷰 단계 복귀
-  └── 전부 존재 → 다음 진행
-  ↓
-PR base 결정 (fail-closed)
-  ├── 수동 오버라이드 `--base <X>` → <X> 사용
-  ├── tasks.md `통합 브랜치:` 앵커 1건 매칭 → 사용
-  ├── CLAUDE.md `통합 브랜치:` 앵커 1건 매칭 → 사용
-  ├── 전부 0건 → 레포 default branch 폴백
-  └── 2건+ 매칭 · 원격 부재 · detached HEAD · 프로젝트 루트 미확인 → ship 중단
-  ↓
-git add + commit (변경 파일만)
-  ↓
-README 검증 (5항목, 평균 8.0+)
-  ↓
-git push -u origin [branch]
-  ↓
-기존 PR 상태 확인 (gh pr list --head [branch] --state all --json number,state,baseRefName)
-  ├── OPEN PR + base 일치 → 재사용
-  ├── OPEN PR + base 불일치 → gh pr edit --base <detected> + CI 재실행 + 사용자 재승인
-  └── OPEN PR 없음 → gh pr create --base <detected> (신규 PR)
-  ↓
-CI 통과 대기
-  ↓
-⏸ 사용자에게 배포 승인 요청 (PR URL + CI 결과 보고)
-  ↓
-승인 후 gh pr merge --merge
-  ↓
-배포 워크플로우 완료 확인 → 라이브 URL 안내
-```
-
-## CI 규칙
+## CI 정책
 
 | 규칙 | 내용 |
 |------|------|
 | CI 없을 때 | PR 생성 시점에 "CI가 없습니다. 추가할까요?" 추천 |
 | 추가 여부 | 사용자 선택 시에만 추가 |
-| 강제 머지 | `--admin` 플래그 사용 **금지** |
-| **머지 조건** | **CI 통과 전 머지 금지** (예외 없음) |
 | CI 없이 머지 | 사용자에게 수동 머지 안내 |
 | **동일 브랜치 재작업** | 기존 PR이 MERGED/CLOSED면 **신규 PR 생성** (OPEN PR만 재사용) |
-| **리뷰 증거 파일 게이트** | `rp-ship` 사전 체크에서 `review-claude-*-r*.md` · `review-codex-*.md` 전부 존재 확인. 하나라도 누락 시 ship 중단 |
-| **PR base 자동 감지** | 감지 우선순위: (1) `--base <X>` 수동 오버라이드 (2) 프로젝트 `docs/tasks.md` 의 앵커 `^[\s\-\*|]*통합 브랜치:` 1건 (3) 프로젝트 `CLAUDE.md` 의 동일 앵커 1건 (4) 레포 default branch. Fail-closed: 2건+ 매칭·원격 부재·detached HEAD·프로젝트 루트 미확인. 느슨한 `feat/*` 추론 금지. base 리타깃 시 CI 재실행 + 재승인 필수 |
 
-## 머지 후 검증
+> CI 통과 전 머지 금지 · `--admin`/`--no-verify` 우회 금지 · 자동 머지 가드 4종 AND · 리뷰 증거 게이트 · PR base 자동 감지(fail-closed) → 본문은 [`harness-absolute-rules.md`](harness-absolute-rules.md) SSOT 참조
 
-- `git log [target-branch] --oneline -3`으로 커밋 반영 확인
-- 배포 워크플로우 상태 확인: `gh run list --limit 1`
+## 푸시 전 README 검증 (정책)
+
+모든 push 전 README.md 가 프로젝트 현 상태와 일치해야 한다.
+
+| 항목 | 정책 |
+|------|------|
+| 검증 5항목 | 프로젝트 개요·디렉토리 구조·설치/실행·기능 목록·기술 스택 |
+| 통과 기준 | 평균 ≥ 8.0 |
+| 실패 시 | README 수정 → 재검증 (최대 3회) → 3회 실패 시 사용자 판단 위임 |
+| 미통과 효과 | **push 차단** |
+
+→ 실행 절차: [`skills/rp-ship.md`](skills/rp-ship.md) "README 검증" SSOT
+
+## 머지 후 정책
+
+- 배포 완료 메시지 직후 `/rp-retro` 자동 진입 **금지** ([`harness-absolute-rules.md`](harness-absolute-rules.md): 회고는 사용자 명령 시에만)
 - 배포 완료 시 라이브 URL 사용자에게 전달
-- **배포 완료 메시지 직후 `/rp-retro` 자동 진입** (생략 불가)
 
-## 푸시 전 README 검증 (필수)
-
-**모든 push 전에** README.md가 현재 프로젝트 상태와 일치하는지 검증한다.
-
-### 검증 항목 (5항목, 각 10점 만점)
-
-| # | 항목 | 검증 내용 |
-|---|------|-----------|
-| 1 | 프로젝트 개요 | 현재 프로젝트 목적/기능과 README 설명 일치 |
-| 2 | 디렉토리 구조 | 주요 폴더/파일이 README에 반영 |
-| 3 | 설치/실행 방법 | 실제 의존성·스크립트와 README 안내 일치 |
-| 4 | 기능 목록 | 구현된 주요 기능이 README에 기재 |
-| 5 | 기술 스택 | 실제 사용 기술과 README 명시 일치 |
-
-### 통과 기준
-
-- **평균 8.0점 이상**: Pass → push 진행
-- **평균 8.0점 미만**: Fail → README 수정 후 재검증
-
-### 실패 시 절차
-
-```
-README 검증 실패 (평균 < 8.0)
-  ↓
-미달 항목 출력 + README 자동 수정
-  ↓
-재검증 (최대 3회 반복)
-  ↓
-3회 실패 시 → 사용자에게 판단 위임 (강제 push 여부 확인)
-```
-
-**⛔ README 검증 미통과 시 push 차단** (3회 재시도 후 사용자 판단)
+→ 실행 절차: [`skills/rp-ship.md`](skills/rp-ship.md) "머지 후 검증" SSOT
 
 ## 최종 산출물
 
