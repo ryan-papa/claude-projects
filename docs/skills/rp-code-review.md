@@ -42,7 +42,7 @@ git diff --cached | grep -iE \
 
 Claude 코드 리뷰는 **반드시 Agent 툴의 서브에이전트로 실행** (`subagent_type=general-purpose`). 메인 에이전트 셀프 채점 **금지**.
 
-**서브에이전트 프롬프트**: (a) 리뷰 대상 diff·브랜치·파일 경로, (b) 7항목 채점 기준 + PR 유형별 포커스, (c) 독립 판정 지시, (d) **역할 경계**: Claude 채점만. Codex 실행·저장 금지.
+**서브에이전트 프롬프트** 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) 리뷰 대상 diff·브랜치·파일 경로 (b) 7항목 + PR 유형별 포커스 (c)·(d) SSOT 그대로.
 
 **증거 저장**: 메인 에이전트가 서브에이전트 결과를 `<project-root>/docs/prd/[feature]/review-claude-code-r{N}.md`로 저장 (N=회차, 덮어쓰기 금지).
 

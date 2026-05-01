@@ -12,6 +12,7 @@
 - **[리뷰 단계 서브에이전트 필수]** `/rp-plan-review`·`/rp-eng-review`·`/rp-code-review` Claude 리뷰 적용:
   - 실행 주체: Agent 툴 분리 서브에이전트(`subagent_type=general-purpose`). 메인 셀프 채점 **전면 금지** (이해충돌·관성 편향 방지)
   - 역할 분리: 서브 = Claude 채점, 메인 = `/codex:review` 실행·결과 저장
+  - 서브에이전트 프롬프트 4 필수 항목(SSOT): (a) 대상 파일 경로 + 참고 파일, (b) 채점 기준(단계별 항목 수: 4=9, 5=5, 9=7), (c) 독립 판정 지시(메인 컨텍스트 미공유), (d) 역할 경계: 본 단계 채점만 수행 — **Claude 측 적용 시 Codex 실행·저장 금지 / Codex 측 적용 시 `review-claude-*.md` 합성 금지** (`.codex/skills/` 어댑터 노트 동시 참조). **스킬 파일은 본 (a)~(d) 본문 중복 금지, 링크 참조만 허용**
   - Fallback: 기술적 실패 최대 2회 재호출 → 지속 시 사용자 즉시 보고. 셀프 채점 우회 금지
   - 평가 미달: PRD 재작성 후 새 서브에이전트 재실행 (기술 실패와 구분)
   - 증거 저장: `<project-root>/docs/prd/[feature]/review-claude-{plan,eng,code,meta}-r{N}.md`. `{meta}` = 간소 PRD 단일 리뷰 전용. 회차별 새 파일 (덮어쓰기 금지)

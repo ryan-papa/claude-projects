@@ -14,7 +14,7 @@ argument-hint: '[대상 PRD 경로]'
 
 ## 절차
 
-1. **⛔ Claude 엔지 리뷰는 반드시 Agent 툴의 서브에이전트로 실행** (`subagent_type=general-purpose`). 메인 에이전트의 셀프 채점 **금지**. 서브에이전트 프롬프트: (a) PRD + 상위 CLAUDE.md·harness-db.md 참고 파일 경로, (b) 5항목 채점 기준, (c) 독립 판정 지시, (d) **역할 경계: Claude 채점만. Codex 실행·저장 금지**
+1. **⛔ Claude 엔지 리뷰는 반드시 Agent 툴의 서브에이전트로 실행** (`subagent_type=general-purpose`). 메인 셀프 채점 **금지**. 서브에이전트 프롬프트 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) PRD + 상위 CLAUDE.md·harness-db.md 참고 (b) 5항목 (c)·(d) SSOT 그대로
 2. 메인 에이전트가 서브에이전트 응답(점수·기술 리스크·대안)을 수신
 3. 메인 에이전트: **결과를 `<project-root>/docs/prd/[feature]/review-claude-eng-r{N}.md`로 저장** (N=회차, 덮어쓰기 금지) 후 판정
    - **하네스 메타 변경(간소 PRD)**: 파일명은 `review-claude-meta-r{N}.md` 단일 리뷰로 대체. Codex 저장도 `review-codex-meta.md`

@@ -39,16 +39,45 @@
 | Spring 설정 | `properties = {"spring.autoconfigure.exclude=", "spring.datasource.url=${POSTGRES_URL}", ...}` 으로 테스트 전용 application.yml 의 datasource 제외 우회 |
 | 환경 전파 | `build.gradle.kts` 에 `tasks.withType<Test> { environment(...) }` 로 prod DB env 패스스루 (debug only — CI 에서는 `POSTGRES_URL` 미설정으로 자동 skip) |
 | 비용 | SpringContext 1회 부팅 ~3초. 1 PR 당 1~2건 추가 권장 |
-| **fail-closed 증거 의무** | CI skip 가능성을 보완하기 위해 **로컬에서 `POSTGRES_URL=...` 셋 한 후 `./gradlew test --tests "*IntegrationTest*"` 출력 (테스트 통과 라인 + 시각) 을 `qa-smoke.md` 에 캡처**. 미캡처 시 `rp-ship` 차단. 수기 누락 방지. |
-| 회귀 가드 | "테스트 통과 → 의도 깨뜨림 → 빨간불 → 복원 → 다시 통과" 4-stroke 검증. 4 단계 모두 출력(또는 commit hash 차이) 을 `qa-smoke.md` 또는 PR description 한 곳에 1줄씩 4줄 이상 기록. 단순 "4-stroke 통과" 한 줄 금지 |
+| **fail-closed 증거 의무** | 로컬 캡처 의무 (아래 a·b·c·d) — 미캡처 시 `rp-ship` 차단 |
+| 회귀 가드 | 4-stroke 검증 (아래 1·2·3·4) — 단순 "통과" 1줄 기록 금지 |
+
+**fail-closed 캡처 절차:**
+
+| 단계 | 내용 |
+|:---:|------|
+| a | `POSTGRES_URL=... ./gradlew test --tests "*IntegrationTest*"` 실행 |
+| b | 통과 라인 + 시각을 `qa-smoke.md` 에 저장 |
+| c | CI skip 가능성 보완 (CI 는 `POSTGRES_URL` 미설정으로 자동 skip) |
+| d | 미캡처 시 `rp-ship` 차단, 수기 누락 방지 |
+
+**회귀 가드 4-stroke:**
+
+| # | 단계 | 증거 |
+|:-:|------|------|
+| 1 | 테스트 통과 | 출력 또는 commit hash |
+| 2 | 의도 깨뜨림 | 출력 또는 commit hash |
+| 3 | 빨간불 | 출력 또는 commit hash |
+| 4 | 복원 → 다시 통과 | 출력 또는 commit hash |
+
+→ `qa-smoke.md` 또는 PR description 한 곳에 1줄씩 4줄 이상 기록
 
 ### 2.4 로컬 bootRun + OAuth 수기
 
 | 항목 | 기준 |
 |---|---|
 | 적용 | 컨트롤러 추가/시그니처 변경, DI 배선 추가, Flyway V*.sql 추가, application.yml 변경 |
-| 절차 | (a) `./gradlew bootRun` (b) `curl /actuator/health` 200 UP (c) Flyway 로그 `Successfully validated N migrations` + `Schema up to date` 또는 `Successfully applied` (d) 변경 endpoint OAuth 인증 cookie 통한 실 응답 1건 캡처 — PR description 또는 `qa-smoke.md` 첨부 |
+| 절차 | 4단계 (a·b·c·d, 아래 표) |
 | 5초 내 미통과 | 즉시 디버그. 머지 전 통과 필수 |
+
+**bootRun 4단계 절차:**
+
+| # | 단계 | 결과 기준 |
+|:-:|------|----------|
+| a | `./gradlew bootRun` | 정상 기동 |
+| b | `curl /actuator/health` | 200 UP |
+| c | Flyway 로그 확인 | `Successfully validated N migrations` + `Schema up to date` 또는 `Successfully applied` |
+| d | 변경 endpoint OAuth 인증 cookie 응답 1건 캡처 | PR description 또는 `qa-smoke.md` 첨부 |
 
 ## 3. 예외 조항
 
