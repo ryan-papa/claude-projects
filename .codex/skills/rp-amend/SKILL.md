@@ -35,20 +35,16 @@ description: "기존 프로젝트에 기능 수정·추가. rp-init 스킵, rp-s
 
 ## 플로우
 
-| 순서 | 스킬 | 비고 |
-|:---:|------|------|
-| 1 | — | `rp-init` **스킵** (프로젝트 이미 존재) |
-| 2 | `/rp-specify` | **기능 단위**로 5단계 질문 전체 실행 |
-| 3 | `/rp-prd` | **Full PRD** (간소 PRD 아님) |
-| 4 | `/rp-plan-review` | Codex-led 독립 리뷰 |
-| 5 | `/rp-eng-review` | Codex-led 독립 리뷰 |
-| 6 | `/rp-task` | 기능 변경분만 태스크 분해 |
-| 7 | `/rp-dev` | feat 브랜치에서 구현 |
-| 8 | `/rp-qa` | QA·콘텐츠 검수 |
-| 9 | `/rp-code-review` | Codex-led 7항목 독립 리뷰 |
-| 10 | 산출물 보고 | 사용자 승인 |
-| 11 | `/rp-ship` | 커밋·PR·머지·배포 |
-| 12 | `/rp-retro` | 회고 |
+기본은 [`rp-workflow.md`](rp-workflow.md) "플로우" 표 (12단계 SSOT)와 동일. **rp-amend 의 차이점만 명시:**
+
+| 순서 | 차이 |
+|:---:|------|
+| 1 | `rp-init` **스킵** (프로젝트 이미 존재) |
+| 2 | `/rp-specify` 는 **기능 단위**로 5단계 질문 전체 실행 |
+| 3 | `/rp-prd` 는 **Full PRD** 사용 (간소 PRD 아님) |
+| 6 | `/rp-task` 는 기능 변경분만 분해 |
+| 7 | `/rp-dev` 는 feat 브랜치에서 구현 |
+| 4·5·8·9·10·11·12 | rp-workflow 와 동일 (Codex 1회 포함) |
 
 ## 절차
 
