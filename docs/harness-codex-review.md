@@ -26,7 +26,9 @@ Claude 리뷰 이후 Codex 플러그인(`openai/codex-plugin-cc`)으로 **추가
 | 반영 규칙 | 지적 심각도 **High / Critical**만 수동 반영. Medium 이하는 참고용 |
 | 결과 저장 | Codex stdout 전체를 경로에 그대로 기록 |
 | cwd | **해당 기능의 PRD가 있는 프로젝트 루트**에서 실행. 일반 기능은 `repositories/[project]/`, 하네스 메타 변경은 `claude-projects/` 루트. cwd 오인 시 Codex가 상위 레포를 리뷰해 결과 무효 |
+| 실행 전 cwd 저장 | `/codex:review` 진입 **직전** `SAVED_CWD=$(pwd)`로 시작 cwd 캡처 후 PRD 프로젝트 루트로 `cd`. 이미 일치 시 `cd` 생략 가능 |
 | 실행 전 체크 | `pwd` 출력이 PRD 프로젝트 루트와 일치하는지 검증. 불일치 시 `cd` 후 재확인. 체크 생략 금지 |
+| 실행 후 cwd 복귀 | Codex 종료 직후(정상/SKIPPED/중단 무관) `cd "$SAVED_CWD"` + `pwd` 검증. 복귀 실패(원래 디렉터리 삭제 등) 시 중단 + 사용자 보고. 누락 시 다음 단계 진행 금지 |
 | Hang 타임아웃 | wall-clock **300초** 초과 시 SIGTERM → 비-스킵 = 중단 (사용자 보고). 회고에서 조정 가능 |
 
 ## 직렬 실행 패턴
@@ -38,12 +40,16 @@ Claude 리뷰 서브에이전트 실행 (기존 점수제 판정)
   ↓
 Claude 통과 확인
   ↓
+SAVED_CWD=$(pwd)  ← 시작 cwd 캡처
+  ↓
+PRD 프로젝트 루트로 cd (이미 일치 시 생략)
+  ↓
 Codex 포그라운드 실행 (1회, 300초 타임아웃)
   ↓
 exit code + stderr/stdout 분석
-  ├─ 정상 종료 → stdout 저장 → High/Critical 반영 → 다음 단계
-  ├─ 토큰/기능 신호 패턴 매칭 → SKIPPED 헤더로 저장 → 다음 단계
-  └─ 그 외 비정상 종료 → 워크플로우 중단 → 사용자 보고
+  ├─ 정상 종료 → stdout 저장 → cd "$SAVED_CWD" → High/Critical 반영 → 다음 단계
+  ├─ 토큰/기능 신호 패턴 매칭 → SKIPPED 헤더로 저장 → cd "$SAVED_CWD" → 다음 단계
+  └─ 그 외 비정상 종료 → cd "$SAVED_CWD" → 워크플로우 중단 → 사용자 보고
 ```
 
 ## High / Critical 반영 절차
