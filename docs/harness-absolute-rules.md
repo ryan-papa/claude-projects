@@ -20,6 +20,7 @@
 - **[4][5][9] Codex 추가 리뷰 필수**: Claude 리뷰 통과 후 `/codex:review --wait` 1회 포그라운드 실행
   - 타임아웃: wall-clock 300초
   - cwd: 일반 기능 `repositories/[project]/`, 하네스 메타 변경 `claude-projects/`
+  - **실행 종료 후 시작 cwd 복귀 필수** (정상/SKIPPED/중단 무관). `SAVED_CWD=$(pwd)` 캡처 → 종료 직후 `cd "$SAVED_CWD"`. 누락 시 다음 단계 진행 금지
   - 점수화 없음. High/Critical 지적 반영 후 다음 단계 진입
   - 결과 저장: `<project-root>/docs/prd/[feature]/review-codex-{plan,eng,code,meta}.md`
   - 토큰/기능 신호 패턴 명시 출력 시 1회 스킵 + SKIPPED 헤더 + 7항목 증거 저장 ([`harness-codex-review.md`](harness-codex-review.md) "토큰·기능 신호 패턴" SSOT)
