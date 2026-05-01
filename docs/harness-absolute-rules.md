@@ -17,7 +17,7 @@
   - 평가 미달: PRD 재작성 후 새 서브에이전트 재실행 (기술 실패와 구분)
   - 증거 저장: `<project-root>/docs/prd/[feature]/review-claude-{plan,eng,code,meta}-r{N}.md`. `{meta}` = 간소 PRD 단일 리뷰 전용. 회차별 새 파일 (덮어쓰기 금지)
 - 기능 변경 시 코드 전에 PRD 문서 먼저 업데이트 + 리뷰
-- **[4][5][9] Codex 추가 리뷰 필수**: Claude 리뷰 통과 후 `/codex:review --wait` 1회 포그라운드 실행
+- **[4][5][9] Codex 추가 리뷰 필수**: Claude 리뷰와 **1차 병렬 실행** (메인이 Agent 툴 + Bash `codex review`를 동일 메시지에서 동시 호출). Codex 1회만, Claude 미달 시 Claude만 최대 2회 추가 재실행 (총 3회). 통과 조건: Claude 점수 통과 AND Codex High/Critical 반영 완료 (Codex SKIP 시 Claude 점수만으로 판정)
   - 타임아웃: wall-clock 300초
   - cwd: 일반 기능 `repositories/[project]/`, 하네스 메타 변경 `claude-projects/`
   - **실행 종료 후 시작 cwd 복귀 필수** (정상/SKIPPED/중단 무관). `SAVED_CWD=$(pwd)` 캡처 → 종료 직후 `cd "$SAVED_CWD"`. 누락 시 다음 단계 진행 금지

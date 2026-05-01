@@ -25,17 +25,18 @@ description: "[5] 엔지 리뷰. Codex-led 5항목 점수제 독립 리뷰. Use 
 
 ## 절차
 
-1. **⛔ Codex-led 엔지 리뷰는 반드시 `spawn_agent` 서브에이전트로 실행** (`agent_type=explorer` 또는 `worker`). 메인 셀프 채점 **금지**. 서브에이전트 프롬프트 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) PRD + 상위 CLAUDE.md·harness-db.md 참고 (b) 5항목 (c)·(d) SSOT 그대로
-2. 메인 에이전트가 서브에이전트 응답(점수·기술 리스크·대안)을 수신
-3. 메인 에이전트: **결과를 `<project-root>/docs/prd/[feature]/review-codex-eng.md`로 저장** (N=회차, 덮어쓰기 금지) 후 판정
-   - **하네스 메타 변경(간소 PRD)**: 파일명은 `review-codex-meta.md` 단일 리뷰로 대체. Codex 저장도 `review-codex-meta.md`
-4. 평균 >= 8.0 + 각 항목 >= 7 → Codex-led 리뷰 통과. 미달 시 PRD 수정 후 **새 서브에이전트로 재검토** (최대 3회, 매 회차 새 에이전트)
-5. **기술 실패 Fallback**: spawn_agent 오류·토큰 초과·형식 오류 시 최대 2회 재호출. 지속 실패 시 사용자에게 즉시 보고 + 중단. 메인 셀프 채점 우회 금지
-6. **Codex-led 리뷰 통과 후 Codex 추가 리뷰 (1회)**:
-   - **Codex 실행 전 `pwd` 확인 필수**: 출력이 해당 PRD 프로젝트 루트와 다르면 `cd`로 이동 후 재확인
-   - `Codex-led findings-first review` 실행 (wall-clock 300초 타임아웃)
-   - **종료 분기**: [`../harness-codex-review.md`](../harness-codex-review.md) "직렬 실행 패턴" SSOT 참조 (정상/SKIPPED/중단 3분기 동일 적용). 본 스킬의 저장 경로는 단계 5 = `review-codex-eng.md` (메타 변경은 `review-codex-meta.md`)
-7. 반영 완료(또는 SKIPPED 저장) 후 다음 단계 진입
+1. **1차 병렬 발사**: 메인이 동일 메시지에서 두 tool_use 동시 호출
+   - **Agent 툴**(Claude 서브에이전트, `agent_type=explorer` 또는 `worker`): 메인 셀프 채점 **금지**. 프롬프트 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) PRD + CLAUDE.md·harness-db.md 참고 (b) 5항목 (c)·(d) SSOT 그대로
+   - **Bash `codex review`**: 사전 `SAVED_CWD=$(pwd)` 캡처 + PRD 루트로 `cd`. 300초 타임아웃. 종료 후 `cd "$SAVED_CWD"`
+2. 양쪽 결과 수신 후 메인이 매트릭스 판정 → SSOT [`../harness-codex-review.md`](../harness-codex-review.md) "1차 결과 매트릭스" 참조
+3. **결과 저장**:
+   - Claude → `<project-root>/docs/prd/[feature]/review-codex-eng.md` (덮어쓰기 금지)
+   - Codex → `<project-root>/docs/prd/[feature]/review-codex-eng.md`
+   - **메타 변경(간소 PRD)**: 두 파일 모두 `review-{claude-meta-r{N},codex-meta}.md`로 대체
+4. **통과**: Claude 평균 ≥8.0 + 각 항목 ≥7 AND Codex High/Critical 반영 완료 → 다음 단계
+5. **미달**: 통합 반영 → 새 서브에이전트로 Claude만 재실행 (Codex 재호출 금지). 최대 2회 추가, 총 3회
+6. **기술 실패 Fallback**: 동일 SSOT 적용 (Agent 오류 시 최대 2회 재호출, 지속 실패 시 사용자 보고)
+7. **Codex 비-스킵 비정상 종료**: 워크플로우 중단 + 사용자 보고
 
 ## 평가 항목
 
