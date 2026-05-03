@@ -70,8 +70,12 @@ ls "$FEATURE"/review-claude-meta-r*.md >/dev/null 2>&1 || exit 1
 
 ### PRD 정리 (머지 직전, 동일 PR)
 8. **PRD 요약 PR 본문 임베드**:
-   - 추출 섹션: `## 개요·목적`, `## 기능 요구사항`, PRD 하단 `## Review 결과`
+   - PRD 유형별 추출 섹션:
+     - Full PRD: `## 개요·목적` + `## 기능 요구사항` + PRD 하단 `## Review 결과`
+     - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증` + PRD 하단 `## Review 결과`
+   - 추출 검증: 위 필수 섹션 중 하나라도 PRD에서 누락 시 ship 중단 + OPEN 유지 + 사용자 보고
    - 적용: `gh pr edit <num> --body "$(...)"` — 기존 본문 끝에 `<details><summary>PRD 요약</summary>...</details>` 추가
+   - 실패 분기 (body 길이 초과·rate limit·네트워크 등): **1회 재시도** → 지속 실패 시 ship 중단 + OPEN 유지 + 사용자 보고. 정리 커밋(단계 9) 진입 금지
 9. **PRD 디렉토리 삭제 커밋**:
    - `git rm -r <project-root>/docs/prd/[feature]/`
    - `git commit -m "chore(prd): merge 직전 PRD 정리"`

@@ -48,7 +48,7 @@ QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 
 
 | 단계 | 내용 |
 |------|------|
-| 요약 임베드 | PRD `## 개요·목적` + `## 기능 요구사항` + `## Review 결과` 추출 → PR 본문 `<details>` 블록 |
+| 요약 임베드 | Full = `## 개요·목적` + `## 기능 요구사항` + `## Review 결과` / 간소 = `## 변경 이유` + `## 영향 파일` + `## 검증` + `## Review 결과` → PR 본문 `<details>` 블록. 추출 누락·`gh pr edit` 1회 재시도 실패 시 ship 중단 |
 | 디렉토리 삭제 | `git rm -r <project-root>/docs/prd/[feature]/` (Full + 간소 동일) |
 | 정리 커밋 | `chore(prd): merge 직전 PRD 정리` |
 | CI 재통과 | 정리 커밋 CI SUCCESS 확인 (가드 b 재실행 면제) |

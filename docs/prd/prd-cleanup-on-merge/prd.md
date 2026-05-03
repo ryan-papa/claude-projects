@@ -39,7 +39,10 @@ PRD·리뷰 증거 파일이 `repositories/[project]/docs/prd/[feature]/` 및 `d
 
 **핵심 동작 (`rp-ship` 절차):**
 1. 가드 4종 AND 통과 (CI · 리뷰 증거 · base 정상 · MERGEABLE)
-2. PRD `## 개요·목적` + `## 기능 요구사항` + `## Review 결과` 추출 → PR 본문 `<details>` 블록 임베드 (`gh pr edit --body`)
+2. PRD 유형별 요약 추출 → PR 본문 `<details>` 블록 임베드 (`gh pr edit --body`)
+   - Full PRD: `## 개요·목적` + `## 기능 요구사항` + `## Review 결과`
+   - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증` + `## Review 결과`
+   - 추출 누락 / `gh pr edit` 1회 재시도 실패 시 ship 중단 + OPEN 유지
 3. `git rm -r <project-root>/docs/prd/[feature]/`
 4. 정리 커밋 `chore(prd): merge 직전 PRD 정리` + push
 5. CI 재통과 확인 (가드 b 재실행 면제)
@@ -76,5 +79,6 @@ PRD·리뷰 증거 파일이 `repositories/[project]/docs/prd/[feature]/` 및 `d
 
 | 단계 | 회차 | 결과 |
 |------|:----:|------|
-| Claude 메타 리뷰 | r1 | (대기) |
-| Codex 메타 리뷰 | — | (대기) |
+| Claude 메타 리뷰 | r1 | **통과** — 평균 8.1, 최저 7 (항목 6 경계 명확성·항목 7 분기 충분성). 지적 (간소 PRD 추출 섹션 매핑·임베드 실패 분기·임베드 완전성 검증) → r1 통합 반영 |
+| Codex 메타 리뷰 | — | 정상 — P2 1건 (간소 PRD 추출 매핑 불일치). dogfood 영향 회피 위해 자발 반영 (등급 무관) |
+| 통합 반영 | r1 | rp-ship 단계 8 PRD 유형별 추출 분기 + 임베드 실패 1회 재시도 후 ship 중단 + harness-ship 정책 표 + 핵심 동작 동기화 |
