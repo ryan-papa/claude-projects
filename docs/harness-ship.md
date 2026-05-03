@@ -42,6 +42,21 @@ QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 
 
 → 실행 절차: [`skills/rp-ship.md`](skills/rp-ship.md) "README 검증" SSOT
 
+## 머지 직전 PRD 정리 (정책)
+
+가드 4종 AND 통과 후, 머지 실행 전에 **동일 PR**에서 PRD 디렉토리를 통째 삭제한다. Full PRD·간소 PRD 모두 적용. 머지 후 PRD 참조는 **PR 본문 요약 + git history**로만 가능.
+
+| 단계 | 내용 |
+|------|------|
+| 요약 임베드 | PRD `## 개요·목적` + `## 기능 요구사항` + `## Review 결과` 추출 → PR 본문 `<details>` 블록 |
+| 디렉토리 삭제 | `git rm -r <project-root>/docs/prd/[feature]/` (Full + 간소 동일) |
+| 정리 커밋 | `chore(prd): merge 직전 PRD 정리` |
+| CI 재통과 | 정리 커밋 CI SUCCESS 확인 (가드 b 재실행 면제) |
+| 누락 시 | 머지 차단 |
+
+→ 실행 절차: [`skills/rp-ship.md`](skills/rp-ship.md) "PRD 정리" SSOT
+→ 절대 규칙: [`harness-absolute-rules.md`](harness-absolute-rules.md) "머지 직전 PRD 정리 필수"
+
 ## 머지 후 정책
 
 - 배포 완료 메시지 직후 `/rp-retro` 자동 진입 **금지** ([`harness-absolute-rules.md`](harness-absolute-rules.md): 회고는 사용자 명령 시에만)
