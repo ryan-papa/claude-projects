@@ -78,8 +78,24 @@ ls "$FEATURE"/review-codex-meta.md >/dev/null 2>&1 || exit 1
    - (c) PR base 자동 감지 또는 메타 분기 결과 정상 (fail-closed 통과)
    - (d) `gh pr view <num> --json mergeable` 가 `MERGEABLE`
    하나라도 실패 → **자동 머지 중단 + PR 상태 OPEN 유지 + 사용자 즉시 보고**. `--admin`·`--no-verify` 우회 금지.
-8. **머지 실행**: `gh pr merge <num> --merge --delete-branch` (전략 `--merge` 고정)
-9. **배포 확인**: 배포 워크플로우 완료 대기 + 결과 보고
+
+### PRD 정리 (머지 직전, 동일 PR)
+8. **PRD 요약 PR 본문 임베드**:
+   - PRD 유형별 추출 섹션:
+     - Full PRD: `## 개요·목적` + `## 기능 요구사항` + PRD 하단 `## Review 결과`
+     - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증` + PRD 하단 `## Review 결과`
+   - 추출 검증: 위 필수 섹션 중 하나라도 PRD에서 누락 시 ship 중단 + OPEN 유지 + 사용자 보고
+   - 적용: `gh pr edit <num> --body "$(...)"` — 기존 본문 끝에 `<details><summary>PRD 요약</summary>...</details>` 추가
+   - 실패 분기 (body 길이 초과·rate limit·네트워크 등): **1회 재시도** → 지속 실패 시 ship 중단 + OPEN 유지 + 사용자 보고. 정리 커밋(단계 9) 진입 금지
+9. **PRD 디렉토리 삭제 커밋**:
+   - `git rm -r <project-root>/docs/prd/[feature]/`
+   - `git commit -m "chore(prd): merge 직전 PRD 정리"`
+   - `git push`
+10. **CI 재대기**: 정리 커밋 CI 통과만 확인 (`gh pr checks <num>`). 가드 (b) 재실행 면제 (정리 직전 통과 + 요약 임베드 완료)
+
+### 머지·배포
+11. **머지 실행**: `gh pr merge <num> --merge --delete-branch` (전략 `--merge` 고정)
+12. **배포 확인**: 배포 워크플로우 완료 대기 + 결과 보고
 
 ### 비상 탈출구
 

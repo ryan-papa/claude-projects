@@ -48,6 +48,7 @@
   - (c) PR base 정상 감지
   - (d) `gh pr view --json mergeable` = `MERGEABLE`
   - 하나라도 실패 → 중단 + OPEN 유지 + 사용자 보고. `--admin`·`--no-verify` 우회 금지. 비상 탈출구 `RP_SHIP_MANUAL=1` 환경변수만 자동 머지 비활성 허용
+- **머지 직전 PRD 정리 필수**: 자동 머지 가드 4종 통과 후 머지 실행 전, 동일 PR 내에서 PRD 디렉토리(`<project-root>/docs/prd/[feature]/`)를 `git rm -r` 통째 삭제 + PR 본문에 요약(개요·기능 요구사항·Review 결과) 임베드 + 정리 커밋 CI 재통과 확인 후 머지. Full PRD·간소 PRD 모두 적용. 가드 (b)는 정리 커밋 직전까지만 유효(정리 후 재실행 면제). 정리 단계 누락 시 머지 차단. 머지 후 PRD 참조는 **PR 본문 요약 + git history**로만 가능
 - **`rp-ship` PR base 자동 감지 게이트**: 통합 브랜치 선언 감지 → `--base` 주입
   - 감지 순서: (0) 메타 분기 선검사 (`review-claude-meta-r*.md` 또는 `review-codex-meta.md` 존재 → `--base main`) → (1) `docs/tasks.md` → (2) `CLAUDE.md` → (3) repo default
   - 매칭 정규식: `^[\s\-\*|]*통합 브랜치:\s*`?([A-Za-z0-9/_\-]+)`?` 정확히 1건만 채택
