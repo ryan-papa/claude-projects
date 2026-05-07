@@ -11,7 +11,7 @@ description: "[9] 코드 리뷰. 7항목 최저 점수제 독립 리뷰. High/Cr
 - Resolve copied relative links against the source file under `docs/skills/` when needed.
 - Do not record Claude-only `.claude` hooks or slash commands as executed unless they actually ran.
 - Use Codex `spawn_agent` for independent review when a review step requires role separation.
-- Write Codex-led evidence to `review-codex-*.md`; never synthesize `review-claude-*.md` evidence.
+- Reflect Codex-led review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.
 
 
 # rp-code-review
@@ -55,11 +55,9 @@ Codex-led 코드 리뷰는 **반드시 `spawn_agent` 서브에이전트로 실�
 
 **서브에이전트 프롬프트** 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) 리뷰 대상 diff·브랜치·파일 경로 (b) 7항목 + PR 유형별 포커스 (c)·(d) SSOT 그대로.
 
-**증거 저장**: 메인 에이전트가 서브에이전트 결과를 `<project-root>/docs/prd/[feature]/review-codex-code.md`로 저장 (N=회차, 덮어쓰기 금지).
+**결과 처리**: 별도 파일 저장 없음. Claude 점수·지적은 인-메모리에서 메인이 수신 후 코드·PRD 본문에 반영.
 
-> **하네스 메타 변경(간소 PRD)**: 코드 리뷰까지 내려올 경우 파일명은 `review-codex-meta.md` 단일 리뷰로 대체. Codex 저장도 `review-codex-meta.md`.
-
-**재시도**: 매 회차 새 서브에이전트.
+**재시도**: PRD 본문 갱신 + 코드 수정 후 새 서브에이전트로 재실행. 회차 추적 없음.
 
 **기술 실패 Fallback**: spawn_agent 오류·토큰 초과·형식 오류 시 최대 2회 재호출. 지속 실패 시 사용자에게 즉시 보고 + 중단. 메인 셀프 채점 우회 금지.
 
@@ -81,7 +79,7 @@ Codex-led 코드 리뷰는 **반드시 `spawn_agent` 서브에이전트로 실�
 최저 미달 시 평균 8.0 이상이어도 **미통과**.
 
 **재시도:**
-- < 8.0 → 개발 수정 재투입 (최대 3회)
+- < 8.0 → 개발 수정 재투입 (인-메모리 최대 3회)
 - 3회 후 < 7.0 → 사용자에게 추가 사이클 여부 확인
 - 3회 후 7.0~8.0 → 통과 처리
 
@@ -91,7 +89,7 @@ Claude 코드 리뷰 서브에이전트와 **동시** 발사 (메인이 동일 �
 
 1. **사전 `SAVED_CWD=$(pwd)` 캡처** + PRD 루트로 `cd`
 2. `codex review --base main` 실행 (wall-clock 300초 타임아웃). 종료 후 `cd "$SAVED_CWD"`
-3. **매트릭스 판정**: [`../harness-codex-review.md`](../harness-codex-review.md) "1차 결과 매트릭스" SSOT 참조. 저장 경로는 단계 9 = `review-codex-code.md` (메타 변경은 `review-codex-meta.md`)
+3. **매트릭스 판정**: [`../harness-codex-review.md`](../harness-codex-review.md) "1차 결과 매트릭스" SSOT 참조. Codex 결과는 별도 파일 저장 없이 인-메모리에서 코드·PRD 본문에 반영
 4. **통과**: Claude 점수제 통과 AND Codex High/Critical 반영 완료 → 산출물 보고[10] 진입
 5. **미달**: 통합 반영 → Claude만 재실행 (Codex 재호출 금지, 최대 2회 추가)
 

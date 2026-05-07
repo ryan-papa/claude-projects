@@ -4,14 +4,14 @@ Claude 리뷰와 Codex 플러그인(`openai/codex-plugin-cc`) 추가 리뷰를 *
 
 ## 적용 단계
 
-| 단계 | Claude 리뷰 | Codex 명령 | 저장 경로 |
+| 단계 | Claude 리뷰 | Codex 명령 | 결과 처리 |
 |:---:|-------------|-----------|---------|
-| 4 | 기획 리뷰 | `/codex:review --wait` | `<project-root>/docs/prd/[feature]/review-codex-plan.md` |
-| 5 | 엔지니어링 리뷰 | `/codex:review --wait` | `<project-root>/docs/prd/[feature]/review-codex-eng.md` |
-| 9 | 코드 리뷰 | `/codex:review --wait --base main` | `<project-root>/docs/prd/[feature]/review-codex-code.md` |
-| meta | 하네스 메타 변경(간소 PRD 단일 리뷰) | `/codex:review --wait` | `claude-projects/docs/prd/[feature]/review-codex-meta.md` |
+| 4 | 기획 리뷰 | `/codex:review --wait` | High/Critical 지적을 PRD 본문에 반영 |
+| 5 | 엔지니어링 리뷰 | `/codex:review --wait` | High/Critical 지적을 PRD 본문에 반영 |
+| 9 | 코드 리뷰 | `/codex:review --wait --base main` | High/Critical 지적을 코드·PRD 본문에 반영 |
+| meta | 하네스 메타 변경(간소 PRD 단일 리뷰) | `/codex:review --wait` | High/Critical 지적을 간소 PRD 본문에 반영 |
 
-`<project-root>` 정의:
+cwd 정의:
 - 일반 기능 변경 → `repositories/[project]/`
 - 하네스 메타 변경(본 규칙·docs/·CLAUDE.md 등) → `claude-projects/` 루트
 
@@ -24,7 +24,7 @@ Claude 리뷰와 Codex 플러그인(`openai/codex-plugin-cc`) 추가 리뷰를 *
 | 회차 | Codex는 **1차 1회만** 실행 (재시도 없음). Claude는 최대 3회 |
 | 점수화 | **없음** — Codex는 점수 산출·통과 판정 안 함 |
 | 반영 규칙 | 지적 심각도 **High / Critical**만 수동 반영. Medium 이하는 참고용 |
-| 결과 저장 | Codex stdout 전체를 경로에 그대로 기록 |
+| 결과 보존 | **별도 파일 저장 없음** — High/Critical 지적은 PRD 본문에 반영. Codex stdout은 인-메모리 처리 후 폐기 |
 | cwd | **해당 기능의 PRD가 있는 프로젝트 루트**에서 실행. 일반 기능은 `repositories/[project]/`, 하네스 메타 변경은 `claude-projects/` 루트. cwd 오인 시 Codex가 상위 레포를 리뷰해 결과 무효 |
 | 실행 전 cwd 저장 | `/codex:review` 진입 **직전** `SAVED_CWD=$(pwd)`로 시작 cwd 캡처 후 PRD 프로젝트 루트로 `cd`. 이미 일치 시 `cd` 생략 가능 |
 | 실행 전 체크 | `pwd` 출력이 PRD 프로젝트 루트와 일치하는지 검증. 불일치 시 `cd` 후 재확인. 체크 생략 금지 |
@@ -55,7 +55,7 @@ PRD 프로젝트 루트로 cd (이미 일치 시 생략)
 
 | Claude | Codex 정상 | Codex SKIP (토큰/기능) | Codex 비-스킵 비정상 |
 |--------|-----------|----------------------|--------------------|
-| **통과** (평균 ≥8.0 / 최저 ≥7) | High/Critical 반영 → 다음 단계 | SKIPPED 헤더 저장 → 다음 단계 | 워크플로우 중단 + 사용자 보고 (Claude 결과는 회차 카운트로 저장) |
+| **통과** (평균 ≥8.0 / 최저 ≥7) | High/Critical 반영 → 다음 단계 | SKIPPED 보고 → 다음 단계 | 워크플로우 중단 + 사용자 보고 |
 | **미달** | Codex High/Critical + Claude 지적 통합 반영 → Claude 재실행 (Codex 재호출 금지) | Claude 지적만 반영 → Claude 재실행 | 워크플로우 중단 + 사용자 보고 |
 
 통과 조건: **Claude 점수 통과 AND Codex High/Critical 반영 완료** (Codex SKIP 시 Claude 점수만으로 판정).
@@ -65,8 +65,8 @@ PRD 프로젝트 루트로 cd (이미 일치 시 생략)
 ## High / Critical 반영 절차
 
 1. Codex 결과에서 `[high]` / `[critical]` 표기 라인만 추출
-2. 각 지적을 PRD(단계 4·5) 또는 코드(단계 9)에 반영
-3. 반영 결과를 해당 `review-codex-*.md` 하단에 `## 반영` 섹션으로 기록
+2. 각 지적을 PRD(단계 4·5·메타) 또는 코드(단계 9)에 반영
+3. 반영 결과는 PRD 본문 자체로 흡수 (별도 기록 파일 없음)
 4. Claude 리뷰는 재실행하지 않음 (Codex 1회 원칙 유지, 반영만 수행)
 
 ## 토큰/기능 이슈 스킵 (1회)
@@ -102,19 +102,9 @@ Codex CLI가 토큰 한도·rate limit·기능 미지원 신호를 명시적으�
 
 신규 패턴 추가 시 본 섹션 갱신 + [동작 시뮬레이션 양방향 검증](#스킵-규칙-검증) 통과 후 머지.
 
-### 스킵 시 증거 파일 형식
+### 스킵 시 보고 형식
 
-저장 경로는 [적용 단계](#적용-단계) 표와 동일. 첫 줄에 `# SKIPPED — codex token/feature signal` 헤더 + 아래 7개 항목:
-
-| 키 | 내용 |
-|----|------|
-| (a) timestamp | UTC ISO 8601 (`date -u +"%Y-%m-%dT%H:%M:%SZ"`) |
-| (b) cwd | `pwd` 출력 |
-| (c) command | 실제 실행한 Codex 명령 전체 |
-| (d) exit code | wrapper로 캡처. 캡처 누락 시 사유 명시 |
-| (e) stderr/stdout 원문 | 코드블록 인용. 단 `(?i)(api[_-]?key\|token\|secret)\s*[:=]\s*\S+` 매칭 값은 `***REDACTED***`로 치환 |
-| (f) 매칭 패턴 | 매칭된 정규식 # + 발견 라인 번호 |
-| (g) 판정 사유 | 한 줄 |
+증거 파일 저장 없음. 사용자에게 응답 텍스트로 `SKIPPED — codex token/feature signal` 헤더 + 매칭 패턴 # + 판정 사유 한 줄만 보고 후 다음 단계 진입. stdout/stderr 인용 시 `(?i)(api[_-]?key\|token\|secret)\s*[:=]\s*\S+` 매칭 값은 `***REDACTED***`로 치환.
 
 ### 비-스킵 사유 (기존대로 중단)
 
@@ -129,8 +119,8 @@ Codex CLI가 토큰 한도·rate limit·기능 미지원 신호를 명시적으�
 
 | 검증 항목 | 방법 |
 |-----------|------|
-| 양방향 동작 시뮬레이션 | (1) 가짜 stderr `rate limit exceeded`/`hit your usage limit` 주입 → SKIPPED 헤더 자동 생성 + 다음 단계 진입 PASS. (2) 가짜 stderr `network unreachable` → 매칭 0건 → 워크플로우 중단 + 사용자 보고 PASS. 두 케이스 모두 통과해야 검증 완료 |
-| 마스킹 검증 | 가짜 stderr `api_key=sk-abc123def` 주입 → 증거 파일에 `***REDACTED***` 치환 확인 |
+| 양방향 동작 시뮬레이션 | (1) 가짜 stderr `rate limit exceeded`/`hit your usage limit` 주입 → SKIPPED 보고 출력 + 다음 단계 진입 PASS. (2) 가짜 stderr `network unreachable` → 매칭 0건 → 워크플로우 중단 + 사용자 보고 PASS. 두 케이스 모두 통과해야 검증 완료 |
+| 마스킹 검증 | 가짜 stderr `api_key=sk-abc123def` 주입 → 사용자 보고 텍스트에 `***REDACTED***` 치환 확인 |
 
 ## 플러그인 선언
 
@@ -154,7 +144,7 @@ Codex CLI가 토큰 한도·rate limit·기능 미지원 신호를 명시적으�
 ## ⛔ 절대 규칙
 
 - 단계 4 · 5 · 9 및 **메타 변경 단일 리뷰**에서 Codex 리뷰 **수행 필수**. **단**, [토큰/기능 이슈 스킵](#토큰기능-이슈-스킵-1회) 조건(AND 충족) 시에만 1회 스킵 허용. 임의 생략 금지
-- Codex 결과 **저장 필수** (정상 결과는 stdout, 스킵은 SKIPPED 헤더 + 7항목)
+- Codex 결과 **별도 파일 저장 금지** (인-메모리 처리 후 PRD 본문 반영)
 - High / Critical 지적은 반영 **필수**. 미반영 시 다음 단계 진입 금지
 - Codex는 점수화·재시도 **하지 않음** (1회 원칙)
 - 플러그인 미설치·login 미완료 등 환경 오류 시 워크플로우 중단, 사용자 보고

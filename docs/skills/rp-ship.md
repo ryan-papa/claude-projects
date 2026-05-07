@@ -5,7 +5,7 @@ argument-hint: '[브랜치명] [변경 요약]'
 
 # rp-ship
 
-커밋 → PR → CI 확인 → **자동 머지(가드 4종 AND)** → 배포.
+커밋 → PR → CI 확인 → **자동 머지(가드 3종 AND)** → 배포.
 
 ## 트리거
 
@@ -14,41 +14,7 @@ argument-hint: '[브랜치명] [변경 요약]'
 
 ## 절차
 
-### ⛔ 사전 체크 게이트 (커밋 전 필수)
-
-커밋 직전 `<project-root>/docs/prd/[feature]/` 디렉터리에서 리뷰 증거 파일 존재 검증. 누락 시 ship **중단** + 해당 리뷰 단계로 복귀.
-
-| PRD 유형 | 필수 파일 |
-|---------|----------|
-| 일반 기능 | `review-claude-plan-r{N}.md` + `review-codex-plan.md` + `review-claude-eng-r{N}.md` + `review-codex-eng.md` + `review-claude-code-r{N}.md` + `review-codex-code.md` |
-| 하네스 메타 변경 | `review-claude-meta-r{N}.md` + `review-codex-meta.md` |
-| 회고 반영 사이클 | 상기 조건 + `retro-r{N}.md`(반영 근거) |
-
-검증 방식: **PRD 유형별 필수 파일을 개별적으로 존재 확인**. 부분 존재는 통과 불가.
-
-```bash
-# 일반 기능 — 6개 전부 존재해야 통과 (단, review-claude-*-r*.md는 최소 1개 이상 회차)
-FEATURE=docs/prd/[feature]
-for f in \
-  "$FEATURE"/review-codex-plan.md \
-  "$FEATURE"/review-codex-eng.md \
-  "$FEATURE"/review-codex-code.md; do
-  [ -f "$f" ] || { echo "MISSING: $f"; exit 1; }
-done
-# Claude 회차 파일은 단계별로 최소 1개
-for stage in plan eng code; do
-  ls "$FEATURE"/review-claude-${stage}-r*.md >/dev/null 2>&1 \
-    || { echo "MISSING: review-claude-${stage}-r*.md"; exit 1; }
-done
-
-# 하네스 메타 변경 — 2종 존재 필수
-ls "$FEATURE"/review-claude-meta-r*.md >/dev/null 2>&1 || exit 1
-[ -f "$FEATURE"/review-codex-meta.md ] || exit 1
-```
-
-하나라도 누락 시 "리뷰 증거 부족 — 해당 리뷰 단계로 복귀" 메시지 출력 후 ship 중단.
-
-### 자동 수행 (게이트 통과 시)
+### 자동 수행
 0. **PR base 결정 (fail-closed)**: 아래 "PR base 자동 감지" 섹션에 따라 감지. 비정상 상태는 ship 중단 후 사용자 확인 요구.
 1. **커밋**: 변경 파일만 `git add` + `git commit`
 2. **README 검증**: 푸시 전 README.md 점검 (아래 참조)
@@ -60,19 +26,18 @@ ls "$FEATURE"/review-claude-meta-r*.md >/dev/null 2>&1 || exit 1
 5. **PR 생성/재사용**: `gh pr create --base <detected-base> ...` (제목 + 변경 요약 + 테스트 계획)
 6. **CI 확인**: CI 통과 대기
 
-### 자동 머지 (가드 4종 AND)
+### 자동 머지 (가드 3종 AND)
 7. **자동 머지 안전 가드** — 모두 충족 시에만 진행:
    - (a) CI 모든 체크 SUCCESS (`gh pr checks <num>` exit 0)
-   - (b) 리뷰 증거 파일 게이트 통과 (위 사전 체크 게이트 재확인)
-   - (c) PR base 자동 감지 또는 메타 분기 결과 정상 (fail-closed 통과)
-   - (d) `gh pr view <num> --json mergeable` 가 `MERGEABLE`
+   - (b) PR base 자동 감지 또는 메타 분기 결과 정상 (fail-closed 통과)
+   - (c) `gh pr view <num> --json mergeable` 가 `MERGEABLE`
    하나라도 실패 → **자동 머지 중단 + PR 상태 OPEN 유지 + 사용자 즉시 보고**. `--admin`·`--no-verify` 우회 금지.
 
 ### PRD 정리 (머지 직전, 동일 PR)
 8. **PRD 요약 PR 본문 임베드**:
    - PRD 유형별 추출 섹션:
-     - Full PRD: `## 개요·목적` + `## 기능 요구사항` + PRD 하단 `## Review 결과`
-     - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증` + PRD 하단 `## Review 결과`
+     - Full PRD: `## 개요·목적` + `## 기능 요구사항`
+     - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증`
    - 추출 검증: 위 필수 섹션 중 하나라도 PRD에서 누락 시 ship 중단 + OPEN 유지 + 사용자 보고
    - 적용: `gh pr edit <num> --body "$(...)"` — 기존 본문 끝에 `<details><summary>PRD 요약</summary>...</details>` 추가
    - 실패 분기 (body 길이 초과·rate limit·네트워크 등): **1회 재시도** → 지속 실패 시 ship 중단 + OPEN 유지 + 사용자 보고. 정리 커밋(단계 9) 진입 금지
@@ -80,7 +45,7 @@ ls "$FEATURE"/review-claude-meta-r*.md >/dev/null 2>&1 || exit 1
    - `git rm -r <project-root>/docs/prd/[feature]/`
    - `git commit -m "chore(prd): merge 직전 PRD 정리"`
    - `git push`
-10. **CI 재대기**: 정리 커밋 CI 통과만 확인 (`gh pr checks <num>`). 가드 (b) 재실행 면제 (정리 직전 통과 + 요약 임베드 완료)
+10. **CI 재대기**: 정리 커밋 CI 통과만 확인 (`gh pr checks <num>`)
 
 ### 머지·배포
 11. **머지 실행**: `gh pr merge <num> --merge --delete-branch` (전략 `--merge` 고정)
@@ -98,7 +63,7 @@ PR 생성/리타깃 전 **통합 브랜치 선언을 감지**해 `--base` 에 �
 
 | # | 소스 | 규칙 | 실패 시 |
 |:-:|------|------|--------|
-| 0 | **메타 변경 분기 (선검사)** | 현재 ship 사이클의 PRD 폴더에 `review-claude-meta-r*.md` 또는 `review-codex-meta.md` 가 존재하면 **자동 감지 우회** + `--base main` 적용 | 메타 파일 부재 → 다음 소스로 진행 |
+| 0 | **메타 변경 분기 (선검사)** | 현재 ship 사이클의 PRD(`docs/prd/[feature]/prd.md`)가 frontmatter `**유형:** 하네스 메타 변경` + 간소 4섹션(`## 변경 이유`·`## 영향 파일`·`## 롤백 전략`·`## 검증`) 동시 존재 시 **자동 감지 우회** + `--base main` 적용 | 식별자 부재 → 다음 소스로 진행 |
 | 1 | 프로젝트 `docs/tasks.md` | 라인 시작 앵커 정규식 `^[\s\-\*|]*통합 브랜치:\s*`?([A-Za-z0-9/_\-]+)`?` 로 **정확히 1건** 매칭 | 2건 이상 → fail-closed / 0건 → 다음 소스 |
 | 2 | 프로젝트 `CLAUDE.md` | 동일 정규식 정확히 1건 매칭 | 2건 이상 → fail-closed / 0건 → 다음 소스 |
 | 3 | 레포 default branch | `gh repo view --json defaultBranchRef` | 결정 불가 → fail-closed |
@@ -147,7 +112,7 @@ PR 생성 시점에 .github/workflows/ 확인
 
 ## 절대 규칙
 
-→ **SSOT**: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) — CI 통과 전 머지 금지, 자동 머지 가드 4종 AND, 리뷰 증거 게이트, PR base 자동 감지(fail-closed), feat 브랜치 직행 배포 금지, rp-ship 필수 호출, 비상 탈출구 `RP_SHIP_MANUAL=1`. 본문 중복 금지.
+→ **SSOT**: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) — CI 통과 전 머지 금지, 자동 머지 가드 3종 AND, PR base 자동 감지(fail-closed), feat 브랜치 직행 배포 금지, rp-ship 필수 호출, 비상 탈출구 `RP_SHIP_MANUAL=1`. 본문 중복 금지.
 
 **본 스킬 한정 보조 규칙:**
 - **머지 전략**: `--merge` 고정 (squash/rebase 금지)

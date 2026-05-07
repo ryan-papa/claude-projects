@@ -11,19 +11,19 @@
 
 - **[리뷰 단계 서브에이전트 필수]** `/rp-plan-review`·`/rp-eng-review`·`/rp-code-review` Claude 리뷰 적용:
   - 실행 주체: Agent 툴 분리 서브에이전트(`subagent_type=general-purpose`). 메인 셀프 채점 **전면 금지** (이해충돌·관성 편향 방지)
-  - 역할 분리: 서브 = Claude 채점, 메인 = `/codex:review` 실행·결과 저장
-  - 서브에이전트 프롬프트 4 필수 항목(SSOT): (a) 대상 파일 경로 + 참고 파일, (b) 채점 기준(단계별 항목 수: 4=9, 5=5, 9=7), (c) 독립 판정 지시(메인 컨텍스트 미공유), (d) 역할 경계: 본 단계 채점만 수행 — **Claude 측 적용 시 Codex 실행·저장 금지 / Codex 측 적용 시 `review-claude-*.md` 합성 금지** (`.codex/skills/` 어댑터 노트 동시 참조). **스킬 파일은 본 (a)~(d) 본문 중복 금지, 링크 참조만 허용**
+  - 역할 분리: 서브 = Claude 채점, 메인 = `/codex:review` 실행 + 양측 지적을 PRD 본문에 반영
+  - 서브에이전트 프롬프트 4 필수 항목(SSOT): (a) 대상 파일 경로 + 참고 파일, (b) 채점 기준(단계별 항목 수: 4=9, 5=5, 9=7), (c) 독립 판정 지시(메인 컨텍스트 미공유), (d) 역할 경계: 본 단계 채점만 수행 — **응답 텍스트로만 결과 반환, 어떤 결과 파일도 생성 금지** (Claude 측: Codex 실행 금지 / Codex 측: Claude 채점 결과 합성 금지) (`.codex/skills/` 어댑터 노트 동시 참조). **스킬 파일은 본 (a)~(d) 본문 중복 금지, 링크 참조만 허용**
   - Fallback: 기술적 실패 최대 2회 재호출 → 지속 시 사용자 즉시 보고. 셀프 채점 우회 금지
-  - 평가 미달: PRD 재작성 후 새 서브에이전트 재실행 (기술 실패와 구분)
-  - 증거 저장: `<project-root>/docs/prd/[feature]/review-claude-{plan,eng,code,meta}-r{N}.md`. `{meta}` = 간소 PRD 단일 리뷰 전용. 회차별 새 파일 (덮어쓰기 금지)
+  - 평가 미달: PRD 본문 갱신 후 새 서브에이전트 재실행 (기술 실패와 구분). 인-메모리 최대 3회 한도, 회차별 별도 파일·점수 보존 없음
+  - **증거 파일 보존 없음**: 리뷰 지적은 PRD 본문 자체에 반영된 결과물로만 남는다. `review-claude-*.md`·`review-codex-*.md` 어떤 형태도 생성 금지
 - 기능 변경 시 코드 전에 PRD 문서 먼저 업데이트 + 리뷰
 - **[4][5][9] Codex 추가 리뷰 필수**: Claude 리뷰와 **1차 병렬 실행** (메인이 Agent 툴 + Bash `codex review`를 동일 메시지에서 동시 호출). Codex 1회만, Claude 미달 시 Claude만 최대 2회 추가 재실행 (총 3회). 통과 조건: Claude 점수 통과 AND Codex High/Critical 반영 완료 (Codex SKIP 시 Claude 점수만으로 판정)
   - 타임아웃: wall-clock 300초
   - cwd: 일반 기능 `repositories/[project]/`, 하네스 메타 변경 `claude-projects/`
   - **실행 종료 후 시작 cwd 복귀 필수** (정상/SKIPPED/중단 무관). `SAVED_CWD=$(pwd)` 캡처 → 종료 직후 `cd "$SAVED_CWD"`. 누락 시 다음 단계 진행 금지
   - 점수화 없음. High/Critical 지적 반영 후 다음 단계 진입
-  - 결과 저장: `<project-root>/docs/prd/[feature]/review-codex-{plan,eng,code,meta}.md`
-  - 토큰/기능 신호 패턴 명시 출력 시 1회 스킵 + SKIPPED 헤더 + 7항목 증거 저장 ([`harness-codex-review.md`](harness-codex-review.md) "토큰·기능 신호 패턴" SSOT)
+  - **결과는 PRD 본문에 반영**, 별도 파일 저장 금지
+  - 토큰/기능 신호 패턴 명시 출력 시 1회 스킵 + SKIPPED 보고 ([`harness-codex-review.md`](harness-codex-review.md) "토큰·기능 신호 패턴" SSOT)
   - 그 외 비정상 종료(네트워크·login·플러그인·hang·매칭 0건): 중단 + 사용자 보고. 자동 재시도 금지
 
 ## 테스트·QA·게이트
@@ -42,15 +42,14 @@
 - **feat 브랜치 직행 배포 금지**: 모든 배포는 `rp-ship` 경유 (PR → CI → main 머지 → 배포). feat/통합 브랜치 상태로 프로덕션 프로세스 기동·노출 금지. 단, 로컬 개발 서버(`uvicorn --reload`)는 예외
 - **`main` 직접 수정 금지**: `main` 브랜치에서 docs·CLAUDE.md·스킬·settings 수정 감지 시 즉시 중단 + feat 브랜치 전환 요구
 - **`rp-ship` 스킬 호출 필수**: 커밋·PR·머지·배포는 수동 `git`/`gh` 우회 없이 `rp-ship` 스킬 경유. 단, `rp-ship` 스킬 내부 절차로 명시된 명령은 예외
-- **`rp-ship` 자동 머지 가드 4종 AND**: 모두 충족 시에만 자동 머지
+- **`rp-ship` 자동 머지 가드 3종 AND**: 모두 충족 시에만 자동 머지
   - (a) CI 모든 체크 SUCCESS
-  - (b) 리뷰 증거 게이트 통과
-  - (c) PR base 정상 감지
-  - (d) `gh pr view --json mergeable` = `MERGEABLE`
+  - (b) PR base 정상 감지
+  - (c) `gh pr view --json mergeable` = `MERGEABLE`
   - 하나라도 실패 → 중단 + OPEN 유지 + 사용자 보고. `--admin`·`--no-verify` 우회 금지. 비상 탈출구 `RP_SHIP_MANUAL=1` 환경변수만 자동 머지 비활성 허용
-- **머지 직전 PRD 정리 필수**: 자동 머지 가드 4종 통과 후 머지 실행 전, 동일 PR 내에서 PRD 디렉토리(`<project-root>/docs/prd/[feature]/`)를 `git rm -r` 통째 삭제 + PR 본문에 요약(개요·기능 요구사항·Review 결과) 임베드 + 정리 커밋 CI 재통과 확인 후 머지. Full PRD·간소 PRD 모두 적용. 가드 (b)는 정리 커밋 직전까지만 유효(정리 후 재실행 면제). 정리 단계 누락 시 머지 차단. 머지 후 PRD 참조는 **PR 본문 요약 + git history**로만 가능
+- **머지 직전 PRD 정리 필수**: 자동 머지 가드 3종 통과 후 머지 실행 전, 동일 PR 내에서 PRD 디렉토리(`<project-root>/docs/prd/[feature]/`)를 `git rm -r` 통째 삭제 + PR 본문에 요약(Full = 개요·기능 요구사항 / 간소 = 변경 이유·영향 파일·검증) 임베드 + 정리 커밋 CI 재통과 확인 후 머지. Full PRD·간소 PRD 모두 적용. 정리 단계 누락 시 머지 차단. 머지 후 PRD 참조는 **PR 본문 요약 + git history**로만 가능
 - **`rp-ship` PR base 자동 감지 게이트**: 통합 브랜치 선언 감지 → `--base` 주입
-  - 감지 순서: (0) 메타 분기 선검사 (`review-claude-meta-r*.md` 또는 `review-codex-meta.md` 존재 → `--base main`) → (1) `docs/tasks.md` → (2) `CLAUDE.md` → (3) repo default
+  - 감지 순서: (0) 메타 분기 선검사 (PRD 본문 frontmatter `**유형:** 하네스 메타 변경` + 간소 4섹션(`## 변경 이유`·`## 영향 파일`·`## 롤백 전략`·`## 검증`) 동시 존재 → `--base main`) → (1) `docs/tasks.md` → (2) `CLAUDE.md` → (3) repo default
   - 매칭 정규식: `^[\s\-\*|]*통합 브랜치:\s*`?([A-Za-z0-9/_\-]+)`?` 정확히 1건만 채택
   - Fail-closed: 2건+ 매칭·공백 포함·원격 부재·detached HEAD·프로젝트 루트 미확인 → 중단. 느슨한 `feat/*` 추론 금지
   - 우회 허용: 수동 `--base <X>`, 메타 분기 자동

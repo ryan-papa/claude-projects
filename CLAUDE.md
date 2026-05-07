@@ -66,7 +66,7 @@ claude-projects/
 │   │   ├── secrets-management.md       # sops+age 세팅·운영·rotation
 │   │   └── recipients.local.md         # (git 제외) 공개키 레지스트리
 │   ├── prd-template.md         # PRD 템플릿
-│   ├── prd/                    # PRD 산출물 (`[feature]/prd.md` + 리뷰 증거)
+│   ├── prd/                    # PRD 산출물 (`[feature]/prd.md` 단일 — 리뷰 결과는 본문 흡수)
 │   ├── images/                 # 문서 이미지·다이어그램
 │   ├── templates/              # 문서·CI·시크릿 템플릿
 │   │   ├── readme-opensource.md
@@ -124,7 +124,7 @@ claude-projects/
 **오케스트레이터:**
 - `rp-workflow` — 신규 프로젝트·기능 (init부터 전 단계)
 - `rp-amend` — 기존 프로젝트 기능 수정·추가 (init 스킵, specify부터 전 단계 Full PRD)
-**자동 전환:** 모든 단계 완료 시 다음 단계 자동 진입. 사용자 확인 없이 즉시 진행. 커밋·PR·**머지(자동 머지 가드 4종 AND 충족 시)까지 자동**. 배포[11] 완료 후 회고[12]는 **사용자 명령 시에만 실행** (자동 진입 없음).
+**자동 전환:** 모든 단계 완료 시 다음 단계 자동 진입. 사용자 확인 없이 즉시 진행. 커밋·PR·**머지(자동 머지 가드 3종 AND 충족 시)까지 자동**. 배포[11] 완료 후 회고[12]는 **사용자 명령 시에만 실행** (자동 진입 없음).
 - 구체화 완료 → PRD 작성 자동 진입 (확인 질문 금지)
 - PRD 완료 → 기획 리뷰 자동 진입
 - 각 단계 완료 시 "다음 단계로 갈까요?" 질문 금지 — 바로 진행

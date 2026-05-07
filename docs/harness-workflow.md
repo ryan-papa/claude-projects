@@ -25,7 +25,7 @@
   ↓
 ▶ [10] 산출물 보고 (자동 진행)
   ↓
-▶ [11] 커밋 → PR → CI → **자동 머지(가드 4종 AND)** → 배포 → /rp-ship
+▶ [11] 커밋 → PR → CI → **자동 머지(가드 3종 AND)** → 배포 → /rp-ship
   ↓
 (선택) [12] 회고 — 사용자 명시 명령 시에만 실행 → /rp-retro
 ```
@@ -74,7 +74,7 @@
 | [11] 커밋·PR→자동 머지 | **CI + 게이트 + base 정상 + MERGEABLE AND 충족 시 자동 머지** | 가드 1개 이상 실패 → 중단 + OPEN 유지 + 사용자 보고 |
 | [11]→[12] 배포→회고 | **자동 진입 없음**. 사용자 `/rp-retro` 명령 시에만 실행 | — |
 
-**⛔ 절대 규칙 SSOT:** [`harness-absolute-rules.md`](harness-absolute-rules.md) — QA/코드리뷰 생략 불가, 자동 머지 가드 4종 AND, 메타 단축 경로, rp-ship 필수 호출, main 직접 수정 금지 등 본문은 SSOT 참조
+**⛔ 절대 규칙 SSOT:** [`harness-absolute-rules.md`](harness-absolute-rules.md) — QA/코드리뷰 생략 불가, 자동 머지 가드 3종 AND, 메타 단축 경로, rp-ship 필수 호출, main 직접 수정 금지 등 본문은 SSOT 참조
 
 **워크플로우 보조 규칙 (단계 흐름 한정):**
 - 사용자에게 "작업 완료"라고 전달하는 시점은 [10] 이후, [11] 이전
