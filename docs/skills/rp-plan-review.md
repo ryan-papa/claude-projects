@@ -18,14 +18,11 @@ argument-hint: '[대상 PRD 경로]'
    - **Agent 툴**(Claude 서브에이전트, `subagent_type=general-purpose`): 메인 셀프 채점 **금지**. 프롬프트 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) PRD 경로 (b) 9항목 (c)·(d) SSOT 그대로
    - **Bash `codex review`**: 사전 `SAVED_CWD=$(pwd)` 캡처 + PRD 루트로 `cd` (일반 기능 `repositories/[project]/`, 메타 `claude-projects/`). 300초 타임아웃. 종료 후 `cd "$SAVED_CWD"`
 2. 양쪽 결과 수신 후 메인이 매트릭스 판정 → SSOT [`../harness-codex-review.md`](../harness-codex-review.md) "1차 결과 매트릭스" 참조
-3. **결과 저장**:
-   - Claude → `<project-root>/docs/prd/[feature]/review-claude-plan-r{N}.md` (덮어쓰기 금지)
-   - Codex → `<project-root>/docs/prd/[feature]/review-codex-plan.md` (정상/SKIPPED 헤더)
-   - **메타 변경(간소 PRD)**: 두 파일 모두 `review-{claude-meta-r{N},codex-meta}.md`로 대체
+3. **결과 처리**: 별도 파일 저장 없음. Claude 점수·지적과 Codex High/Critical은 인-메모리에서 PRD 본문에 반영
 4. **통과**: Claude 평균 ≥8.0 + 각 항목 ≥7 AND Codex High/Critical 반영 완료 (Codex SKIP 시 Claude 점수만으로) → 다음 단계
-5. **미달**: 통합 반영(Codex High/Critical + Claude 지적) → 새 서브에이전트로 Claude만 재실행 (Codex 재호출 금지). 최대 2회 추가, 총 3회
+5. **미달**: 통합 반영(Codex High/Critical + Claude 지적)을 PRD 본문에 갱신 → 새 서브에이전트로 Claude만 재실행 (Codex 재호출 금지). 최대 2회 추가, 총 3회. 회차 추적 없음
 6. **기술 실패 Fallback**: Agent 툴 오류·토큰 초과·형식 오류 시 최대 2회 재호출. 지속 실패 시 사용자 보고 + 중단. 메인 셀프 채점 우회 금지
-7. **Codex 비-스킵 비정상 종료**(네트워크·hang·매칭 0건): 워크플로우 중단 + 사용자 보고 (Claude 결과는 회차 카운트로 저장)
+7. **Codex 비-스킵 비정상 종료**(네트워크·hang·매칭 0건): 워크플로우 중단 + 사용자 보고
 
 ## 평가 항목
 
@@ -44,7 +41,7 @@ argument-hint: '[대상 PRD 경로]'
 ## 판정
 
 - 평균 >= 8.0 + 각 항목 >= 7 → 통과
-- 평균 미달 또는 항목별 최저 < 7 → Doc Agent 재작성 (최대 3회)
+- 평균 미달 또는 항목별 최저 < 7 → Doc Agent가 PRD 본문 갱신 후 재실행 (인-메모리 최대 3회)
 - 3회 실패 → 사용자에게 보고
 
 ## ▶ 자동 전환

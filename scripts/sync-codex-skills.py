@@ -143,7 +143,7 @@ def render_skill(source: Path) -> str:
         "- Resolve copied relative links against the source file under `docs/skills/` when needed.\n"
         "- Do not record Claude-only `.claude` hooks or slash commands as executed unless they actually ran.\n"
         "- Use Codex `spawn_agent` for independent review when a review step requires role separation.\n"
-        "- Write Codex-led evidence to `review-codex-*.md`; never synthesize `review-claude-*.md` evidence.\n\n"
+        "- Reflect Codex-led review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.\n\n"
         + adapted_body
     )
 

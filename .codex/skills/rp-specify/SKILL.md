@@ -11,7 +11,7 @@ description: "[2] 구체화. 존재 이유·사용자·핵심 장면·경계·�
 - Resolve copied relative links against the source file under `docs/skills/` when needed.
 - Do not record Claude-only `.claude` hooks or slash commands as executed unless they actually ran.
 - Use Codex `spawn_agent` for independent review when a review step requires role separation.
-- Write Codex-led evidence to `review-codex-*.md`; never synthesize `review-claude-*.md` evidence.
+- Reflect Codex-led review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.
 
 
 # rp-specify

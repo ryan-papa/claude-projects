@@ -6,7 +6,7 @@
 
 목표:
 - Claude 중심 하네스에서 Codex를 보조 구현자·독립 리뷰어로 사용
-- 문서 우선, 리뷰 증거, QA, 코드리뷰 게이트 유지
+- 문서 우선, QA, 코드리뷰 게이트 유지 (리뷰 결과는 PRD 본문 흡수, 별도 증거 파일 없음)
 - `/rp-*`, `.claude` hook 등 Claude 전용 기능을 Codex에서 실행한 것처럼 기록하지 않음
 
 ## 기본 운영
@@ -117,8 +117,8 @@ Codex가 주 작성자이고 현재 런타임에서 Claude 호출이 불가한 �
 
 하네스 메타 변경은 단축 경로를 허용한다.
 - `init`, `specify`, `task`, `dev` 생략 가능
-- `docs/prd/[feature]/prd.md` 간소 PRD 필수
-- 리뷰 증거 수집 필수
+- `docs/prd/[feature]/prd.md` 간소 PRD 필수 (frontmatter `**유형:** 하네스 메타 변경` + 4섹션)
+- 리뷰 결과는 PRD 본문에 반영, 별도 증거 파일 생성 금지
 
 Codex-led Mode에서도 단계 구조를 유지한다.
 - PRD update
@@ -132,29 +132,20 @@ Codex-led Mode에서도 단계 구조를 유지한다.
 
 ## 리뷰 산출물
 
-Codex가 하네스 리뷰 증거를 작성할 때 파일명 규칙을 유지한다.
+Claude·Codex 양측 리뷰 결과는 **PRD 본문에 반영**한다. 별도 증거 파일(`review-claude-*.md`, `review-codex-*.md`)을 작성·저장하지 않는다.
 
-- plan review: `review-codex-plan.md`
-- engineering review: `review-codex-eng.md`
-- code review: `review-codex-code.md`
-- harness-meta single review: `review-codex-meta.md`
+- 리뷰 지적은 응답 텍스트로만 메인 에이전트에 전달
+- High/Critical 지적은 PRD(또는 코드) 본문 갱신으로만 흔적을 남김
+- 회차 추적·점수표 보존·Codex 원문 저장 모두 폐기
 
-Claude 리뷰 산출물:
-- `review-claude-plan-r{N}.md`
-- `review-claude-eng-r{N}.md`
-- `review-claude-code-r{N}.md`
-- `review-claude-meta-r{N}.md`
-
-기존 회차 파일은 사용자 요청 없이 덮어쓰지 않는다.
-
-Codex-led Mode에서 위 산출물은 하나의 리뷰를 3번 반복한 기록이 아니라, 서로 다른 세 리뷰 단계의 기록이다.
+Codex-led Mode에서도 plan/eng/code 세 단계는 서로 다른 관점의 리뷰임을 유지하되, 산출물은 각 단계에서 갱신된 PRD 본문 자체로 흡수된다.
 
 ## 리뷰 기준
 
 사용자가 리뷰를 요청하면:
 - findings를 먼저 제시하고 심각도순 정렬
 - 파일 경로와 근거 포함
-- 버그, 워크플로우 회귀, 누락된 게이트, 리뷰 증거 오류, 문서 간 모순을 우선 검토
+- 버그, 워크플로우 회귀, 누락된 게이트, 문서 간 모순을 우선 검토
 - 요약은 짧게 유지
 
 Code review는 [`docs/harness-code-review.md`](./docs/harness-code-review.md)를 따른다.
@@ -172,8 +163,8 @@ Codex-led Mode의 리뷰 결과에는 독립성을 명시한다.
 
 - 동작 변경은 문서 우선
 - QA와 code review는 생략 불가
-- High/Critical finding은 다음 단계 전 반영
-- 리뷰 증거 파일 보존
+- High/Critical finding은 다음 단계 전 반영 (PRD/코드 본문에 흡수)
+- 리뷰 결과는 별도 증거 파일이 아닌 PRD 본문 자체에 반영
 - 테스트 통과를 QA 대체로 기록하지 않음
 - 실제 수행하지 않은 CI, PR, deploy, ship 단계를 완료로 기록하지 않음
 - "리뷰 3"을 같은 관점의 반복 채점으로 재정의하지 않음

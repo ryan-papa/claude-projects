@@ -11,7 +11,7 @@ description: "[3] PRD 작성. 일반 기능은 Full PRD, 하네스 메타 변경
 - Resolve copied relative links against the source file under `docs/skills/` when needed.
 - Do not record Claude-only `.claude` hooks or slash commands as executed unless they actually ran.
 - Use Codex `spawn_agent` for independent review when a review step requires role separation.
-- Write Codex-led evidence to `review-codex-*.md`; never synthesize `review-claude-*.md` evidence.
+- Reflect Codex-led review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.
 
 
 # rp-prd
@@ -42,7 +42,7 @@ PRD(Product Requirements Document) 작성.
 1. 변경 이유·영향 파일·롤백 전략·검증 방법 4섹션 작성
 2. 파일명: `docs/prd/[feature]/prd.md`(하네스 루트 기준)
 3. 완전 생략 금지 — 4섹션 모두 작성 필수
-4. **리뷰 파일명 규약**: plan/eng/code 구분 없이 `review-codex-meta.md` 단일 리뷰 + Codex는 `review-codex-meta.md`. 회차 보존(덮어쓰기 금지)
+4. **frontmatter 식별자**: PRD 본문 상단에 `**유형:** 하네스 메타 변경` 명시 (rp-ship 메타 분기 선검사 키)
 5. 상세 규격: [`../harness-prd.md`](../harness-prd.md) "간소 PRD" 섹션 참조
 
 ## 필수 포함 항목

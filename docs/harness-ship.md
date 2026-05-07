@@ -16,7 +16,7 @@ QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 
 
 ## 커밋 → PR → 배포 (실행 절차)
 
-→ [`skills/rp-ship.md`](skills/rp-ship.md) "절차" 섹션 SSOT (사전 체크 게이트, PR base 결정, 자동 머지 가드 4종 AND, 비상 탈출구 포함)
+→ [`skills/rp-ship.md`](skills/rp-ship.md) "절차" 섹션 SSOT (PR base 결정, 자동 머지 가드 3종 AND, 비상 탈출구 포함)
 
 ## CI 정책
 
@@ -27,7 +27,7 @@ QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 
 | CI 없이 머지 | 사용자에게 수동 머지 안내 |
 | **동일 브랜치 재작업** | 기존 PR이 MERGED/CLOSED면 **신규 PR 생성** (OPEN PR만 재사용) |
 
-> CI 통과 전 머지 금지 · `--admin`/`--no-verify` 우회 금지 · 자동 머지 가드 4종 AND · 리뷰 증거 게이트 · PR base 자동 감지(fail-closed) → 본문은 [`harness-absolute-rules.md`](harness-absolute-rules.md) SSOT 참조
+> CI 통과 전 머지 금지 · `--admin`/`--no-verify` 우회 금지 · 자동 머지 가드 3종 AND · PR base 자동 감지(fail-closed) → 본문은 [`harness-absolute-rules.md`](harness-absolute-rules.md) SSOT 참조
 
 ## 푸시 전 README 검증 (정책)
 
@@ -44,14 +44,14 @@ QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 
 
 ## 머지 직전 PRD 정리 (정책)
 
-가드 4종 AND 통과 후, 머지 실행 전에 **동일 PR**에서 PRD 디렉토리를 통째 삭제한다. Full PRD·간소 PRD 모두 적용. 머지 후 PRD 참조는 **PR 본문 요약 + git history**로만 가능.
+가드 3종 AND 통과 후, 머지 실행 전에 **동일 PR**에서 PRD 디렉토리를 통째 삭제한다. Full PRD·간소 PRD 모두 적용. 머지 후 PRD 참조는 **PR 본문 요약 + git history**로만 가능.
 
 | 단계 | 내용 |
 |------|------|
-| 요약 임베드 | Full = `## 개요·목적` + `## 기능 요구사항` + `## Review 결과` / 간소 = `## 변경 이유` + `## 영향 파일` + `## 검증` + `## Review 결과` → PR 본문 `<details>` 블록. 추출 누락·`gh pr edit` 1회 재시도 실패 시 ship 중단 |
+| 요약 임베드 | Full = `## 개요·목적` + `## 기능 요구사항` / 간소 = `## 변경 이유` + `## 영향 파일` + `## 검증` → PR 본문 `<details>` 블록. 추출 누락·`gh pr edit` 1회 재시도 실패 시 ship 중단 |
 | 디렉토리 삭제 | `git rm -r <project-root>/docs/prd/[feature]/` (Full + 간소 동일) |
 | 정리 커밋 | `chore(prd): merge 직전 PRD 정리` |
-| CI 재통과 | 정리 커밋 CI SUCCESS 확인 (가드 b 재실행 면제) |
+| CI 재통과 | 정리 커밋 CI SUCCESS 확인 |
 | 누락 시 | 머지 차단 |
 
 → 실행 절차: [`skills/rp-ship.md`](skills/rp-ship.md) "PRD 정리" SSOT

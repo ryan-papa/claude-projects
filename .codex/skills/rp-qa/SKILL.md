@@ -11,7 +11,7 @@ description: "[8] QA/콘텐츠 검수. 코드 프로젝트는 E2E+axe 필수, �
 - Resolve copied relative links against the source file under `docs/skills/` when needed.
 - Do not record Claude-only `.claude` hooks or slash commands as executed unless they actually ran.
 - Use Codex `spawn_agent` for independent review when a review step requires role separation.
-- Write Codex-led evidence to `review-codex-*.md`; never synthesize `review-claude-*.md` evidence.
+- Reflect Codex-led review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.
 
 
 # rp-qa
