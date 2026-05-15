@@ -34,7 +34,13 @@ description: "[11] 커밋·PR·CI·자동머지·배포. 수동 git/gh 우회 �
    - OPEN PR 존재 + base 일치 → 해당 PR 재사용
    - OPEN PR 존재 + base 불일치 → `gh pr edit <num> --base <detected-base>` 로 보정 후 **CI 재실행 대기** (base 변경은 diff 범위 재정의. 자동 머지 가드는 재실행된 CI 통과를 다시 확인)
    - MERGED/CLOSED만 존재하거나 PR 없음 → 신규 PR 생성
-5. **PR 생성/재사용**: `gh pr create --base <detected-base> ...` (제목 + 변경 요약 + 테스트 계획)
+5. **PR 생성/재사용**: `gh pr create --base <detected-base> ...` (제목 + 변경 요약 + 테스트 계획 + **PRD 요약 `<details>` 블록 본문에 처음부터 포함**)
+   - PRD 유형별 추출 섹션:
+     - Full PRD: `## 개요·목적` + `## 기능 요구사항`
+     - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증`
+   - 추출 검증: 필수 섹션 중 하나라도 PRD에서 누락 시 PR 생성 차단 + 사용자 보고
+   - **재사용 PR**: 단계 4 에서 OPEN PR 재사용 시, 기존 본문에 PRD 요약 `<details>` 블록 부재면 `gh pr edit <num> --body` 로 보강 (정책 변경 이전에 생성된 PR 대응). 보강 실패 시 ship 중단
+   - PRD 디렉토리 main 영구 보존 — 별도 정리 commit 금지 (CI 재실행 비용 차단)
 6. **CI 확인**: CI 통과 대기
 
 ### 자동 머지 (가드 3종 AND)
@@ -44,23 +50,9 @@ description: "[11] 커밋·PR·CI·자동머지·배포. 수동 git/gh 우회 �
    - (c) `gh pr view <num> --json mergeable` 가 `MERGEABLE`
    하나라도 실패 → **자동 머지 중단 + PR 상태 OPEN 유지 + 사용자 즉시 보고**. `--admin`·`--no-verify` 우회 금지.
 
-### PRD 정리 (머지 직전, 동일 PR)
-8. **PRD 요약 PR 본문 임베드**:
-   - PRD 유형별 추출 섹션:
-     - Full PRD: `## 개요·목적` + `## 기능 요구사항`
-     - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증`
-   - 추출 검증: 위 필수 섹션 중 하나라도 PRD에서 누락 시 ship 중단 + OPEN 유지 + 사용자 보고
-   - 적용: `gh pr edit <num> --body "$(...)"` — 기존 본문 끝에 `<details><summary>PRD 요약</summary>...</details>` 추가
-   - 실패 분기 (body 길이 초과·rate limit·네트워크 등): **1회 재시도** → 지속 실패 시 ship 중단 + OPEN 유지 + 사용자 보고. 정리 커밋(단계 9) 진입 금지
-9. **PRD 디렉토리 삭제 커밋**:
-   - `git rm -r <project-root>/docs/prd/[feature]/`
-   - `git commit -m "chore(prd): merge 직전 PRD 정리"`
-   - `git push`
-10. **CI 재대기**: 정리 커밋 CI 통과만 확인 (`gh pr checks <num>`)
-
 ### 머지·배포
-11. **머지 실행**: `gh pr merge <num> --merge --delete-branch` (전략 `--merge` 고정)
-12. **배포 확인**: 배포 워크플로우 완료 대기 + 결과 보고
+8. **머지 실행**: `gh pr merge <num> --merge --delete-branch` (전략 `--merge` 고정)
+9. **배포 확인**: 배포 워크플로우 완료 대기 + 결과 보고
 
 ### 비상 탈출구
 

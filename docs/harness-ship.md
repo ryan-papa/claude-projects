@@ -42,20 +42,18 @@ QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 
 
 → 실행 절차: [`skills/rp-ship.md`](skills/rp-ship.md) "README 검증" SSOT
 
-## 머지 직전 PRD 정리 (정책)
+## PR 생성 시 PRD 요약 본문 포함 (정책)
 
-가드 3종 AND 통과 후, 머지 실행 전에 **동일 PR**에서 PRD 디렉토리를 통째 삭제한다. Full PRD·간소 PRD 모두 적용. 머지 후 PRD 참조는 **PR 본문 요약 + git history**로만 가능.
+`gh pr create` 시 본문에 PRD 요약을 처음부터 임베드한다. PRD 디렉토리는 그대로 main 에 머지 (별도 정리 commit 금지 — CI 재실행 비용 차단). Full PRD·간소 PRD 모두 적용.
 
 | 단계 | 내용 |
 |------|------|
-| 요약 임베드 | Full = `## 개요·목적` + `## 기능 요구사항` / 간소 = `## 변경 이유` + `## 영향 파일` + `## 검증` → PR 본문 `<details>` 블록. 추출 누락·`gh pr edit` 1회 재시도 실패 시 ship 중단 |
-| 디렉토리 삭제 | `git rm -r <project-root>/docs/prd/[feature]/` (Full + 간소 동일) |
-| 정리 커밋 | `chore(prd): merge 직전 PRD 정리` |
-| CI 재통과 | 정리 커밋 CI SUCCESS 확인 |
-| 누락 시 | 머지 차단 |
+| 요약 임베드 | Full = `## 개요·목적` + `## 기능 요구사항` / 간소 = `## 변경 이유` + `## 영향 파일` + `## 검증` → PR 생성 시 본문 `<details>` 블록 |
+| 추출 누락 | PR 생성 차단 |
+| 사후 정리 | 없음 — PRD 디렉토리 main 영구 보존 (추적성 향상) |
 
-→ 실행 절차: [`skills/rp-ship.md`](skills/rp-ship.md) "PRD 정리" SSOT
-→ 절대 규칙: [`harness-absolute-rules.md`](harness-absolute-rules.md) "머지 직전 PRD 정리 필수"
+→ 실행 절차: [`skills/rp-ship.md`](skills/rp-ship.md) "PR 생성" SSOT
+→ 절대 규칙: [`harness-absolute-rules.md`](harness-absolute-rules.md) "PR 생성 시 PRD 요약 본문 포함 필수"
 
 ## 머지 후 정책
 

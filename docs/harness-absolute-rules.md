@@ -47,7 +47,7 @@
   - (b) PR base 정상 감지
   - (c) `gh pr view --json mergeable` = `MERGEABLE`
   - 하나라도 실패 → 중단 + OPEN 유지 + 사용자 보고. `--admin`·`--no-verify` 우회 금지. 비상 탈출구 `RP_SHIP_MANUAL=1` 환경변수만 자동 머지 비활성 허용
-- **머지 직전 PRD 정리 필수**: 자동 머지 가드 3종 통과 후 머지 실행 전, 동일 PR 내에서 PRD 디렉토리(`<project-root>/docs/prd/[feature]/`)를 `git rm -r` 통째 삭제 + PR 본문에 요약(Full = 개요·기능 요구사항 / 간소 = 변경 이유·영향 파일·검증) 임베드 + 정리 커밋 CI 재통과 확인 후 머지. Full PRD·간소 PRD 모두 적용. 정리 단계 누락 시 머지 차단. 머지 후 PRD 참조는 **PR 본문 요약 + git history**로만 가능
+- **PR 생성 시 PRD 요약 본문 포함 필수**: `gh pr create` 본문에 PRD 요약(Full = 개요·기능 요구사항 / 간소 = 변경 이유·영향 파일·검증)을 처음부터 임베드. Full PRD·간소 PRD 모두 적용. PRD 디렉토리는 main 에 그대로 머지 (별도 삭제 commit 금지 — 정리 commit CI 재실행 비용 차단). PRD 추출 누락 시 PR 생성 차단
 - **`rp-ship` PR base 자동 감지 게이트**: 통합 브랜치 선언 감지 → `--base` 주입
   - 감지 순서: (0) 메타 분기 선검사 (PRD 본문 frontmatter `**유형:** 하네스 메타 변경` + 간소 4섹션(`## 변경 이유`·`## 영향 파일`·`## 롤백 전략`·`## 검증`) 동시 존재 → `--base main`) → (1) `docs/tasks.md` → (2) `CLAUDE.md` → (3) repo default
   - 매칭 정규식: `^[\s\-\*|]*통합 브랜치:\s*`?([A-Za-z0-9/_\-]+)`?` 정확히 1건만 채택
@@ -58,5 +58,7 @@
 ## 단축 경로·예외
 
 - **하네스 메타 변경 단축 경로**: `rp-init`·`rp-specify`·`rp-task`·`rp-dev` 스킵 + feat 브랜치 + `rp-prd` 간소(변경 이유·영향 파일·롤백·검증 4섹션) + 리뷰 + `rp-ship`. 완전 생략은 금지
+  - 리뷰 범위: 기본 [4]·[5]·[9] 모두 Claude+Codex 병렬 1회
+  - **예외**: `docs/skills/` 전용 메타 변경 (코드 동작 영향 0건 — `repositories/[project]/` 산하 파일 미수정) 은 [9] 코드 리뷰만 적용 ([4]·[5] 스킵). 영향 파일 범위가 docs/skills/ + 동기화된 `.codex/skills/` 로 한정될 때만 적용
 - **회고(`/rp-retro`)는 사용자 명시 명령 시에만 실행** — 자동 진입 없음. 필요 시 사용자가 직접 `/rp-retro` 호출
 - 워크플로우 위반 발견 시 즉시 중단하고 빠진 단계부터 재진행
