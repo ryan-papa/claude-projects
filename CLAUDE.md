@@ -134,6 +134,7 @@ claude-projects/
 **Codex 스킬 동기화:** `docs/skills/rp-*.md`가 원본이다. 변경 후 `.claude/commands/` 심링크와 `.codex/skills/rp-*/SKILL.md` 변환본을 함께 갱신한다. 수동 확인은 `rtk python3 scripts/sync-codex-skills.py --check`, 로컬 설치는 `rtk python3 scripts/sync-codex-skills.py --install-user`.
 
 **⛔ 하네스 절대 규칙:** [`docs/harness-absolute-rules.md`](docs/harness-absolute-rules.md) (SSOT, 예외 없음)
+- **⛔ 인프라 재기동(colima·k3s·노드 reboot 등)은 사용자 명시 허락 필수** — 일반 결정 위임 신호 불충분. 상세: SSOT §인프라 재기동·다운타임 작업 + 레포별 정책 (`repositories/mac-mini-infra/CLAUDE.md` §⛔ 인프라 재기동 결정)
 
 **코드리뷰 상세:** [`harness-code-review.md`](docs/harness-code-review.md)
 **Codex 추가 리뷰:** [`harness-codex-review.md`](docs/harness-codex-review.md) — 플러그인 `openai/codex-plugin-cc` (루트에 1회 설치, settings.json 선언)

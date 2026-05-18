@@ -55,6 +55,15 @@
   - 우회 허용: 수동 `--base <X>`, 메타 분기 자동
   - base 리타깃 시 CI 재실행 후 자동 머지 가드 재확인
 
+## 인프라 재기동·다운타임 작업
+
+- **클러스터/노드 재기동성 작업 = 사용자 명시 허락 필수**: AI 어시스턴트·자동화 스크립트는 다음 작업을 사용자의 **구체 동의** 없이 실행 절대 금지
+  - `colima restart`·`colima stop`+`start` / k3s 서비스 재시작 / 노드 reboot·shutdown / docker daemon 재기동 / 클러스터 영향 daemonset rollout-restart (CNI·CoreDNS·argo-rollouts 등)
+- 일반 결정 위임 신호 ("ㄱㄱ"·"진행해"·"바로 해")로는 **불충분** — 재기동 자체에 대한 명시 동의 필요 (예: "colima restart 진행해도 됨")
+- 영속성 검증을 위한 `colima restart`도 동일 규칙 적용 — 운영자 한산 시간 별도 시점 권장
+- 위반 시 리뷰[4·5·9] 모든 항목 즉시 fail. `rp-ship` 자동 머지 차단
+- 레포별 상세 정책은 해당 레포 CLAUDE.md (예: `repositories/mac-mini-infra/CLAUDE.md` §⛔ 인프라 재기동 결정)
+
 ## 단축 경로·예외
 
 - **하네스 메타 변경 단축 경로**: `rp-init`·`rp-specify`·`rp-task`·`rp-dev` 스킵 + feat 브랜치 + `rp-prd` 간소(변경 이유·영향 파일·롤백·검증 4섹션) + 리뷰 + `rp-ship`. 완전 생략은 금지
