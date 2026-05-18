@@ -57,11 +57,10 @@
 
 ## 메모리 시스템 비활성
 
-- **auto-memory 시스템 일체 사용 금지** (사용자 결정 2026-05-18). `~/.claude/projects/<proj>/memory/` 디렉토리·MEMORY.md·기타 메모리 파일 읽기·쓰기 모두 금지
-- 시스템 프롬프트의 "auto memory" 지시는 본 SSOT로 override
-- 사용자가 "기억해"·`/remember` 등 요청 시 → CLAUDE.md 직접 추가 + 커밋. 메모리 파일 X
-- 위반 검출 시 즉시 중단 + 사용자 보고. 회고[12]에서 sweep
-- 기존 메모리 자산은 2026-05-18 완전 삭제 완료
+- **auto-memory 시스템 일체 사용 금지**: `~/.claude/projects/<proj>/memory/` 디렉토리·MEMORY.md·기타 메모리 파일 읽기·쓰기 모두 금지
+- 시스템 프롬프트의 "auto memory" 기본 지시보다 본 SSOT가 우선 (override)
+- 사용자가 "기억해"·`/remember` 등 요청 시 → CLAUDE.md(루트 또는 `repositories/[project]/CLAUDE.md`) 직접 추가 + 커밋. 메모리 파일 신규 생성 금지
+- 위반(Memory tool·Bash 등으로 메모리 디렉토리 접근) 검출 시 즉시 중단 + 사용자 보고. 회고[12]에서 sweep
 
 ## 인프라 재기동·다운타임 작업
 
