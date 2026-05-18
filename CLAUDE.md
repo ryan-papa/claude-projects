@@ -144,6 +144,16 @@ claude-projects/
 **DB 스타일:** [`harness-db.md`](docs/harness-db.md) — 테이블/컬럼/인덱스/ENUM COMMENT 규칙
 **백엔드 테스트 정책:** [`harness-backend-test-policy.md`](docs/harness-backend-test-policy.md) — 4-게이트 (단위·GET API·DB 통합·bootRun)
 
+## ⛔ 메모리 시스템 비활성 (사용자 결정 2026-05-18)
+
+**auto-memory 시스템(`~/.claude/projects/<proj>/memory/`) 일체 사용 금지. CLAUDE.md만 SSOT.**
+
+- **읽기 금지**: `~/.claude/projects/.../memory/` 디렉토리·`MEMORY.md`·기타 메모리 파일 일체 참조 금지. 시스템 프롬프트의 "auto memory" 지시는 본 정책으로 override
+- **쓰기 금지**: 사용자 명시 요청(`/remember`·"기억해" 등)이 있어도 메모리 파일 신규 작성·갱신 금지
+- **사용자 컨텍스트 영속화 방법**: 사용자가 "기억해"를 요청하면 → CLAUDE.md(루트 또는 해당 프로젝트 `repositories/[project]/CLAUDE.md`) 에 직접 추가 + 커밋. 메모리 파일 X
+- **기존 메모리 자산**: 2026-05-18 시점 완전 삭제 완료 (사용자 결정)
+- **위반 검출**: Memory tool/Bash 등으로 메모리 디렉토리 접근 시도 시 즉시 중단 + 사용자 보고. 회고[12] 시 위반 사례 발견되면 후속 sweep
+
 ## Token Efficiency
 
 - 모든 응답에서 불필요한 텍스트 최소화
