@@ -134,7 +134,8 @@ claude-projects/
 **Codex 스킬 동기화:** `docs/skills/rp-*.md`가 원본이다. 변경 후 `.claude/commands/` 심링크와 `.codex/skills/rp-*/SKILL.md` 변환본을 함께 갱신한다. 수동 확인은 `rtk python3 scripts/sync-codex-skills.py --check`, 로컬 설치는 `rtk python3 scripts/sync-codex-skills.py --install-user`.
 
 **⛔ 하네스 절대 규칙:** [`docs/harness-absolute-rules.md`](docs/harness-absolute-rules.md) (SSOT, 예외 없음)
-- **⛔ 인프라 재기동(colima·k3s·노드 reboot 등)은 사용자 명시 허락 필수** — 일반 결정 위임 신호 불충분. 상세: SSOT §인프라 재기동·다운타임 작업 + 레포별 정책 (`repositories/mac-mini-infra/CLAUDE.md` §⛔ 인프라 재기동 결정)
+- **⛔ 인프라 재기동(colima·k3s·노드 reboot 등)은 사용자 명시 허락 필수** — 상세: SSOT §인프라 재기동·다운타임 작업 + 레포별 정책 (`repositories/mac-mini-infra/CLAUDE.md` §⛔ 인프라 재기동 결정)
+- **⛔ auto-memory 시스템 비활성** — `~/.claude/projects/<proj>/memory/` 읽기·쓰기 금지, 사용자 "기억해" 요청 시 CLAUDE.md 직접 추가. 상세: SSOT §메모리 시스템 비활성
 
 **코드리뷰 상세:** [`harness-code-review.md`](docs/harness-code-review.md)
 **Codex 추가 리뷰:** [`harness-codex-review.md`](docs/harness-codex-review.md) — 플러그인 `openai/codex-plugin-cc` (루트에 1회 설치, settings.json 선언)
@@ -143,16 +144,6 @@ claude-projects/
 **시크릿 관리:** [`security-guide.md`](docs/security-guide.md) / [`security/secrets-management.md`](docs/security/secrets-management.md)
 **DB 스타일:** [`harness-db.md`](docs/harness-db.md) — 테이블/컬럼/인덱스/ENUM COMMENT 규칙
 **백엔드 테스트 정책:** [`harness-backend-test-policy.md`](docs/harness-backend-test-policy.md) — 4-게이트 (단위·GET API·DB 통합·bootRun)
-
-## ⛔ 메모리 시스템 비활성 (사용자 결정 2026-05-18)
-
-**auto-memory 시스템(`~/.claude/projects/<proj>/memory/`) 일체 사용 금지. CLAUDE.md만 SSOT.**
-
-- **읽기 금지**: `~/.claude/projects/.../memory/` 디렉토리·`MEMORY.md`·기타 메모리 파일 일체 참조 금지. 시스템 프롬프트의 "auto memory" 지시는 본 정책으로 override
-- **쓰기 금지**: 사용자 명시 요청(`/remember`·"기억해" 등)이 있어도 메모리 파일 신규 작성·갱신 금지
-- **사용자 컨텍스트 영속화 방법**: 사용자가 "기억해"를 요청하면 → CLAUDE.md(루트 또는 해당 프로젝트 `repositories/[project]/CLAUDE.md`) 에 직접 추가 + 커밋. 메모리 파일 X
-- **기존 메모리 자산**: 2026-05-18 시점 완전 삭제 완료 (사용자 결정)
-- **위반 검출**: Memory tool/Bash 등으로 메모리 디렉토리 접근 시도 시 즉시 중단 + 사용자 보고. 회고[12] 시 위반 사례 발견되면 후속 sweep
 
 ## Token Efficiency
 
