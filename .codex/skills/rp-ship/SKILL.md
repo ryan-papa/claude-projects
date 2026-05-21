@@ -45,13 +45,15 @@ description: "[11] 커밋·PR·CI·자동머지·배포. 수동 git/gh 우회 �
 
 ### 자동 머지 (가드 3종 AND)
 7. **자동 머지 안전 가드** — 모두 충족 시에만 진행:
-   - (a) CI 모든 체크 SUCCESS (`gh pr checks <num>` exit 0)
+   - (a) **CI 모든 체크 SUCCESS — 동기 검증 의무**
+     - CI 있음(`.github/workflows/` 1건 이상): `gh pr checks <num> --watch` 로 모든 체크 종결 대기 → 종료 후 `gh pr checks <num>` 재호출 → exit 0 + `pending`/`queued`/`in_progress`/`fail` 0건 검증. `--auto` 옵션 위임 금지 (branch protection 정책 의존이라 인프라 결손 시 가드 무력화 위험. PR #274 r1 사례)
+     - CI 없음(`.github/workflows/` 0건): (a) **N/A**, (b)(c) 만 평가 후 진행
    - (b) PR base 자동 감지 또는 메타 분기 결과 정상 (fail-closed 통과)
    - (c) `gh pr view <num> --json mergeable` 가 `MERGEABLE`
-   하나라도 실패 → **자동 머지 중단 + PR 상태 OPEN 유지 + 사용자 즉시 보고**. `--admin`·`--no-verify` 우회 금지.
+   하나라도 실패 → **자동 머지 중단 + PR 상태 OPEN 유지 + 사용자 즉시 보고**. `--admin`·`--no-verify`·`--auto` 우회 금지.
 
 ### 머지·배포
-8. **머지 실행**: `gh pr merge <num> --merge --delete-branch` (전략 `--merge` 고정)
+8. **머지 실행**: `gh pr merge <num> --merge --delete-branch` (전략 `--merge` 고정, **`--auto` 금지** — 가드 (a) 는 단계 7 에서 동기 검증 완료 후 호출이라 즉시 머지)
 9. **배포 확인**: 배포 워크플로우 완료 대기 + 결과 보고
 
 ### 비상 탈출구
@@ -107,11 +109,16 @@ PR 생성/리타깃 전 **통합 브랜치 선언을 감지**해 `--base` 에 �
 
 ```
 PR 생성 시점에 .github/workflows/ 확인
-  ├── CI 있음 → gh pr merge --merge --auto (CI 통과 대기)
+  ├── CI 있음 → 가드 (a) 동기 검증: `gh pr checks <num> --watch` 종결 대기
+  │             → 재호출 exit 0 + pending/queued/in_progress/fail 0건 검증
+  │             → 통과 시 `gh pr merge <num> --merge --delete-branch` (auto 없이)
+  │             → 미통과 시 자동 머지 중단 + 사용자 보고
   └── CI 없음 → "CI가 없습니다. 추가할까요?" 사용자에게 질문
        ├── 추가 원함 → CI 워크플로우 생성 후 재푸시
-       └── 추가 안 함 → 사용자에게 수동 머지 안내
+       └── 추가 안 함 → 가드 (a) N/A, (b)(c) 평가 후 `gh pr merge --merge` 수동 안내
 ```
+
+**금지 패턴:** `gh pr merge --auto` 단독 호출. GitHub 의 `--auto` 는 branch protection 의 required status checks 통과 시 머지로, 인프라 결손(예: backend·frontend job 이 required 미지정) 시 일부 체크 pending 상태로 머지 트리거. 가드 (a) 의무를 위반.
 
 ## 절대 규칙
 
