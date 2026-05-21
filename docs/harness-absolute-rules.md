@@ -38,15 +38,15 @@
 ## 배포·머지·브랜치
 
 - 산출물 보고 없이 배포 진행 금지 (커밋·PR은 산출물 보고 후 자동)
-- **CI 통과 전 머지 금지** (예외 없음)
+- **CI 통과 전 머지 금지**: `.github/workflows/` 1건 이상 존재 시 모든 체크 SUCCESS 전 머지 금지 (예외 없음). 워크플로우 자체 부재 시 본 조항 N/A — 가드 (a) N/A 분기와 정합 (단계 7 참조)
 - **feat 브랜치 직행 배포 금지**: 모든 배포는 `rp-ship` 경유 (PR → CI → main 머지 → 배포). feat/통합 브랜치 상태로 프로덕션 프로세스 기동·노출 금지. 단, 로컬 개발 서버(`uvicorn --reload`)는 예외
 - **`main` 직접 수정 금지**: `main` 브랜치에서 docs·CLAUDE.md·스킬·settings 수정 감지 시 즉시 중단 + feat 브랜치 전환 요구
 - **`rp-ship` 스킬 호출 필수**: 커밋·PR·머지·배포는 수동 `git`/`gh` 우회 없이 `rp-ship` 스킬 경유. 단, `rp-ship` 스킬 내부 절차로 명시된 명령은 예외
 - **`rp-ship` 자동 머지 가드 3종 AND**: 모두 충족 시에만 자동 머지
-  - (a) CI 모든 체크 SUCCESS
+  - (a) CI 모든 체크 SUCCESS — **동기 검증 의무**. CI 있음 시 `gh pr checks <num> --watch` 종결 대기 후 재호출 exit 0 + pending/queued/in_progress/fail 0건 검증. **`gh pr merge --auto` 위임 금지** (branch protection 정책 의존이라 인프라 결손 시 가드 무력화. PR #274 r1 사례). CI 없음 시 (a) N/A, (b)(c) 만 평가
   - (b) PR base 정상 감지
   - (c) `gh pr view --json mergeable` = `MERGEABLE`
-  - 하나라도 실패 → 중단 + OPEN 유지 + 사용자 보고. `--admin`·`--no-verify` 우회 금지. 비상 탈출구 `RP_SHIP_MANUAL=1` 환경변수만 자동 머지 비활성 허용
+  - 하나라도 실패 → 중단 + OPEN 유지 + 사용자 보고. `--admin`·`--no-verify`·`--auto` 우회 금지. 비상 탈출구 `RP_SHIP_MANUAL=1` 환경변수만 자동 머지 비활성 허용
 - **PR 생성 시 PRD 요약 본문 포함 필수**: `gh pr create` 본문에 PRD 요약(Full = 개요·기능 요구사항 / 간소 = 변경 이유·영향 파일·검증)을 처음부터 임베드. Full PRD·간소 PRD 모두 적용. PRD 디렉토리는 main 에 그대로 머지 (별도 삭제 commit 금지 — 정리 commit CI 재실행 비용 차단). PRD 추출 누락 시 PR 생성 차단
 - **`rp-ship` PR base 자동 감지 게이트**: 통합 브랜치 선언 감지 → `--base` 주입
   - 감지 순서: (0) 메타 분기 선검사 (PRD 본문 frontmatter `**유형:** 하네스 메타 변경` + 간소 4섹션(`## 변경 이유`·`## 영향 파일`·`## 롤백 전략`·`## 검증`) 동시 존재 → `--base main`) → (1) `docs/tasks.md` → (2) `CLAUDE.md` → (3) repo default
