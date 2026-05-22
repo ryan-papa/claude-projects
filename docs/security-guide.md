@@ -1,6 +1,6 @@
 # SECURITY Guide
 
-claude-projects 공통 보안 규칙. 신규 프로젝트는 이 문서를 기준으로 시크릿·자격증명을 운영한다.
+workflow-agent-harness 공통 보안 규칙. 신규 프로젝트는 이 문서를 기준으로 시크릿·자격증명을 운영한다.
 
 ## 원칙
 

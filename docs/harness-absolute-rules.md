@@ -48,20 +48,20 @@
 
 - 인-메모리 최대 **3회** (서브에이전트 재호출 + PRD/코드 갱신 사이클)
 - **3회 미달 시 자동 진행 중단 + 사용자 결정 요청** (강행 / 재설계 / 중단). 임계 완화·임의 통과 금지
-- 기술적 실패(서브에이전트 오류·토큰·형식)는 별도 카운팅 — 최대 2회 재호출 후 지속 시 사용자 보고
+- 기술적 실패(서브에이전트 오류·토큰·형식)는 별도 카운팅 — **1차 시도 후 추가 최대 2회 재호출(총 최대 3회)** 후 지속 시 사용자 보고
 
 ## 문서·리뷰 절차
 
 - **[리뷰 단계 서브에이전트 필수]** `/rp-plan-review`·`/rp-eng-review`·`/rp-code-review` 적용 — 작성 모드별 서브에이전트는 SSOT [작성 모드 및 리뷰 매트릭스](#작성-모드-및-리뷰-매트릭스-ssot) 참조:
   - 서브에이전트 프롬프트 4 필수 항목(SSOT): (a) 대상 파일 경로 + 참고 파일, (b) 채점 기준(단계별 항목 수: 4=9, 5=5, 9=7), (c) 독립 판정 지시(메인 컨텍스트 미공유), (d) 역할 경계: 본 단계 채점만 수행 — **응답 텍스트로만 결과 반환, 어떤 결과 파일도 생성 금지** (Claude-led: Codex 실행 금지 / Codex-led: Claude 호출·결과 합성 금지) (`.codex/skills/` 어댑터 노트 동시 참조). **스킬 파일은 본 (a)~(d) 본문 중복 금지, 링크 참조만 허용**
-  - Fallback: 기술적 실패 최대 2회 재호출 → 지속 시 사용자 즉시 보고. 셀프 채점 우회 금지
+  - Fallback: 기술적 실패 시 **1차 시도 후 추가 최대 2회 재호출(총 최대 3회)** → 지속 시 사용자 즉시 보고. 셀프 채점 우회 금지
   - 평가 미달: PRD 본문 갱신 후 새 서브에이전트 재실행 (기술 실패와 구분). 인-메모리 최대 3회 한도, 회차별 별도 파일·점수 보존 없음. 3회 미달 시 SSOT [재시도 한도](#재시도-한도-단계당) 적용
   - **증거 파일 보존 없음**: 리뷰 지적은 PRD 본문 자체에 반영된 결과물로만 남는다. `review-claude-*.md`·`review-codex-*.md` 어떤 형태도 생성 금지
 - 기능 변경 시 코드 전에 PRD 문서 먼저 업데이트 + 리뷰
 - **[4][5][9] Codex 추가 리뷰 (Claude-led 전용)**: Codex-led 모드에서는 본 절 N/A — 메인이 이미 Codex이므로 외부 추가 리뷰 없음. Claude-led 모드에서만 적용:
   - Claude 서브에이전트와 **1차 병렬 실행** (메인이 Agent 툴 + Bash `codex review`를 동일 메시지에서 동시 호출). Codex 1회만, Claude 미달 시 Claude만 최대 2회 추가 재실행 (총 3회). 통과 조건: Claude 점수 통과 AND Codex High/Critical 반영 완료 (Codex SKIP 시 Claude 점수만으로 판정)
   - 타임아웃: wall-clock 300초
-  - cwd: 일반 기능 `repositories/[project]/`, 하네스 메타 변경 `claude-projects/`
+  - cwd: 일반 기능 `repositories/[project]/`, 하네스 메타 변경 `workflow-agent-harness/`
   - **실행 종료 후 시작 cwd 복귀 필수** (정상/SKIPPED/중단 무관). `SAVED_CWD=$(pwd)` 캡처 → 종료 직후 `cd "$SAVED_CWD"`. 누락 시 다음 단계 진행 금지
   - 점수화 없음. High/Critical 지적 반영 후 다음 단계 진입
   - **결과는 PRD 본문에 반영**, 별도 파일 저장 금지
@@ -113,10 +113,30 @@
 - 위반 시 리뷰[4·5·9] 모든 항목 즉시 fail. `rp-ship` 자동 머지 차단
 - 레포별 상세 정책은 해당 레포 CLAUDE.md (예: `repositories/mac-mini-infra/CLAUDE.md` §⛔ 인프라 재기동 결정)
 
+## ⛔ 서브레포 참조 금지 / 회고 위치 정책
+
+하네스 레포(`docs/`·`CLAUDE.md`·`AGENTS.md`·루트 직속 문서)는 서브레포 내부 파일을 직접 링크 참조 **금지**.
+
+| 항목 | 규칙 |
+|------|------|
+| 금지 패턴 | 하네스 문서에서 `repositories/[project]/...` 경로 링크 작성 |
+| 허용 패턴 | 출처 명시는 텍스트로만(예: "museum-finder T-22 회고 출처") + 근거 내용은 `docs/research/` 발췌본에 작성 후 자기참조 |
+| 위반 감지 | 리뷰[9] 정합성 항목에서 `grep -rnE "\]\(.*repositories/[a-z-]+/[^)]+\)" docs/ CLAUDE.md AGENTS.md README.md` (마크다운 링크만 매칭, 변수형 placeholder/텍스트 언급은 허용) 검출 시 즉시 fail |
+
+### 회고 문서 위치 분리
+
+| 회고 유형 | 위치 | 예시 |
+|----------|------|------|
+| **하네스 메타 변경 회고** (하네스 규칙·스킬·문서 자체에 대한 회고, 또는 서비스 회고에서 메타 변경 근거가 된 발췌) | `docs/research/` | `docs/research/retro-T22-aop-concurrency.md` |
+| **서비스 프로젝트 회고** (`/rp-retro` 산출물) | `repositories/[project]/docs/research/` | `repositories/museum-finder/docs/research/retro-T22.md` |
+
+**발췌 원칙**: 서비스 회고가 하네스 메타 변경 근거로 사용될 때, 원본은 서비스 레포에 보존하고 **하네스 메타 변경 근거가 된 섹션만** `docs/research/`에 발췌본으로 작성한다. 발췌본 frontmatter에 출처(서비스 식별자 또는 익명 — 보안·민감도에 따라 선택, 시점)·발췌 목적 명시. 발췌 본문에는 서비스 도메인 정보(클래스명·PR 번호·브랜치명·도메인 용어)를 일반화된 패턴으로 추출한다.
+
 ## 단축 경로·예외
 
 - **하네스 메타 변경 단축 경로**: `rp-init`·`rp-specify`·`rp-task`·`rp-dev` 스킵 + feat 브랜치 + `rp-prd` 간소(변경 이유·영향 파일·롤백·검증 4섹션) + 리뷰 + `rp-ship`. 완전 생략은 금지
   - 리뷰 범위: 기본 [4]·[5]·[9] 모두 Claude+Codex 병렬 1회
   - **예외**: `docs/skills/` 전용 메타 변경 (코드 동작 영향 0건 — `repositories/[project]/` 산하 파일 미수정) 은 [9] 코드 리뷰만 적용 ([4]·[5] 스킵). 영향 파일 범위가 docs/skills/ + 동기화된 `.codex/skills/` 로 한정될 때만 적용
 - **회고(`/rp-retro`)는 사용자 명시 명령 시에만 실행** — 자동 진입 없음. 필요 시 사용자가 직접 `/rp-retro` 호출
+- **스킬-단독 운영 5종 (원본 `harness-*.md` 없음)**: `rp-workflow`·`rp-amend`(오케스트레이터), `rp-init`·`rp-specify`·`rp-retro`는 스킬 파일이 SSOT. "하네스 동기화" 정책의 원본↔스킬 페어 적용 예외
 - 워크플로우 위반 발견 시 즉시 중단하고 빠진 단계부터 재진행

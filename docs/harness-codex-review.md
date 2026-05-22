@@ -6,16 +6,17 @@ Claude-led 모드에서 Claude 서브에이전트 리뷰와 Codex 플러그인(`
 
 ## 적용 단계
 
+하네스 메타 변경(단축 경로) 시에도 동일 3단계(4·5·9) 모두 적용. **단**, `docs/skills/` 전용 메타 변경(코드 동작 영향 0건)은 SSOT 예외에 따라 [9]만 적용 — SSOT [`harness-absolute-rules.md`](harness-absolute-rules.md) "단축 경로·예외" 참조.
+
 | 단계 | Claude 리뷰 | Codex 명령 | 결과 처리 |
 |:---:|-------------|-----------|---------|
 | 4 | 기획 리뷰 | `/codex:review --wait` | High/Critical 지적을 PRD 본문에 반영 |
 | 5 | 엔지니어링 리뷰 | `/codex:review --wait` | High/Critical 지적을 PRD 본문에 반영 |
 | 9 | 코드 리뷰 | `/codex:review --wait --base main` | High/Critical 지적을 코드·PRD 본문에 반영 |
-| meta | 하네스 메타 변경(간소 PRD 단일 리뷰) | `/codex:review --wait` | High/Critical 지적을 간소 PRD 본문에 반영 |
 
 cwd 정의:
 - 일반 기능 변경 → `repositories/[project]/`
-- 하네스 메타 변경(본 규칙·docs/·CLAUDE.md 등) → `claude-projects/` 루트
+- 하네스 메타 변경(본 규칙·docs/·CLAUDE.md 등) → `workflow-agent-harness/` 루트
 
 ## 실행 규칙
 
@@ -27,7 +28,7 @@ cwd 정의:
 | 점수화 | **없음** — Codex는 점수 산출·통과 판정 안 함 |
 | 반영 규칙 | 지적 심각도 **High / Critical**만 수동 반영. Medium 이하는 참고용 |
 | 결과 보존 | **별도 파일 저장 없음** — High/Critical 지적은 PRD 본문에 반영. Codex stdout은 인-메모리 처리 후 폐기 |
-| cwd | **해당 기능의 PRD가 있는 프로젝트 루트**에서 실행. 일반 기능은 `repositories/[project]/`, 하네스 메타 변경은 `claude-projects/` 루트. cwd 오인 시 Codex가 상위 레포를 리뷰해 결과 무효 |
+| cwd | **해당 기능의 PRD가 있는 프로젝트 루트**에서 실행. 일반 기능은 `repositories/[project]/`, 하네스 메타 변경은 `workflow-agent-harness/` 루트. cwd 오인 시 Codex가 상위 레포를 리뷰해 결과 무효 |
 | 실행 전 cwd 저장 | `/codex:review` 진입 **직전** `SAVED_CWD=$(pwd)`로 시작 cwd 캡처 후 PRD 프로젝트 루트로 `cd`. 이미 일치 시 `cd` 생략 가능 |
 | 실행 전 체크 | `pwd` 출력이 PRD 프로젝트 루트와 일치하는지 검증. 불일치 시 `cd` 후 재확인. 체크 생략 금지 |
 | 실행 후 cwd 복귀 | Codex 종료 직후(정상/SKIPPED/중단 무관) `cd "$SAVED_CWD"` + `pwd` 검증. 복귀 실패(원래 디렉터리 삭제 등) 시 중단 + 사용자 보고. 누락 시 다음 단계 진행 금지 |
@@ -146,7 +147,7 @@ Codex CLI가 토큰 한도·rate limit·기능 미지원 신호를 명시적으�
 ## ⛔ 절대 규칙
 
 - **Claude-led 모드 한정**. Codex-led 모드에서는 본 절 N/A
-- 단계 4 · 5 · 9 및 **메타 변경 단일 리뷰**에서 Codex 리뷰 **수행 필수**. **단**, [토큰/기능 이슈 스킵](#토큰기능-이슈-스킵-1회) 조건(AND 충족) 시에만 1회 스킵 허용. 임의 생략 금지
+- 단계 4 · 5 · 9에서 Codex 리뷰 **수행 필수** (메타 변경 단축 경로 시에도 동일 3단계 적용). **단**, [토큰/기능 이슈 스킵](#토큰기능-이슈-스킵-1회) 조건(AND 충족) 시에만 1회 스킵 허용. 임의 생략 금지
 - Codex 결과 **별도 파일 저장 금지** (인-메모리 처리 후 PRD 본문 반영)
 - High / Critical 지적은 반영 **필수**. 미반영 시 다음 단계 진입 금지
 - Codex는 점수화·재시도 **하지 않음** (1회 원칙)

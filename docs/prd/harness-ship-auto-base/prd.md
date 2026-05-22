@@ -2,7 +2,7 @@
 
 ## 변경 이유
 
-museum-finder T-23 (어드민 백엔드 가드) 통합 브랜치 머지 후 회고(`repositories/museum-finder/docs/research/retro-T23.md`) 에서 rp-ship 배포 영역 점수 **7.5/10 · 최저 6** 의 근본 원인으로 두 가지가 지목됨:
+museum-finder T-23 (어드민 백엔드 가드) 통합 브랜치 머지 후 회고 발췌([`../../research/retro-T23-ship-base.md`](../../research/retro-T23-ship-base.md)) 에서 rp-ship 배포 영역 점수 **7.5/10 · 최저 6** 의 근본 원인으로 두 가지가 지목됨:
 
 | # | 회고 이슈 | 근본 원인 |
 |:-:|----------|----------|

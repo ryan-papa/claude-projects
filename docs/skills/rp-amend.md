@@ -50,7 +50,7 @@ argument-hint: '[프로젝트명] [기능 수정·추가 설명]'
 
 - `rp-init` 스킵해도 **기능 단위 `rp-specify`는 생략 불가**
 - 간소 PRD 아님 — Full PRD 필수
-- QA·코드리뷰·회고 **생략 불가** (워크플로우와 동일)
+- QA·코드리뷰 **생략 불가** (워크플로우와 동일). 회고는 **사용자 명시 명령(`/rp-retro`) 시에만 실행** — 자동 진입 없음 (SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "단축 경로·예외")
 - `main` 직접 수정 금지, feat 브랜치 필수
 - `rp-ship` 스킬 경유 필수
 

@@ -24,7 +24,7 @@ grep "public key" ~/.config/sops/age/keys.txt
 ```bash
 cd /path/to/new-repo
 
-# 1. 템플릿 복사 (claude-projects 상대경로 기준)
+# 1. 템플릿 복사 (workflow-agent-harness 상대경로 기준)
 cp ../../docs/templates/sops.yaml.template .sops.yaml
 cp ../../docs/templates/env.example.template .env.example
 
