@@ -11,17 +11,18 @@
 
 ## 기본 운영
 
-기본 모델:
-- Claude가 전체 워크플로우의 메인 오케스트레이터
-- Codex는 구현 보조, 레포 점검, 독립 리뷰 수행
-- 하네스가 "Codex review"를 요구하면 Codex는 작성자 방어가 아닌 리뷰어 관점으로 판단
+작성 모드 SSOT: [`docs/harness-absolute-rules.md`](./docs/harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
-사용자가 Codex에게 직접 구현을 맡긴 경우에도 가능한 범위에서 동일한 하네스 게이트를 따른다.
+| 모드 | 메인 | 서브에이전트 (단계당 재시도 포함) | 외부 추가 리뷰 |
+|------|------|------------------------------|-------------|
+| Claude-led | Claude Code | Claude 서브에이전트 (단계당 최대 3회) | 단계별 Codex 1회 (4·5·9) |
+| Codex-led | Codex CLI | Codex `spawn_agent` 서브에이전트 (단계당 최대 3회) | 없음 — Claude 리뷰 금지 |
 
-| 작성 모드 | 리뷰 구성 |
-|---|---|
-| Claude-authored | Claude 작업 + Claude 독립 리뷰 + Codex 추가 리뷰 |
-| Codex-authored | Codex 작업 + 단계별 Codex 독립 리뷰 + 추후 Claude 리뷰 가능 |
+핵심:
+- 사용자가 진입한 런타임이 메인
+- 메인 셀프 채점 절대 금지 — 모든 채점은 해당 런타임의 서브에이전트가 수행
+- 3회 미달 시 자동 중단 + 사용자 결정 요청 (강행/재설계/중단)
+- 동일 변경을 나중에 다른 런타임에서 다시 열어도 기존 리뷰 대체 금지 — 추가 독립 검토로만 기록
 
 ## 명령 규칙
 
@@ -84,23 +85,25 @@ Codex도 `spawn_agent` 기반 서브에이전트 실행은 가능하다. 단, Cl
 하네스 원문 절차를 그대로 따른다.
 
 - Claude가 작성·구현
-- Claude subagent가 plan, engineering, code review 수행
-- Codex는 하네스가 요구하는 추가 리뷰 산출물 작성
+- **Claude 서브에이전트**(Agent 툴, `subagent_type=general-purpose`)가 plan / engineering / code review 수행 — 메인 셀프 채점 금지
+- 단계별 Codex 추가 리뷰 1회 (4·5·9) 병렬 발사
+- 단계당 최대 3회 재시도, 3회 미달 시 사용자 결정 요청
 
 ### Codex-led Mode
 
-Codex가 주 작성자이고 현재 런타임에서 Claude 호출이 불가한 경우:
-- 동일한 세 리뷰 단계 유지: plan, engineering, code
-- 이를 "같은 리뷰 3회 반복"으로 해석하지 않음
-- 각 단계는 별도 관점·별도 산출물·별도 판정으로 처리
-- 각 리뷰에서 독립 리뷰어 관점을 명시
+Codex가 주 작성자이고 메인 런타임이 Codex CLI인 경우:
 
-실행 기준:
+- **Codex 서브에이전트**(`spawn_agent` 별도 컨텍스트)가 plan / engineering / code review 수행 — 메인 셀프 채점 금지
+- 외부 추가 Codex 리뷰 없음 (메인이 이미 Codex) · **Claude 리뷰 호출 금지** (런타임 비대칭)
+- 단계당 최대 3회 재시도, 3회 미달 시 사용자 결정 요청
+- 세 리뷰 단계는 별도 관점·별도 판정으로 처리 — "같은 리뷰 3회 반복"으로 해석 금지
+
+관점 분리:
 - plan review: PRD를 기획 관점으로 검토
 - engineering review: PRD를 기술 관점으로 검토
-- code review: 구현 diff를 코드리뷰 관점으로 검토
+- code review: 구현 diff를 코드 관점으로 검토
 
-동일 변경을 나중에 Claude에서 다시 열면 Claude 리뷰는 기존 증거 대체가 아니라 추가 독립 검토로 기록한다.
+동일 변경을 나중에 Claude에서 다시 열면 Claude 리뷰는 기존 증거 대체가 아니라 추가 독립 검토로 기록한다 — 모드 전환·재채점 금지.
 
 ## 필수 워크플로우
 
@@ -181,11 +184,12 @@ Codex-led Mode의 리뷰 결과에는 독립성을 명시한다.
 ## 기본 판단
 
 사용자가 "Codex도 이 레포를 쓸 수 있나"라고 묻는 경우:
-- Claude가 워크플로우를 주도
-- Codex는 독립 리뷰와 제한적 구현 보조 수행
-- Codex도 하네스 게이트를 지키는 범위에서 docs·rules 수정 가능
+- 메인 런타임 선택 시점에 작성 모드 결정 (Claude Code → Claude-led / Codex CLI → Codex-led)
+- 양쪽 모두 동일 12단계 워크플로우·동일 게이트·동일 SSOT 규칙 적용
+- 차이는 (a) 채점 서브에이전트 종류 (b) 외부 Codex 추가 리뷰 유무뿐
 
 사용자가 Claude 없이 Codex로 진행하라고 하면:
-- Codex가 변경을 작성
-- Codex가 plan, engineering, code review를 세 단계로 분리 수행
-- 추후 Claude 리뷰는 로컬 진행의 필수 조건이 아닌 추가 검증으로 취급
+- Codex가 변경 작성, Codex 서브에이전트가 plan / engineering / code 세 관점으로 분리 채점
+- 메인 셀프 채점 절대 금지 — 모든 채점은 `spawn_agent` 서브에이전트가 수행
+- 단계당 최대 3회 재시도, 3회 미달 시 사용자 결정 요청
+- 추후 Claude 리뷰는 동일 변경의 재채점이 아닌 추가 독립 검토로만 기록

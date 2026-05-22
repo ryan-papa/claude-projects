@@ -1,6 +1,8 @@
 # Harness Codex Review
 
-Claude 리뷰와 Codex 플러그인(`openai/codex-plugin-cc`) 추가 리뷰를 **1차 병렬**로 실행한다. Codex는 1회만 호출되며, Claude는 미달 시 최대 2회 추가 재실행(총 3회).
+**적용 조건 — Claude-led 모드 한정.** 메인 런타임이 Codex인 Codex-led 모드에서는 본 문서 전체 N/A (메인 = Codex 이미 외부 관점, 추가 Codex 리뷰 없음). 작성 모드 SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
+
+Claude-led 모드에서 Claude 서브에이전트 리뷰와 Codex 플러그인(`openai/codex-plugin-cc`) 추가 리뷰를 **1차 병렬**로 실행한다. Codex는 1회만 호출되며, Claude 서브에이전트는 미달 시 최대 2회 추가 재실행(총 3회). 단계당 3회 미달 시 사용자 결정 요청 (SSOT "재시도 한도" 참조).
 
 ## 적용 단계
 
@@ -143,6 +145,7 @@ Codex CLI가 토큰 한도·rate limit·기능 미지원 신호를 명시적으�
 
 ## ⛔ 절대 규칙
 
+- **Claude-led 모드 한정**. Codex-led 모드에서는 본 절 N/A
 - 단계 4 · 5 · 9 및 **메타 변경 단일 리뷰**에서 Codex 리뷰 **수행 필수**. **단**, [토큰/기능 이슈 스킵](#토큰기능-이슈-스킵-1회) 조건(AND 충족) 시에만 1회 스킵 허용. 임의 생략 금지
 - Codex 결과 **별도 파일 저장 금지** (인-메모리 처리 후 PRD 본문 반영)
 - High / Critical 지적은 반영 **필수**. 미반영 시 다음 단계 진입 금지
