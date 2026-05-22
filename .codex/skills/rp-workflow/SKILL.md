@@ -32,7 +32,7 @@ description: "하네스 전체 워크플로우 오케스트레이터. 신규 프
 ## 자동 전환 규칙
 
 **모든 단계는 완료 시 다음 단계로 자동 진입한다.**
-사용자가 멈추는 지점은 **산출물 보고[10]만**(사용자 승인 대기).
+산출물 보고[10] 뒤 `rp-ship`까지 자동 진입한다. 기본 경로의 사용자 승인 대기는 없고, 자동 머지 가드 실패·재시도 한도·명시된 중단 조건에서만 멈춘다.
 
 각 스킬 파일 하단 `▶ 자동 전환` 섹션에 전환 지시가 명시되어 있다.
 
@@ -50,7 +50,7 @@ description: "하네스 전체 워크플로우 오케스트레이터. 신규 프
 | 8 | `/rp-qa` | → [9] | 3회 실패 → 사용자 보고 |
 | 9 | `/rp-code-review` (Claude-led 시 → `Codex-led findings-first code review against main` 1회 병렬) | → [10] | 서브에이전트 3회 미달 → 사용자 결정 요청 |
 | 10 | 산출물 보고 | → [11] 커밋·PR | — |
-| 11 | `/rp-ship` (**필수 호출**, 수동 git/gh 우회 금지) | 커밋·PR 자동 → **⏸ 배포 승인 대기** | CI 실패 |
+| 11 | `/rp-ship` (**필수 호출**, 수동 git/gh 우회 금지) | 커밋·PR·자동 머지 가드·배포 | CI 실패·자동 머지 가드 실패 |
 | 12 | `/rp-retro` (사용자 명시 명령 시에만) | 종료 | 자동 진입 없음 |
 
 ## 상태 메시지
@@ -65,7 +65,7 @@ description: "하네스 전체 워크플로우 오케스트레이터. 신규 프
 - **메타 변경 단축 경로** — 하네스 문서(`docs/`, `CLAUDE.md`, 스킬, `.claude/settings.json`) 변경은 `rp-init`·`rp-specify`·`rp-task`·`rp-dev` **스킵** + feat 브랜치 + `rp-prd` 간소 경로 + `rp-plan-review` + `rp-eng-review` + `rp-code-review` + `rp-ship`으로 진행. `main` 직접 수정 금지
 - **신규 `rp-*` 스킬 추가 시 심링크 자동 동기화** — `docs/skills/rp-*.md` 생성 감지 시 `PostToolUse` 훅이 `.claude/commands/rp-*.md` 심링크 자동 생성. 훅 실패 시 수동 fallback: `cd .claude/commands && ln -s ../../docs/skills/rp-새이름.md rp-새이름.md`
 - **전 단계 자동 연결** — 각 스킬 완료 시 다음 스킬 자동 호출
-- **유일한 멈춤 지점** — 배포[11]에서만 사용자 승인 대기 (커밋·PR까지는 자동)
+- **기본 경로 승인 대기 없음** — 산출물 보고 후 `rp-ship`이 커밋·PR·자동 머지 가드·배포를 진행. 자동 머지 가드 실패 시 OPEN 유지 + 사용자 보고
 - QA([8]), 코드리뷰([9]) **생략 불가**
 - **[4][5][9] Codex 추가 리뷰 (Claude-led 한정, 메타 단축 경로 시에도 동일)** — Claude-led 모드에서만 Claude 서브에이전트 통과 후 `Codex-led findings-first review` 1회 실행, High/Critical 지적 반영 필수. Codex-led 모드는 본 항 N/A (메인이 Codex). SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스"
 - 산출물 보고([10]) 없이 배포([11]) 진행 **금지**

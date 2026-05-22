@@ -90,7 +90,7 @@ repositories/[project]/docs/prd/YYYYMMDD_HHMMSS_[feature]_[8자리랜덤].md
 
 **파일명:** `docs/prd/[feature]/prd.md` (하네스 루트 기준)
 
-## PRD 리뷰 (2단계 순차 실행)
+## PRD 리뷰 (Full flow 2단계 순차 실행)
 
 ```
 Doc Agent 작성 완료
@@ -99,10 +99,12 @@ Doc Agent 작성 완료
   ↓ 통과 (평균 ≥ 8.0)
 [2단계] 엔지니어링 리뷰 (Engineering Review Sub-Agent, 메인 런타임의 서브에이전트)
   ↓ 통과 (평균 ≥ 8.0)
-사용자 최종 확인
+다음 단계 자동 진입
 ```
 
 **⛔ 실행 주체**: 각 리뷰 단계는 **반드시 메인 런타임의 서브에이전트(Claude-led=Agent 툴 / Codex-led=`spawn_agent`)** 가 수행한다. 메인 에이전트의 셀프 채점 금지. SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
+
+Lite track은 [`harness-workflow.md`](harness-workflow.md) 의 간이 PRD + 통합 plan/engineering 리뷰 예외를 따른다.
 
 각 단계 미달 시 Doc Agent 재작성, 최대 3회 반복 (매 회차 새 서브에이전트). **3회 미달 시 자동 중단 + 사용자 결정 요청** (강행/재설계/중단).
 

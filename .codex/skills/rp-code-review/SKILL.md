@@ -131,7 +131,7 @@ Claude 코드 리뷰 서브에이전트와 **동시** 발사 (메인이 동일 �
 - Claude-led: Claude 서브에이전트 통과 + (Codex High/Critical 반영 완료 OR Codex 토큰/기능 SKIPPED) 시 `✓ [9] 코드리뷰 통과 (Claude+Codex)` (스킵 시 `(Claude+Codex SKIPPED)`) 출력 후 **산출물 보고[10] 자동 진입**
 - Codex-led: Codex 서브에이전트 통과 시 `✓ [9] 코드리뷰 통과 (Codex-led)` 출력 후 **산출물 보고[10] 자동 진입** (외부 Codex 추가 리뷰 N/A)
 
-산출물 보고 후 **커밋·PR까지 자동 진행**. 배포[11]에서 사용자 승인 대기.
+산출물 보고 후 `rp-ship`이 커밋·PR·자동 머지 가드·배포를 이어서 진행한다. 자동 머지 가드 실패 시 중단·보고.
 
 → 리뷰 기준 상세: [`../harness-code-review.md`](../harness-code-review.md)
 → Codex 리뷰 규칙: [`../harness-codex-review.md`](../harness-codex-review.md)
