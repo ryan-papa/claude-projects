@@ -23,7 +23,7 @@ description: "[9] 코드 리뷰. 7항목 최저 점수제 독립 리뷰. High/Cr
 | 모드 | 채점 주체 | 외부 추가 리뷰 |
 |------|---------|-------------|
 | Claude-led (Claude Code) | Claude Agent 툴 서브에이전트 | Codex 1회 병렬 |
-| Codex-led (Codex CLI) | Codex `spawn_agent` 서브에이전트 | 없음 |
+| Codex-led (Codex CLI) | Codex `spawn_agent` 서브에이전트 | **N/A** — 메인=Codex이므로 외부 추가 리뷰 없음 |
 
 SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
@@ -68,7 +68,7 @@ git diff --cached | grep -iE \
 
 **재시도**: PRD 본문 갱신 + 코드 수정 후 새 서브에이전트로 재실행. 회차 추적 없음.
 
-**기술 실패 Fallback**: 서브에이전트 오류·토큰 초과·형식 오류 시 최대 2회 재호출. 지속 실패 시 사용자에게 즉시 보고 + 중단. 메인 셀프 채점 우회 금지.
+**기술 실패 Fallback**: SSOT [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "재시도 한도" 적용. 메인 셀프 채점 우회 금지.
 
 ## PR 유형별 포커스
 

@@ -40,7 +40,7 @@ argument-hint: '[프로젝트·기능 설명]'
 | 9 | `/rp-code-review` (Claude-led 시 → `/codex:review --wait --base main` 1회 병렬) | → [10] | 서브에이전트 3회 미달 → 사용자 결정 요청 |
 | 10 | 산출물 보고 | → [11] 커밋·PR | — |
 | 11 | `/rp-ship` (**필수 호출**, 수동 git/gh 우회 금지) | 커밋·PR 자동 → **⏸ 배포 승인 대기** | CI 실패 |
-| 12 | `/rp-retro` | 종료 | — |
+| 12 | `/rp-retro` (사용자 명시 명령 시에만) | 종료 | 자동 진입 없음 |
 
 ## 상태 메시지
 
@@ -51,14 +51,14 @@ argument-hint: '[프로젝트·기능 설명]'
 
 ## 규칙
 
-- **메타 변경 단축 경로** — 하네스 문서(`docs/`, `CLAUDE.md`, 스킬, `.claude/settings.json`) 변경은 `rp-init`·`rp-specify`·`rp-task`·`rp-dev` **스킵** + feat 브랜치 + `rp-prd` 간소 경로 + `rp-plan-review` + `rp-code-review` + `rp-ship`으로 진행. `main` 직접 수정 금지
+- **메타 변경 단축 경로** — 하네스 문서(`docs/`, `CLAUDE.md`, 스킬, `.claude/settings.json`) 변경은 `rp-init`·`rp-specify`·`rp-task`·`rp-dev` **스킵** + feat 브랜치 + `rp-prd` 간소 경로 + `rp-plan-review` + `rp-eng-review` + `rp-code-review` + `rp-ship`으로 진행. `main` 직접 수정 금지
 - **신규 `rp-*` 스킬 추가 시 심링크 자동 동기화** — `docs/skills/rp-*.md` 생성 감지 시 `PostToolUse` 훅이 `.claude/commands/rp-*.md` 심링크 자동 생성. 훅 실패 시 수동 fallback: `cd .claude/commands && ln -s ../../docs/skills/rp-새이름.md rp-새이름.md`
 - **전 단계 자동 연결** — 각 스킬 완료 시 다음 스킬 자동 호출
 - **유일한 멈춤 지점** — 배포[11]에서만 사용자 승인 대기 (커밋·PR까지는 자동)
 - QA([8]), 코드리뷰([9]) **생략 불가**
-- **[4][5][9] Codex 추가 리뷰 (Claude-led 한정)** — Claude-led 모드에서만 Claude 서브에이전트 통과 후 `/codex:review --wait` 1회 실행, High/Critical 지적 반영 필수. Codex-led 모드는 본 항 N/A (메인이 Codex). SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스"
+- **[4][5][9] Codex 추가 리뷰 (Claude-led 한정, 메타 단축 경로 시에도 동일)** — Claude-led 모드에서만 Claude 서브에이전트 통과 후 `/codex:review --wait` 1회 실행, High/Critical 지적 반영 필수. Codex-led 모드는 본 항 N/A (메인이 Codex). SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스"
 - 산출물 보고([10]) 없이 배포([11]) 진행 **금지**
-- 회고([12]) **생략 불가** — 배포 완료 후 반드시 수행
+- 회고([12]) — **사용자 명시 명령(`/rp-retro`) 시에만 실행, 자동 진입 없음** (SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "단축 경로·예외")
 - 각 스킬의 상세 규칙은 해당 스킬 파일 참조
 
 → 워크플로우 상세: [`../harness-workflow.md`](../harness-workflow.md)

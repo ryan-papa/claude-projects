@@ -23,7 +23,7 @@ description: "[5] 엔지 리뷰. Codex-led 5항목 점수제 독립 리뷰. Use 
 | 모드 | 채점 주체 | 외부 추가 리뷰 |
 |------|---------|-------------|
 | Claude-led (Claude Code) | Claude Agent 툴 서브에이전트 | Codex 1회 병렬 |
-| Codex-led (Codex CLI) | Codex `spawn_agent` 서브에이전트 | 없음 |
+| Codex-led (Codex CLI) | Codex `spawn_agent` 서브에이전트 | **N/A** — 메인=Codex이므로 외부 추가 리뷰 없음 |
 
 SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
@@ -43,7 +43,7 @@ SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모
 3. **결과 처리**: 별도 파일 저장 없음. 서브에이전트 점수·지적과 (Claude-led 시) Codex High/Critical은 인-메모리에서 PRD 본문에 반영
 4. **통과**: 서브에이전트 평균 ≥8.0 + 각 항목 ≥7. Claude-led는 추가로 Codex High/Critical 반영 완료 → 다음 단계
 5. **미달**: 지적 반영 (Claude-led=Codex High/Critical+서브에이전트 통합, Codex-led=서브에이전트만) → PRD 본문 갱신 → 새 서브에이전트로 재실행 (Claude-led의 외부 Codex 재호출 금지). 최대 2회 추가, **총 3회**. 3회 미달 시 자동 중단 + 사용자 결정 요청
-6. **기술 실패 Fallback**: 동일 SSOT 적용 (서브에이전트 오류 시 최대 2회 재호출, 지속 실패 시 사용자 보고)
+6. **기술 실패 Fallback**: SSOT [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "재시도 한도" 적용
 7. **[Claude-led 전용] Codex 비-스킵 비정상 종료**: 워크플로우 중단 + 사용자 보고
 
 ## 평가 항목

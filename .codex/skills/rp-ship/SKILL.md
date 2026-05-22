@@ -37,7 +37,7 @@ description: "[11] 커밋·PR·CI·자동머지·배포. 수동 git/gh 우회 �
 5. **PR 생성/재사용**: `gh pr create --base <detected-base> ...` (제목 + 변경 요약 + 테스트 계획 + **PRD 요약 `<details>` 블록 본문에 처음부터 포함**)
    - PRD 유형별 추출 섹션:
      - Full PRD: `## 개요·목적` + `## 기능 요구사항`
-     - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증`
+     - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증` — `## 롤백 전략`은 PRD 원본에 보존하되 PR 본문 추출 제외(의도, 운영자 내부 자료). SSOT: [`../harness-ship.md`](../harness-ship.md) "PR 생성 시 PRD 요약 본문 포함" 표
    - 추출 검증: 필수 섹션 중 하나라도 PRD에서 누락 시 PR 생성 차단 + 사용자 보고
    - **재사용 PR**: 단계 4 에서 OPEN PR 재사용 시, 기존 본문에 PRD 요약 `<details>` 블록 부재면 `gh pr edit <num> --body` 로 보강 (정책 변경 이전에 생성된 PR 대응). 보강 실패 시 ship 중단
    - PRD 디렉토리 main 영구 보존 — 별도 정리 commit 금지 (CI 재실행 비용 차단)

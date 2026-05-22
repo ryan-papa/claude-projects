@@ -40,13 +40,13 @@
 | 초과 시 | **역할/책임 단위로 파일 분리** (텍스트 압축이 아닌 영역 분리) |
 | 코드 | 코드 직접 작성 금지, 파일 링크 참조로 대체 |
 | **자동 정합성** | docs/ 변경 시 서브에이전트가 CLAUDE.md 트리+링크 자동 동기화 (사용자에게 변경 요약만 출력) |
-| **하네스 동기화** | 하네스 문서(원본) 변경 시 관련 스킬(`docs/skills/`) + CLAUDE.md를 즉시 갱신 |
+| **하네스 동기화** | 하네스 문서(원본) 변경 시 관련 스킬(`docs/skills/`) + CLAUDE.md를 즉시 갱신. **예외**: `rp-workflow`·`rp-amend`(오케스트레이터)·`rp-init`·`rp-specify`·`rp-retro`는 스킬-단독 운영(원본 `harness-*.md` 없음) — 스킬 파일이 SSOT |
 | **⛔ 민감 정보 금지** | 다음 정보는 **어떠한 문서·커밋 메시지에도 작성 금지**: (1) 인프라 — 호스트·계정명·포트·인증서 경로·내부 IP, (2) 개인 식별 정보 — 실명·개인 이메일·개인 연락처·SNS ID, (3) 시크릿 — 비밀번호·API 키·토큰·개인키. 환경변수 참조(`$DB_HOST`)로 대체하고 실제 값은 "관리자에게 별도 문의"로 안내. 공개키는 안전하지만 프로파일링 방지 위해 로컬 파일(`.gitignore`)에 분리 |
 
 ## Project Structure
 
 ```
-claude-projects/
+workflow-agent-harness/
 ├── docs/                       # 공통 문서·규칙
 │   ├── harness-absolute-rules.md  # 절대 규칙 SSOT (예외 없음)
 │   ├── harness-workflow.md     # 전체 플로우 (12단계)
@@ -66,8 +66,8 @@ claude-projects/
 │   │   ├── secrets-management.md       # sops+age 세팅·운영·rotation
 │   │   └── recipients.local.md         # (git 제외) 공개키 레지스트리
 │   ├── prd-template.md         # PRD 템플릿
-│   ├── prd/                    # PRD 산출물 (`[feature]/prd.md` 단일 — 리뷰 결과는 본문 흡수)
-│   ├── images/                 # 문서 이미지·다이어그램
+│   ├── prd/                    # PRD 산출물 (신규: `[feature]/prd.md`, 과거 일부: `YYYYMMDD_HHMMSS_[feature]_[랜덤]/prd.md` — 리뷰 결과는 본문 흡수)
+│   ├── research/               # 하네스 메타 변경 근거 발췌 (서비스 회고에서 추출)
 │   ├── templates/              # 문서·CI·시크릿 템플릿
 │   │   ├── readme-opensource.md
 │   │   ├── readme-service.md
@@ -121,14 +121,14 @@ claude-projects/
 | 9 | `rp-code-review` | 코드 리뷰 (7항목, 최저 점수제, 코드 관점 서브에이전트). Claude-led 시 **Codex 추가 리뷰 1회** | [`harness-code-review.md`](docs/harness-code-review.md) |
 | 10 | — | 산출물 보고 → 커밋·PR 자동 진행 | [`harness-ship.md`](docs/harness-ship.md) |
 | 11 | `rp-ship` | 커밋 → PR → CI → 머지 → 배포 | [`harness-ship.md`](docs/harness-ship.md) |
-| 12 | `rp-retro` | 회고 (절차 준수 + 효율성 + 규칙 개선) | [`skills/rp-retro.md`](docs/skills/rp-retro.md) |
+| 12 | `rp-retro` | 회고 (절차 준수 + 효율성 + 규칙 개선) | [`rp-retro.md`](docs/skills/rp-retro.md) |
 
 **메인 셀프 리뷰 절대 금지:** 4·5·9 단계 모두 메인 런타임의 서브에이전트(Claude-led=Agent 툴 / Codex-led=`spawn_agent`)가 채점. 단계당 최대 3회 재시도, 3회 미달 시 자동 중단 + 사용자 결정 요청.
 
 **오케스트레이터:**
 - `rp-workflow` — 신규 프로젝트·기능 (init부터 전 단계)
 - `rp-amend` — 기존 프로젝트 기능 수정·추가 (init 스킵, specify부터 전 단계 Full PRD)
-**자동 전환:** 모든 단계 완료 시 다음 단계 자동 진입. 사용자 확인 없이 즉시 진행. 커밋·PR·**머지(자동 머지 가드 3종 AND 충족 시)까지 자동**. 배포[11] 완료 후 회고[12]는 **사용자 명령 시에만 실행** (자동 진입 없음).
+**자동 진입:** 모든 단계 완료 시 다음 단계 자동 진입. 사용자 확인 없이 즉시 진행. 커밋·PR·**머지(자동 머지 가드 3종 AND 충족 시)까지 자동**. 배포[11] 완료 후 회고[12]는 **사용자 명령 시에만 실행** (자동 진입 없음).
 - 구체화 완료 → PRD 작성 자동 진입 (확인 질문 금지)
 - PRD 완료 → 기획 리뷰 자동 진입
 - 각 단계 완료 시 "다음 단계로 갈까요?" 질문 금지 — 바로 진행

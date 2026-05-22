@@ -47,6 +47,7 @@
 | 7 | 개발 | [`skills/rp-dev.md`](skills/rp-dev.md) |
 | 8 | QA / 콘텐츠 검수 | [`skills/rp-qa.md`](skills/rp-qa.md) |
 | 9 | 코드 리뷰 | [`skills/rp-code-review.md`](skills/rp-code-review.md) |
+| 10 | 산출물 보고 | — (스킬 없음, 자동 진행) |
 | 11 | 커밋·PR·머지·배포 | [`skills/rp-ship.md`](skills/rp-ship.md) |
 | 12 | 회고 | [`skills/rp-retro.md`](skills/rp-retro.md) |
 
@@ -64,9 +65,9 @@
 → 산출물 + 배포: [`harness-ship.md`](harness-ship.md)
 → 스킬 목록: [`skills/`](skills/)
 
-## 자동 진행 규칙
+## 자동 진입 규칙
 
-| 구간 | 자동 진행 조건 | 중단 조건 |
+| 구간 | 자동 진입 조건 | 중단 조건 |
 |------|--------------|----------|
 | [4]→[5] 리뷰 | 서브에이전트 점수 통과 (Claude-led: + Codex High/Critical 반영 완료) 시 자동 | 단계당 서브에이전트 3회 미달 시 자동 중단 + **사용자 결정 요청** (강행/재설계/중단) |
 | [7]→[8] 개발→QA | 전체 태스크 완료+빌드 통과 시 자동 | 빌드/테스트 실패 |

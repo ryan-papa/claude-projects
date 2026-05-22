@@ -12,7 +12,7 @@ argument-hint: '[대상 PRD 경로]'
 | 모드 | 채점 주체 | 외부 추가 리뷰 |
 |------|---------|-------------|
 | Claude-led (Claude Code) | Claude Agent 툴 서브에이전트 | Codex 1회 병렬 |
-| Codex-led (Codex CLI) | Codex `spawn_agent` 서브에이전트 | 없음 |
+| Codex-led (Codex CLI) | Codex `spawn_agent` 서브에이전트 | **N/A** — 메인=Codex이므로 외부 추가 리뷰 없음 |
 
 SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
@@ -27,12 +27,12 @@ SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모
 
 1. **1차 발사**: Claude-led는 메인이 동일 메시지에서 두 tool_use 동시 호출. Codex-led는 (a)만 호출
    - (a) **서브에이전트**(Claude-led=Agent 툴 `subagent_type=general-purpose` / Codex-led=`spawn_agent`): 메인 셀프 채점 **금지**. 프롬프트 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) PRD 경로 (b) 9항목 (c)·(d) SSOT 그대로
-   - (b) **[Claude-led 전용] Bash `codex review`**: 사전 `SAVED_CWD=$(pwd)` 캡처 + PRD 루트로 `cd` (일반 기능 `repositories/[project]/`, 메타 `claude-projects/`). 300초 타임아웃. 종료 후 `cd "$SAVED_CWD"`. Codex-led는 본 항목 생략 (메인이 이미 Codex)
+   - (b) **[Claude-led 전용] Bash `codex review`**: 사전 `SAVED_CWD=$(pwd)` 캡처 + PRD 루트로 `cd` (일반 기능 `repositories/[project]/`, 메타 `workflow-agent-harness/`). 300초 타임아웃. 종료 후 `cd "$SAVED_CWD"`. Codex-led는 본 항목 생략 (메인이 이미 Codex)
 2. **판정**: Claude-led는 SSOT [`../harness-codex-review.md`](../harness-codex-review.md) "1차 결과 매트릭스" 적용. Codex-led는 서브에이전트 결과만으로 판정
 3. **결과 처리**: 별도 파일 저장 없음. 서브에이전트 점수·지적과 (Claude-led 시) Codex High/Critical은 인-메모리에서 PRD 본문에 반영
 4. **통과**: 서브에이전트 평균 ≥8.0 + 각 항목 ≥7. Claude-led는 추가로 Codex High/Critical 반영 완료 (Codex SKIP 시 서브에이전트 점수만으로) → 다음 단계
 5. **미달**: 지적 반영 (Claude-led=Codex High/Critical+서브에이전트 통합, Codex-led=서브에이전트만) → PRD 본문 갱신 → 새 서브에이전트로 재실행 (Claude-led의 외부 Codex 재호출 금지). 최대 2회 추가, **총 3회**. 3회 미달 시 자동 중단 + 사용자 결정 요청 (강행/재설계/중단)
-6. **기술 실패 Fallback**: 서브에이전트 오류·토큰 초과·형식 오류 시 최대 2회 재호출. 지속 실패 시 사용자 보고 + 중단. 메인 셀프 채점 우회 금지
+6. **기술 실패 Fallback**: SSOT [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "재시도 한도" 적용. 메인 셀프 채점 우회 금지
 7. **[Claude-led 전용] Codex 비-스킵 비정상 종료**(네트워크·hang·매칭 0건): 워크플로우 중단 + 사용자 보고
 
 ## 평가 항목

@@ -61,7 +61,7 @@ argument-hint: '[프로젝트명] [유형: 코드|콘텐츠]'
 
 1. 전제조건 확인
    - sops·age 설치 여부(`command -v sops age`) — 미설치면 [`../security/secrets-management.md`](../security/secrets-management.md) "기기 초기 세팅" 안내 후 대기
-   - `claude-projects/docs/security/recipients.local.md` 존재 여부 — 없으면 `recipients.local.md.example` 복사 후 사용자에게 공개키 입력 요청
+   - `workflow-agent-harness/docs/security/recipients.local.md` 존재 여부 — 없으면 `recipients.local.md.example` 복사 후 사용자에게 공개키 입력 요청
 
 2. 템플릿 복사 + 공개키 치환
    ```bash

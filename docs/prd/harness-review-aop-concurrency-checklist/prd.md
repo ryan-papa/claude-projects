@@ -2,7 +2,7 @@
 
 ## 변경 이유
 
-museum-finder T-22 (정보 확인 중 자동 배지) 배포 후 회고(`repositories/museum-finder/docs/research/retro-T22.md`) 에서 Claude r1 리뷰가 놓친 치명 이슈 2건을 Codex 리뷰가 포착:
+museum-finder T-22 (정보 확인 중 자동 배지) 배포 후 회고 발췌([`../../research/retro-T22-aop-concurrency.md`](../../research/retro-T22-aop-concurrency.md)) 에서 Claude r1 리뷰가 놓친 치명 이슈 2건을 Codex 리뷰가 포착:
 
 | # | Codex 지적 | Claude r1 놓침 사유 |
 |:-:|-----------|------|
