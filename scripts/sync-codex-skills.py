@@ -66,7 +66,6 @@ def adapt_body_for_codex(body: str) -> str:
         "/codex:review --wait --base main": "Codex-led findings-first code review against main",
         "/codex:review --wait": "Codex-led findings-first review",
         "Agent 툴의 서브에이전트": "`spawn_agent` 서브에이전트",
-        "`subagent_type=general-purpose`": "`agent_type=explorer` 또는 `worker`",
         "Claude 채점만 수행. Codex 실행·저장 금지": "Codex-led 독립 채점만 수행. Claude 전용 명령 실행·저장 금지",
         "Claude 채점만. Codex 실행·저장 금지": "Codex-led 독립 채점만 수행. Claude 전용 명령 실행·저장 금지",
         "Claude 리뷰는": "Codex-led 리뷰는",
@@ -90,10 +89,13 @@ def adapt_body_for_codex(body: str) -> str:
         "review-claude-meta-r*.md": "review-codex-meta.md",
         "review-claude-{plan,eng,code,meta}-r{N}.md": "review-codex-{plan,eng,code,meta}.md",
         "Claude 회차 파일은 단계별로 최소 1개": "Codex-led 리뷰 파일은 단계별로 1개",
-        "Claude+Codex": "Codex-led",
         "Agent 툴 오류": "spawn_agent 오류",
-        "Doc Agent": "문서 수정",
-        "Dev Agent": "개발 수정",
+        "Doc Agent가 PRD 본문 갱신": "문서 작성자가 PRD 본문 갱신",
+        "Doc Agent 재투입": "문서 작성자 재투입",
+        "Doc Agent 재작성": "문서 작성자 재작성",
+        "Doc Agent": "문서 작성자",
+        "Dev Agent 재투입": "개발자 재투입",
+        "Dev Agent": "개발자",
     }
 
     adapted = body

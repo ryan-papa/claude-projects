@@ -111,15 +111,19 @@ claude-projects/
 
 → [`docs/harness-workflow.md`](docs/harness-workflow.md)
 
+**작성 모드:** Claude Code 진입 = Claude-led, Codex CLI 진입 = Codex-led. 리뷰 매트릭스 SSOT [`harness-absolute-rules.md`](docs/harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
+
 | 단계 | 스킬 | 내용 |
 |:----:|------|------|
-| 1~5 | `rp-init` ~ `rp-eng-review` | 초기화 → 구체화 → PRD → 기획리뷰 → 엔지니어링리뷰 (**4·5 Codex 추가 리뷰 1회**) | [`harness-prd.md`](docs/harness-prd.md) |
+| 1~5 | `rp-init` ~ `rp-eng-review` | 초기화 → 구체화 → PRD → 기획리뷰(기획 관점 서브에이전트) → 엔지리뷰(기술 관점 서브에이전트). Claude-led 시 **4·5 Codex 추가 리뷰 1회** | [`harness-prd.md`](docs/harness-prd.md) |
 | 6~7 | `rp-task`, `rp-dev` | 태스크 분해 → 개발 | [`harness-dev.md`](docs/harness-dev.md) |
 | 8 | `rp-qa` | QA / 콘텐츠 검수 | [`harness-qa.md`](docs/harness-qa.md) |
-| 9 | `rp-code-review` | 코드 리뷰 (7항목, 최저 점수제, **Codex 추가 리뷰 1회**) | [`harness-code-review.md`](docs/harness-code-review.md) |
+| 9 | `rp-code-review` | 코드 리뷰 (7항목, 최저 점수제, 코드 관점 서브에이전트). Claude-led 시 **Codex 추가 리뷰 1회** | [`harness-code-review.md`](docs/harness-code-review.md) |
 | 10 | — | 산출물 보고 → 커밋·PR 자동 진행 | [`harness-ship.md`](docs/harness-ship.md) |
 | 11 | `rp-ship` | 커밋 → PR → CI → 머지 → 배포 | [`harness-ship.md`](docs/harness-ship.md) |
 | 12 | `rp-retro` | 회고 (절차 준수 + 효율성 + 규칙 개선) | [`skills/rp-retro.md`](docs/skills/rp-retro.md) |
+
+**메인 셀프 리뷰 절대 금지:** 4·5·9 단계 모두 메인 런타임의 서브에이전트(Claude-led=Agent 툴 / Codex-led=`spawn_agent`)가 채점. 단계당 최대 3회 재시도, 3회 미달 시 자동 중단 + 사용자 결정 요청.
 
 **오케스트레이터:**
 - `rp-workflow` — 신규 프로젝트·기능 (init부터 전 단계)
