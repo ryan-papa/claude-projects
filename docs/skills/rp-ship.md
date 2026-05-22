@@ -104,7 +104,7 @@ PR 생성 시점에 .github/workflows/ 확인
   │             → 미통과 시 자동 머지 중단 + 사용자 보고
   └── CI 없음 → "CI가 없습니다. 추가할까요?" 사용자에게 질문
        ├── 추가 원함 → CI 워크플로우 생성 후 재푸시
-       └── 추가 안 함 → 가드 (a) N/A, (b)(c) 평가 후 `gh pr merge --merge` 수동 안내
+       └── 추가 안 함 → 가드 (a) N/A, (b)(c) 평가 후 `gh pr merge --merge` 자동 진행
 ```
 
 **금지 패턴:** `gh pr merge --auto` 단독 호출. GitHub 의 `--auto` 는 branch protection 의 required status checks 통과 시 머지로, 인프라 결손(예: backend·frontend job 이 required 미지정) 시 일부 체크 pending 상태로 머지 트리거. 가드 (a) 의무를 위반.

@@ -131,7 +131,9 @@ Codex-led Mode에서도 단계 구조를 유지한다.
 - QA / verification
 - code review
 
-같은 모델만 사용 가능하다는 이유로 plan review와 engineering review를 합치지 않는다.
+리뷰 단계 진입 시 `spawn_agent` 서브에이전트 호출은 단계 자동 실행이다. 별도 사용자 확인 지점을 추가하지 않는다.
+
+Full flow에서는 같은 모델만 사용 가능하다는 이유로 plan review와 engineering review를 합치지 않는다. 단, [`docs/harness-workflow.md`](./docs/harness-workflow.md) Lite 판별을 통과한 핫픽스는 SSOT 예외에 따라 통합 plan/engineering 리뷰 1회를 적용한다.
 
 ## 리뷰 산출물
 
@@ -141,7 +143,7 @@ Claude·Codex 양측 리뷰 결과는 **PRD 본문에 반영**한다. 별도 증
 - High/Critical 지적은 PRD(또는 코드) 본문 갱신으로만 흔적을 남김
 - 회차 추적·점수표 보존·Codex 원문 저장 모두 폐기
 
-Codex-led Mode에서도 plan/eng/code 세 단계는 서로 다른 관점의 리뷰임을 유지하되, 산출물은 각 단계에서 갱신된 PRD 본문 자체로 흡수된다.
+Codex-led Full flow에서도 plan/eng/code 세 단계는 서로 다른 관점의 리뷰임을 유지하되, 산출물은 각 단계에서 갱신된 PRD 본문 자체로 흡수된다. Lite는 SSOT 통합 plan/engineering 리뷰 예외를 따른다.
 
 ## 리뷰 기준
 
