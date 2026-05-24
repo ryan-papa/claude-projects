@@ -45,12 +45,28 @@ description: "[11] 커밋·PR·CI·자동머지·배포. 수동 git/gh 우회 �
 
 ### 자동 머지 (가드 3종 AND)
 7. **자동 머지 안전 가드** — 모두 충족 시에만 진행:
-   - (a) **CI 모든 체크 SUCCESS — 동기 검증 의무**
-     - CI 있음(`.github/workflows/` 1건 이상): `gh pr checks <num> --watch` 로 모든 체크 종결 대기 → 종료 후 `gh pr checks <num>` 재호출 → exit 0 + `pending`/`queued`/`in_progress`/`fail` 0건 검증. `--auto` 옵션 위임 금지 (branch protection 정책 의존이라 인프라 결손 시 가드 무력화 위험. PR #274 r1 사례)
-     - CI 없음(`.github/workflows/` 0건): (a) **N/A**, (b)(c) 만 평가 후 진행
+   - (a) **⛔ CI 모든 체크 SUCCESS — 동기 검증 의무 (3단계 강제)**
+     - **CI 있음**(`.github/workflows/` 1건 이상): 아래 3단계 **모두 통과 전에는 `gh pr merge` 호출 자체 금지**
+       1. `gh pr checks <num> --watch` 종결 대기 (모든 체크가 종결 상태로 진입할 때까지 blocking)
+       2. 종결 후 `gh pr checks <num>` 재호출 → **exit 0**
+       3. 재호출 출력에 `pending`·`queued`·`in_progress`·`fail` 단어 **0건** (검증 grep)
+     - **CI 없음**(`.github/workflows/` 0건): (a) **N/A**, (b)(c) 만 평가 후 진행
    - (b) PR base 자동 감지 또는 메타 분기 결과 정상 (fail-closed 통과)
    - (c) `gh pr view <num> --json mergeable` 가 `MERGEABLE`
-   하나라도 실패 → **자동 머지 중단 + PR 상태 OPEN 유지 + 사용자 즉시 보고**. `--admin`·`--no-verify`·`--auto` 우회 금지.
+
+   **하나라도 실패 → 자동 머지 중단 + PR 상태 OPEN 유지 + 사용자 즉시 보고**. 사용자가 "그냥 가" 등 강제 진행 지시해도 정책 유지 (비상 탈출구는 `RP_SHIP_MANUAL=1` 환경변수 단 1가지).
+
+   **⛔ 절대 금지 패턴 (어떤 형태로도)**:
+   - `gh pr merge --auto`, `gh pr merge --auto --squash`, `gh pr merge --auto --merge` 등 `--auto` 가 포함된 모든 호출
+   - `gh pr merge --admin`, `--no-verify` 우회
+   - 가드 통과 전 `gh pr merge` 호출 (3단계 검증 누락)
+
+   **⛔ 위반 시 즉시 revert + 회고 의무**: CI 미통과 상태에서 머지 발생 시
+   1. 즉시 `git revert <merge-sha>` 으로 revert PR 생성 → 즉시 머지 (revert 자체는 가드 통과 검증 후)
+   2. 배포 진행 중이면 `gh run cancel <run-id>` 로 배포 중단 / 이미 배포 완료면 롤백
+   3. `docs/research/<YYYYMMDD>_merge_violation_<feature>.md` 회고 노트 작성 (위반 경위 + 회귀 가드 추가안)
+
+   **사례** (회귀 방지 트래커): museum-finder PR #274 r1 / #294 / #225 / #296 — 모두 `--auto` 단독 호출로 인프라 결손 환경(Free + private)에서 즉시 머지 fallback 발생.
 
 ### 머지·배포
 8. **머지 실행**: `gh pr merge <num> --merge --delete-branch` (전략 `--merge` 고정, **`--auto` 금지** — 가드 (a) 는 단계 7 에서 동기 검증 완료 후 호출이라 즉시 머지)
@@ -118,7 +134,7 @@ PR 생성 시점에 .github/workflows/ 확인
        └── 추가 안 함 → 가드 (a) N/A, (b)(c) 평가 후 `gh pr merge --merge` 자동 진행
 ```
 
-**금지 패턴:** `gh pr merge --auto` 단독 호출. GitHub 의 `--auto` 는 branch protection 의 required status checks 통과 시 머지로, 인프라 결손(예: backend·frontend job 이 required 미지정) 시 일부 체크 pending 상태로 머지 트리거. 가드 (a) 의무를 위반.
+**⛔ 절대 금지 패턴:** `gh pr merge --auto` (단독·옵션 조합 무관 어떤 형태로도). GitHub `--auto` 는 branch protection 의 required status checks 통과 시 자동 머지인데, **Free plan + private repo** 또는 required check 미지정 등 인프라 결손 시 **즉시 머지로 fallback** → 가드 (a) 동기 검증 우회. 위반 사례: museum-finder PR #274 r1 / #294 / #225 / #296.
 
 ## 절대 규칙
 

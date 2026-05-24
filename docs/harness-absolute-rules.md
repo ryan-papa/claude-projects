@@ -83,12 +83,14 @@
 ## 배포·머지·브랜치
 
 - 산출물 보고 없이 배포 진행 금지 (커밋·PR은 산출물 보고 후 자동)
-- **CI 통과 전 머지 금지**: `.github/workflows/` 1건 이상 존재 시 모든 체크 SUCCESS 전 머지 금지 (예외 없음). 워크플로우 자체 부재 시 본 조항 N/A — 가드 (a) N/A 분기와 정합 (단계 7 참조)
+- **⛔ CI 통과 전 머지 시도 자체 금지** (예외 없음): `.github/workflows/` 1건 이상 존재 시 (a) `gh pr checks <num> --watch` 종결 대기 + (b) 재호출 exit 0 + (c) `pending`/`queued`/`in_progress`/`fail` 0건 — **3단계 모두 통과 전에는 `gh pr merge` 호출 자체 금지**. 워크플로우 부재 시만 본 조항 N/A — 가드 (a) N/A 분기와 정합
+- **⛔ 위반 시 즉시 revert + 회고 의무**: CI 미통과 상태에서 머지 발생 시 (a) 즉시 `git revert` PR 생성 → 즉시 머지 → 배포 중단/롤백 (b) `docs/research/<date>_merge_violation.md` 회고 노트 작성 + 회귀 가드 추가. 사용자가 "그냥 가" 라고 말해도 정책은 동일 (사용자 명시 비상 탈출구 `RP_SHIP_MANUAL=1` 만 예외, 그 외 모든 우회 금지)
+- **⛔ Free 개인 + private 레포 환경 추가 강화**: GitHub branch protection 이 인프라적으로 미적용되는 환경(`Free plan` + `private repo`)에서는 GitHub 자체 머지 차단이 **불가능** → 본 규칙 SSOT 가 유일한 가드. `gh pr merge --auto`/`--admin`/`--no-verify` 어느 형태로도 호출 금지. 가드는 클라이언트(스킬)에서 동기 검증으로만 보장
 - **feat 브랜치 직행 배포 금지**: 모든 배포는 `rp-ship` 경유 (PR → CI → main 머지 → 배포). feat/통합 브랜치 상태로 프로덕션 프로세스 기동·노출 금지. 단, 로컬 개발 서버(`uvicorn --reload`)는 예외
 - **`main` 직접 수정 금지**: `main` 브랜치에서 docs·CLAUDE.md·스킬·settings 수정 감지 시 즉시 중단 + feat 브랜치 전환 요구
 - **`rp-ship` 스킬 호출 필수**: 커밋·PR·머지·배포는 수동 `git`/`gh` 우회 없이 `rp-ship` 스킬 경유. 단, `rp-ship` 스킬 내부 절차로 명시된 명령은 예외
 - **`rp-ship` 자동 머지 가드 3종 AND**: 모두 충족 시에만 자동 머지
-  - (a) CI 모든 체크 SUCCESS — **동기 검증 의무**. CI 있음 시 `gh pr checks <num> --watch` 종결 대기 후 재호출 exit 0 + pending/queued/in_progress/fail 0건 검증. **`gh pr merge --auto` 위임 금지** (branch protection 정책 의존이라 인프라 결손 시 가드 무력화. PR #274 r1 사례). CI 없음 시 (a) N/A, (b)(c) 만 평가
+  - (a) CI 모든 체크 SUCCESS — **동기 검증 의무**. CI 있음 시 `gh pr checks <num> --watch` 종결 대기 후 재호출 exit 0 + pending/queued/in_progress/fail 0건 검증. **`gh pr merge --auto` 어떤 형태로도 호출 금지** (단독 `--auto`/`--auto --squash`/`--auto --merge` 등 전부 차단). branch protection 정책 의존이라 인프라 결손(`Free plan` + `private repo`, required check 미지정 등) 시 즉시 머지로 fallback → 가드 무력화. 위반 사례: museum-finder PR #274 r1 / #294 / #225 / #296. CI 없음 시 (a) N/A, (b)(c) 만 평가
   - (b) PR base 정상 감지
   - (c) `gh pr view --json mergeable` = `MERGEABLE`
   - 하나라도 실패 → 중단 + OPEN 유지 + 사용자 보고. `--admin`·`--no-verify`·`--auto` 우회 금지. 비상 탈출구 `RP_SHIP_MANUAL=1` 환경변수만 자동 머지 비활성 허용
