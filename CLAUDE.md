@@ -128,7 +128,7 @@ workflow-agent-harness/
 **오케스트레이터:**
 - `rp-workflow` — 신규 프로젝트·기능 (init부터 전 단계)
 - `rp-amend` — 기존 프로젝트 기능 수정·추가 (init 스킵, Lite 판별 후 Full amend 또는 핫픽스 경량 트랙)
-**자동 진입:** 모든 단계 완료 시 다음 단계 자동 진입. 사용자 확인 없이 즉시 진행. 커밋·PR·**머지(자동 머지 가드 3종 AND 충족 시)까지 자동**. 배포[11] 완료 후 회고[12]는 **사용자 명령 시에만 실행** (자동 진입 없음).
+**자동 진입:** 모든 단계 완료 시 다음 단계 자동 진입. 사용자 확인 없이 즉시 진행. 커밋·PR·**머지(자동 머지 가드 3종 AND 동기 검증 통과 시)까지 자동**. ⛔ `gh pr merge --auto` 어떤 형태로도 호출 금지 — 가드 통과는 `gh pr checks --watch` + exit 0 + pending/queued/in_progress/fail 0건 동기 검증 후 `gh pr merge --merge` 명시 실행. 배포[11] 완료 후 회고[12]는 **사용자 명령 시에만 실행** (자동 진입 없음).
 - 구체화 완료 → PRD 작성 자동 진입 (확인 질문 금지)
 - PRD 완료 → 기획 리뷰 자동 진입
 - 각 단계 완료 시 "다음 단계로 갈까요?" 질문 금지 — 바로 진행
@@ -138,6 +138,7 @@ workflow-agent-harness/
 **Codex 스킬 동기화:** `docs/skills/rp-*.md`가 원본이다. 변경 후 `.claude/commands/` 심링크와 `.codex/skills/rp-*/SKILL.md` 변환본을 함께 갱신한다. 수동 확인은 `rtk python3 scripts/sync-codex-skills.py --check`, 로컬 설치는 `rtk python3 scripts/sync-codex-skills.py --install-user`.
 
 **⛔ 하네스 절대 규칙:** [`docs/harness-absolute-rules.md`](docs/harness-absolute-rules.md) (SSOT, 예외 없음)
+- **⛔ CI 통과 전 `gh pr merge` 호출 자체 금지** — 가드 (a) 3단계(`gh pr checks --watch` + 재호출 exit 0 + pending/queued/in_progress/fail 0건) 모두 통과 전 머지 명령 실행 금지. `--auto`/`--admin`/`--no-verify` 전면 금지. 위반 시 즉시 revert + 배포 취소 + 회고 노트 의무. 사례: museum-finder PR #274 r1 / #294 / #225 / #296. 상세: SSOT §배포·머지·브랜치 + [`harness-ship.md`](docs/harness-ship.md) §CI 정책
 - **⛔ 인프라 재기동(colima·k3s·노드 reboot 등)은 사용자 명시 허락 필수** — 상세: SSOT §인프라 재기동·다운타임 작업 + 레포별 정책 (`repositories/mac-mini-infra/CLAUDE.md` §⛔ 인프라 재기동 결정)
 - **⛔ auto-memory 시스템 비활성** — `~/.claude/projects/<proj>/memory/` 읽기·쓰기 금지, 사용자 "기억해" 요청 시 CLAUDE.md 직접 추가. 상세: SSOT §메모리 시스템 비활성
 
