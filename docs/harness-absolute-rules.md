@@ -86,6 +86,8 @@
 - **⛔ CI 통과 전 머지 시도 자체 금지** (예외 없음): `.github/workflows/` 1건 이상 존재 시 (a) `gh pr checks <num> --watch` 종결 대기 + (b) 재호출 exit 0 + (c) `pending`/`queued`/`in_progress`/`fail` 0건 — **3단계 모두 통과 전에는 `gh pr merge` 호출 자체 금지**. 워크플로우 부재 시만 본 조항 N/A — 가드 (a) N/A 분기와 정합
 - **⛔ 위반 시 즉시 revert + 회고 의무**: CI 미통과 상태에서 머지 발생 시 (a) 즉시 `git revert` PR 생성 → 즉시 머지 → 배포 중단/롤백 (b) `docs/research/<date>_merge_violation.md` 회고 노트 작성 + 회귀 가드 추가. 사용자가 "그냥 가" 라고 말해도 정책은 동일 (사용자 명시 비상 탈출구 `RP_SHIP_MANUAL=1` 만 예외, 그 외 모든 우회 금지)
 - **⛔ Free 개인 + private 레포 환경 추가 강화**: GitHub branch protection 이 인프라적으로 미적용되는 환경(`Free plan` + `private repo`)에서는 GitHub 자체 머지 차단이 **불가능** → 본 규칙 SSOT 가 유일한 가드. `gh pr merge --auto`/`--admin`/`--no-verify` 어느 형태로도 호출 금지. 가드는 클라이언트(스킬)에서 동기 검증으로만 보장
+- **베이스 브랜치 origin 최신화 (서브 레포)**: 통합 브랜치는 항상 origin 최신 베이스에서 생성. 유저 미지정 시 베이스 = `origin/develop → origin/main → origin/master` 순 첫 존재. 생성 전 `git fetch origin` 필수, 로컬 stale 사용 금지. origin·후보 전무 시 중단 + 사용자 질의. 상세: [`harness-dev.md`](harness-dev.md) §브랜치 전략·워크트리 격리
+- **워크트리 격리 (서브 레포)**: 통합 브랜치 1개당 워크트리 1개(`worktrees/[project]/[branch]/`), 통합 브랜치는 워크트리에서만 체크아웃(메인 클론은 베이스 유지 — 동시 체크아웃 충돌 회피). `rp-dev` 진입 시 생성, PR 머지 후 `rp-ship`이 제거(미커밋 변경 시 보류). 하네스 메타 레포 적용 외
 - **feat 브랜치 직행 배포 금지**: 모든 배포는 `rp-ship` 경유 (PR → CI → main 머지 → 배포). feat/통합 브랜치 상태로 프로덕션 프로세스 기동·노출 금지. 단, 로컬 개발 서버(`uvicorn --reload`)는 예외
 - **`main` 직접 수정 금지**: `main` 브랜치에서 docs·CLAUDE.md·스킬·settings 수정 감지 시 즉시 중단 + feat 브랜치 전환 요구
 - **`rp-ship` 스킬 호출 필수**: 커밋·PR·머지·배포는 수동 `git`/`gh` 우회 없이 `rp-ship` 스킬 경유. 단, `rp-ship` 스킬 내부 절차로 명시된 명령은 예외
@@ -98,7 +100,7 @@
 - **`rp-ship` PR base 자동 감지 게이트**: 통합 브랜치 선언 감지 → `--base` 주입
   - 감지 순서: (0) 메타 분기 선검사 (PRD 본문 frontmatter `**유형:** 하네스 메타 변경` + 간소 4섹션(`## 변경 이유`·`## 영향 파일`·`## 롤백 전략`·`## 검증`) 동시 존재 → `--base main`) → (1) `docs/tasks.md` → (2) `CLAUDE.md` → (3) repo default
   - 매칭 정규식: `^[\s\-\*|]*통합 브랜치:\s*`?([A-Za-z0-9/_\-]+)`?` 정확히 1건만 채택
-  - Fail-closed: 2건+ 매칭·공백 포함·원격 부재·detached HEAD·프로젝트 루트 미확인 → 중단. 느슨한 `feat/*` 추론 금지
+  - Fail-closed: 2건+ 매칭·공백 포함·원격 부재·detached HEAD·프로젝트 루트 미확인 → 중단. 느슨한 `feat/*` 추론 금지. **워크트리에서 `.git`은 파일(gitdir 포인터)이므로 루트 판정은 `.git` 디렉터리뿐 아니라 `.git` 파일도 정상 인식**
   - 우회 허용: 수동 `--base <X>`, 메타 분기 자동
   - base 리타깃 시 CI 재실행 후 자동 머지 가드 재확인
 

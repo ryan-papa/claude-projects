@@ -3,21 +3,37 @@
 ## 브랜치 전략
 
 ```
-main
-  └── feat/[project-name]          ← 통합 브랜치
+origin/[base]                      ← 베이스 (develop→main→master 순 자동 감지)
+  └── feat/[project-name]          ← 통합 브랜치 (워크트리에서만 체크아웃)
        ├── feat/T-01-description   ← 태스크 브랜치
        ├── feat/T-02-description
        └── ...
-  ← 최종 PR (통합 → main)
+  ← 최종 PR (통합 → base)
 ```
 
 | 규칙 | 내용 |
 |------|------|
-| 통합 브랜치 | `feat/[project-name]`, main에서 생성 |
-| 태스크 브랜치 | `feat/T-XX-description`, 통합 브랜치에서 생성 |
-| 태스크 머지 | 태스크 → 통합 브랜치로 머지 |
-| 최종 머지 | 통합 브랜치 → main (PR) |
-| **main 직접 push** | **금지** — 반드시 PR 경유 |
+| 베이스 감지 | 유저 미지정 시 `origin/develop → origin/main → origin/master` 순 첫 존재 채택. SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) §배포·머지·브랜치 |
+| 최신화 | 통합 브랜치 생성 전 `git fetch origin`, `origin/[base]` 기준 생성 (로컬 stale 금지) |
+| 통합 브랜치 | `feat/[project-name]`, `origin/[base]`에서 생성, **워크트리에서만 체크아웃** |
+| 태스크 브랜치 | `feat/T-XX-description`, 통합 브랜치에서 생성 (워크트리 내부) |
+| 태스크 머지 | 태스크 → 통합 브랜치로 머지 (워크트리 내부) |
+| 최종 머지 | 통합 브랜치 → base (PR) |
+| **base 직접 push** | **금지** — 반드시 PR 경유 |
+
+## 워크트리 격리 (서브 레포 한정)
+
+통합 브랜치(=서로 다른 기능/프로젝트) 간 작업 공간을 분리해 파일 충돌·stale 머지를 방지한다. **하네스 메타 레포는 적용 외.**
+
+| 규칙 | 내용 |
+|------|------|
+| 격리 단위 | 통합 브랜치 1개당 워크트리 1개. 동일 통합 브랜치 내 태스크는 단일 워크트리에서 순차 진행(에이전트당 1태스크 규칙) |
+| 경로 | `worktrees/[project]/[통합브랜치명]/` (하네스 루트, `repositories/` 형제, `.gitignore` 제외). 경로 leaf는 브랜치명 슬래시를 대시로 치환 (`feat/[project]` → `feat-[project]`) |
+| 메인 클론 정책 | `repositories/[project]/`는 **베이스 브랜치에 유지**. 통합 브랜치는 워크트리에서만 체크아웃 → 동일 브랜치 동시 체크아웃 충돌(git 제약) 회피 |
+| 생성 | `git -C repositories/[project] worktree add worktrees/[project]/feat-[project] -b feat/[project] origin/[base]` |
+| 베이스 부재 | `origin` 리모트 없거나 develop/main/master 모두 부재 시 **중단 + 사용자 질의** (임의 로컬 fallback 금지) |
+| 재진입 | 워크트리 존재 시 재사용 + `git fetch`. clean이면 `origin/[base]` rebase 안내, **미커밋 변경 시 rebase 강행 금지 → 경고 후 사용자 선택(중단/stash)** |
+| 정리 | PR 머지 후 `rp-ship`이 `git worktree remove`. 미커밋·미푸시 변경 시 **보류 + 사용자 알림**, 다음 `rp-dev` 진입 시 재확인 |
 
 ## 레포 초기화 체크리스트
 
