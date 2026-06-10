@@ -23,7 +23,19 @@ description: "[7] 개발. 태스크별 반복 사이클. 통합 브랜치에서 
 - 태스크 분해 완료 후
 - `/rp-dev` 명령
 
-## 절차 (태스크당)
+## 진입 시 1회 — 워크트리 + 통합 브랜치 (서브 레포 한정)
+
+태스크 사이클 시작 전 1회 수행. **하네스 메타 레포는 스킵.**
+
+1. **베이스 감지**: 유저 미지정 시 `git -C repositories/[project] ls-remote --heads origin develop|main|master` 순 첫 존재 채택. origin·후보 전무 → 중단 + 사용자 질의
+2. **최신화**: `git -C repositories/[project] fetch origin` (실패 시 중단·보고)
+3. **워크트리 생성**: 없으면 `git -C repositories/[project] worktree add worktrees/[project]/feat-[project] -b feat/[project] origin/[base]`. 메인 클론은 베이스 브랜치 유지(통합 브랜치 체크아웃 금지)
+4. **재진입**: 워크트리 존재 시 재사용 + `git fetch`. clean이면 `origin/[base]` rebase 안내, 미커밋 변경 시 rebase 강행 금지 → 경고 후 사용자 선택(중단/stash)
+5. 이후 모든 태스크 작업은 **워크트리 디렉터리에서** 진행
+
+→ 상세: [`../harness-dev.md` §워크트리 격리](../harness-dev.md)
+
+## 절차 (태스크당, 워크트리 내부)
 
 1. 통합 브랜치에서 태스크 브랜치 생성
 2. 개발자에 1태스크만 위임

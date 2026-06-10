@@ -101,7 +101,7 @@ PR 생성/리타깃 전 **통합 브랜치 선언을 감지**해 `--base` 에 �
 - 감지 정규식이 2건 이상 매칭 (모호성)
 - 감지된 브랜치가 원격에 부재 (`git ls-remote --exit-code origin refs/heads/<base>` 실패)
 - `HEAD` 가 detached 상태
-- 프로젝트 루트(`.git` 디렉터리)를 찾지 못함
+- 프로젝트 루트를 찾지 못함 (워크트리에서 `.git`은 **파일**(gitdir 포인터)이므로 `.git` 디렉터리·파일 모두 정상 루트로 인식)
 - 느슨한 브랜치명 추론(`feat/mvp-*` 등) 금지 — 반드시 `통합 브랜치:` 앵커 필드만 권위
 
 ## README 검증
@@ -150,6 +150,14 @@ PR 생성 시점에 .github/workflows/ 확인
 - `git log [target-branch] --oneline -3`으로 커밋 반영 확인
 - 배포 워크플로우 상태 확인: `gh run list --limit 1`
 - 배포 완료 시 라이브 URL 안내
+
+## 워크트리 정리 (서브 레포 한정)
+
+PR 머지 완료 후 통합 브랜치 워크트리 제거. **하네스 메타 레포는 스킵.**
+
+- 워크트리에 미커밋·미푸시 변경 없으면 `git -C repositories/[project] worktree remove worktrees/[project]/[branch]`
+- 미커밋·미푸시 변경 감지(또는 git이 dirty로 remove 거부) 시 **제거 보류 + 사용자 알림** (강제 `--force` 금지), 다음 `rp-dev` 진입 시 재확인
+- 상세: [`../harness-dev.md` §워크트리 격리](../harness-dev.md)
 
 ## 완료 조건
 

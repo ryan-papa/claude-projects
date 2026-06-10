@@ -93,6 +93,8 @@ workflow-agent-harness/
 │       ├── CLAUDE.md
 │       ├── README.md
 │       └── docs/prd/
+├── worktrees/                  # 통합 브랜치별 워크트리 (서브 레포 격리, git 제외)
+│   └── [project]/[통합브랜치명]/
 ├── .gitignore
 ├── .codex/skills/             # Codex용 프로젝트 로컬 rp-* 스킬
 ├── AGENTS.md                  # Codex용 하네스 어댑터
