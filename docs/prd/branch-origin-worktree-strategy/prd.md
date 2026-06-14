@@ -23,8 +23,8 @@
 | 최신화 | 통합 브랜치 생성 전 `git fetch origin`. 실패 시 중단·보고. origin/[base] 기준 생성, 로컬 stale 사용 금지 |
 | 메인 클론 브랜치 정책 | 메인 클론(`repositories/[project]/`)은 **베이스 브랜치에 유지**. 통합 브랜치는 **워크트리에서만 생성·체크아웃** → 동일 브랜치 동시 체크아웃 충돌(git 제약) 회피 |
 | 격리 단위 | 통합 브랜치(`feat/[project]`) 1개당 워크트리 1개. 태스크 브랜치 생성·체크아웃·통합 브랜치 머지 **모두 해당 워크트리 안에서** 수행 |
-| 워크트리 경로 | `worktrees/[project]/feat-[project]/` (하네스 루트, `repositories/` 형제, leaf는 브랜치 슬래시→대시). 서브 레포 `.git`에 링크되나 서브 레포 내부 중첩 아님 → 하네스 `.gitignore`만 추가, 서브 레포 .gitignore 불변 |
-| 생성 명령 | `git -C repositories/[project] worktree add worktrees/[project]/feat-[project] -b feat/[project] origin/[base]` |
+| 워크트리 경로 | `repositories/[project]/worktrees/feat-[project]/` (서브레포 내부, leaf는 브랜치 슬래시→대시). 생성 명령이 `-C repositories/[project]` 기준 상대경로라 서브레포 내부에 생성 → 서브레포 자체 `.gitignore`에 `worktrees/` 추가(하네스 `.gitignore`는 `repositories/` 전체 제외로 이미 커버) |
+| 생성 명령 | `git -C repositories/[project] worktree add worktrees/feat-[project] -b feat/[project] origin/[base]` |
 | 수행 시점 | `rp-dev` 진입 시 1회 (베이스 감지 → fetch → 워크트리+통합 브랜치 생성). 이후 모든 개발 작업은 워크트리 디렉터리에서 진행 |
 | 재진입 | 워크트리 존재 시 재사용 + `git fetch`. 워킹트리 clean이면 origin/[base] 변경분 rebase 안내, **미커밋 변경 있으면 rebase 강행 금지 → 경고 후 사용자 선택(중단/stash)** |
 | 정리 | PR 머지 후 `rp-ship`이 `git worktree remove` 자동 제거. 미커밋·미푸시 변경 감지 시 **보류 + 사용자 알림**, 다음 `rp-dev` 진입 시 재확인 |

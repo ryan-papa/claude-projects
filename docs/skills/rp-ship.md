@@ -144,7 +144,7 @@ PR 생성 시점에 .github/workflows/ 확인
 
 PR 머지 완료 후 통합 브랜치 워크트리 제거. **하네스 메타 레포는 스킵.**
 
-- 워크트리에 미커밋·미푸시 변경 없으면 `git -C repositories/[project] worktree remove worktrees/[project]/[branch]`
+- 워크트리에 미커밋·미푸시 변경 없으면 `git -C repositories/[project] worktree remove worktrees/[branch]`
 - 미커밋·미푸시 변경 감지(또는 git이 dirty로 remove 거부) 시 **제거 보류 + 사용자 알림** (강제 `--force` 금지), 다음 `rp-dev` 진입 시 재확인
 - 상세: [`../harness-dev.md` §워크트리 격리](../harness-dev.md)
 
