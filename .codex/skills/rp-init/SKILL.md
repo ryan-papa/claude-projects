@@ -81,7 +81,7 @@ description: "[1] 프로젝트 초기화. CLAUDE.md·README.md·PRD 디렉터리
    ```
    → `.sops.yaml`의 `age1PLACEHOLDER_...` 라인을 `recipients.local.md`의 실제 공개키로 치환 후 플레이스홀더 전부 삭제
 
-3. `.gitignore`에 `.env` 없으면 추가(`.env.enc`는 제외 금지)
+3. `.gitignore`에 `.env` 없으면 추가(`.env.enc`는 제외 금지), `worktrees/` 없으면 추가(서브레포 내부 워크트리 격리 — 서브레포가 자기 워크트리 추적 방지)
 
 4. 사용자에게 `.env.example` 기반 `.env` 작성 요청 → 응답 대기
 
