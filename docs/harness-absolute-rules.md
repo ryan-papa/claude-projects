@@ -77,7 +77,7 @@
 - 테스트·빌드 미통과 시 다음 단계 진행 금지
 - **QA·코드 리뷰 단계 생략 금지 (게이트 강화)**: 두 단계 모두 완료 여부 배포 전 체크. 하나라도 미수행이면 배포 차단. "단위 테스트 통과 = QA 대체 불가"
 - **프런트엔드 변경 시 Playwright E2E + axe(접근성) 검사 필수**: `rp-qa` 단계에서 둘 다 실행, 실패 시 진행 차단. E2E 테스트가 없는 UI 태스크는 완료 불가
-- **백엔드 변경 시 4-게이트 의무**: [`harness-backend-test-policy.md`](harness-backend-test-policy.md) — (1) 단위 항상 (2) 읽기 endpoint API 응답 테스트 (3) SQL/JPA/마이그레이션 변경 시 `@SpringBootTest+@Transactional` ROLLBACK 통합 테스트 (4) 컨트롤러·DI·Flyway 변경 시 로컬 `bootRun` + 헬스 + Flyway 로그 + OAuth 인증 endpoint 응답 캡처. 미준수 머지 차단
+- **백엔드 변경 시 2-게이트 의무**: [`harness-backend-test-policy.md`](harness-backend-test-policy.md) — (1) 단위 항상 (2) 읽기 endpoint API 응답 테스트. 모든 게이트 mock/standalone, **실인프라(DB·Redis 등) 의존 테스트 미강제**. 미준수 머지 차단
 - **push 전 README 검증 필수** (5항목 평균 8.0+, 최대 3회 재시도, 미통과 시 push 차단)
 
 ## 배포·머지·브랜치

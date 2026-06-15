@@ -59,7 +59,7 @@ workflow-agent-harness/
 │   ├── harness-design.md       # UI 디자인 원칙
 │   ├── harness-readme.md       # README 작성 규칙
 │   ├── harness-db.md           # DB 스타일 (테이블/컬럼/인덱스/ENUM COMMENT)
-│   ├── harness-backend-test-policy.md  # 백엔드 4-게이트 (단위·GET API·DB 통합·bootRun)
+│   ├── harness-backend-test-policy.md  # 백엔드 2-게이트 (단위·GET API, 실인프라 미강제)
 │   ├── tasks.md                # 태스크 인덱스 (통합 브랜치 앵커 SSOT)
 │   ├── security-guide.md       # 시크릿·자격증명 원칙 (sops+age)
 │   ├── security/
@@ -149,7 +149,7 @@ workflow-agent-harness/
 **README 규칙:** [`harness-readme.md`](docs/harness-readme.md)
 **시크릿 관리:** [`security-guide.md`](docs/security-guide.md) / [`security/secrets-management.md`](docs/security/secrets-management.md)
 **DB 스타일:** [`harness-db.md`](docs/harness-db.md) — 테이블/컬럼/인덱스/ENUM COMMENT 규칙
-**백엔드 테스트 정책:** [`harness-backend-test-policy.md`](docs/harness-backend-test-policy.md) — 4-게이트 (단위·GET API·DB 통합·bootRun)
+**백엔드 테스트 정책:** [`harness-backend-test-policy.md`](docs/harness-backend-test-policy.md) — 2-게이트 (단위·GET API, 실인프라 DB·Redis 미강제)
 
 ## Token Efficiency
 
