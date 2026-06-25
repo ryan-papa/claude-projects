@@ -72,10 +72,7 @@ CI 대기(가드 a) **이전**에 베이스와의 머지 컨플릭트를 검사�
 
 ### 검사 절차
 
-1. `gh pr view <num> --json mergeable,mergeStateStatus` 조회
-2. `mergeable == UNKNOWN`(GitHub 비동기 계산 중) → **2~3초 간격 재폴링(최대 5회)** 후 확정값 획득. 5회 후에도 `UNKNOWN` → **fail-closed**(중단 + 사용자 보고)
-3. `mergeable == MERGEABLE` → 통과, 가드 (a) 진행
-4. `mergeable == CONFLICTING` → 아래 "자동 해소" 진행
+`gh pr view <num> --json mergeable,mergeStateStatus` 조회 → `UNKNOWN`(비동기 계산 중)이면 **2~3초 간격 재폴링(최대 5회)** 후 확정, 5회 후에도 `UNKNOWN`이면 **fail-closed**(중단+보고). `MERGEABLE` → 가드 (a) 진행 / `CONFLICTING` → 아래 자동 해소.
 
 ### 자동 해소
 
@@ -152,11 +149,9 @@ PR 생성/리타깃 전 **통합 브랜치 선언을 감지**해 `--base` 에 �
 
 ## CI 분기
 
+컨플릭트 선행 가드(CI 대기 이전)는 위 "컨플릭트 선행 가드" 섹션 SSOT — `MERGEABLE` 확정 후 아래 CI 분기 진행.
+
 ```
-컨플릭트 선행 가드 (CI 대기 이전): `gh pr view --json mergeable`
-  ├── UNKNOWN → 2~3초 재폴링(최대 5회) → 계속 UNKNOWN 시 fail-closed
-  ├── CONFLICTING → `git merge origin/<base>` 자동 해소(안전 충돌만) → 재푸시 → 가드 처음부터 재평가 (사이클당 1회)
-  └── MERGEABLE → CI 분기 진행
 PR 생성 시점에 .github/workflows/ 확인
   ├── CI 있음 → 가드 (a) 동기 검증: `gh pr checks <num> --watch` 종결 대기
   │             → 재호출 exit 0 + pending/queued/in_progress/fail 0건 검증
