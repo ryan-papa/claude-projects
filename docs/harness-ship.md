@@ -24,6 +24,7 @@ QA + 코드리뷰(또는 콘텐츠 검수) 통과 후 사용자에게 결과를 
 |------|------|
 | CI 없을 때 | PR 생성 시점에 "CI가 없습니다. 추가할까요?" 추천 |
 | 추가 여부 | 사용자 선택 시에만 추가 |
+| **⛔ 컨플릭트 선행 가드** | CI 대기 **이전**에 `mergeable` 선검사 (컨플릭트 시 CI 미실행 → `--watch` 무한 대기 차단). `CONFLICTING` 시 작업자가 `git merge origin/<base>` 자동 해소(안전 충돌만, 불확실 시 중단+보고), 사이클당 1회. 상세: [`skills/rp-ship.md`](skills/rp-ship.md) "컨플릭트 선행 가드" |
 | CI 없이 머지 | CI 가드 (a) N/A, base·MERGEABLE 가드 통과 시 자동 머지 |
 | **동일 브랜치 재작업** | 기존 PR이 MERGED/CLOSED면 **신규 PR 생성** (OPEN PR만 재사용) |
 | **⛔ CI 통과 전 `gh pr merge` 호출 자체 금지** | 가드 (a) 3단계(`--watch` 대기 + exit 0 + pending/queued/in_progress/fail 0건) 모두 통과 전에는 머지 명령 실행 금지. 위반 시 즉시 revert + 배포 취소 + 회고 노트 의무 |
