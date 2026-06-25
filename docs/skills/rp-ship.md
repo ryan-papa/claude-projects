@@ -80,6 +80,21 @@ PR 생성/리타깃 전 **통합 브랜치 선언을 감지**해 `--base` 에 �
 
 **예시 (museum-finder `docs/tasks.md`)**: `- 통합 브랜치: \`feat/mvp-v1\` · 태스크 브랜치 \`feat/T-NN-{slug}\`` → `feat/mvp-v1` 1건 매칭 → `--base feat/mvp-v1`.
 
+### 앵커 stale fallback (감지 후 검증)
+
+소스 1·2 에서 앵커 브랜치를 1건 채택한 직후, **그 앵커가 이미 부모에 병합된 stale 상태인지 검증**한다.
+
+- **부모 결정**: 앵커 표기의 `(← parent)` 명시값, 미표기 시 `main`
+- **stale 판정**: `git fetch origin` 후 `origin/<parent>` 가 앵커 HEAD 를 포함하면(= `git log origin/<anchor>..origin/<parent>` 비어있지 않고 `origin/<parent>..origin/<anchor>` 가 **0 커밋**) 앵커는 부모에 완전 병합됨 → **stale** (원격 브랜치 삭제 여부와 무관)
+- **fallback**: stale 시 앵커 채택을 거부하고 `origin/develop → origin/main → origin/master` 순으로 **원격에 존재하는 첫 브랜치**를 `--base` 로 사용(통합 브랜치 생성 base 순서와 동일). 후보 전무 시 fail-closed
+- **앵커 정리**: 같은 PR 에서 stale 앵커 문서(`docs/tasks.md` 등)를 fallback 결과로 갱신
+- **head PR 머지 상태와 독립**: 본 검증은 *base(타깃)* 측. *head* 브랜치의 기존 PR 이 MERGED/CLOSED 면 신규 PR 생성(단계 4·5, OPEN 만 재사용) — 두 축은 별개
+
+| 케이스 | 상황 | 처리 |
+|--------|------|------|
+| base stale | `C → A` 인데 `A` 가 부모에 머지됨 | fallback `develop → main → master` |
+| head PR 머지됨 | `C` 의 PR 이 MERGED 인데 `C` 에 추가 푸시 | 신규 PR 생성 (재사용 금지) |
+
 ### 수동 오버라이드
 
 사용자가 `rp-ship --base <X>` 로 명시 전달 시 자동 감지 **비활성화**하고 `<X>` 사용. 감지 로직을 거치지 않는 유일한 우회 경로.

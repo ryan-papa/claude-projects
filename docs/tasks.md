@@ -1,7 +1,7 @@
 # Tasks: SECURITY 가이드 + rp-init sops 자동화
 
 PRD: [`docs/prd/security-guide-init/prd.md`](prd/security-guide-init/prd.md)
-통합 브랜치: `feat/security-guide`
+통합 브랜치: `main` (security-guide 통합 완료 → main 머지됨, feat/security-guide 삭제됨 → stale 정리)
 
 ## 태스크 목록
 

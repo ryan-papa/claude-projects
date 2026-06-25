@@ -101,6 +101,8 @@
   - 감지 순서: (0) 메타 분기 선검사 (PRD 본문 frontmatter `**유형:** 하네스 메타 변경` + 간소 4섹션(`## 변경 이유`·`## 영향 파일`·`## 롤백 전략`·`## 검증`) 동시 존재 → `--base main`) → (1) `docs/tasks.md` → (2) `CLAUDE.md` → (3) repo default
   - 매칭 정규식: `^[\s\-\*|]*통합 브랜치:\s*`?([A-Za-z0-9/_\-]+)`?` 정확히 1건만 채택
   - Fail-closed: 2건+ 매칭·공백 포함·원격 부재·detached HEAD·프로젝트 루트 미확인 → 중단. 느슨한 `feat/*` 추론 금지. **워크트리에서 `.git`은 파일(gitdir 포인터)이므로 루트 판정은 `.git` 디렉터리뿐 아니라 `.git` 파일도 정상 인식**
+  - **앵커 stale fallback**: 감지된 앵커 브랜치가 그 부모(앵커 `(← parent)` 표기, 미표기 시 `main`)에 **이미 완전 병합**(`origin/parent` 가 앵커 HEAD 포함; 원격 삭제 여부 무관)이면 stale → 앵커 채택 거부 후 `origin/develop → origin/main → origin/master` 순 원격 존재 첫 브랜치를 base 로 사용(통합 브랜치 생성 base 순서와 동일). 해당 앵커 문서(`docs/tasks.md`)는 동일 PR 에서 정리. fallback 후보 전무 시 fail-closed
+  - **머지된 head PR 재푸시**: head 브랜치의 기존 PR 이 MERGED/CLOSED 면 신규 PR 생성(OPEN 만 재사용). 동일 head 에 추가 커밋 푸시해도 머지된 PR 재오픈·재사용 금지
   - 우회 허용: 수동 `--base <X>`, 메타 분기 자동
   - base 리타깃 시 CI 재실행 후 자동 머지 가드 재확인
 
