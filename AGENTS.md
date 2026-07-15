@@ -24,15 +24,6 @@
 - 3회 미달 시 자동 중단 + 사용자 결정 요청 (강행/재설계/중단)
 - 동일 변경을 나중에 다른 런타임에서 다시 열어도 기존 리뷰 대체 금지 — 추가 독립 검토로만 기록
 
-## 명령 규칙
-
-이 레포에서는 shell 명령 앞에 `rtk`를 붙인다.
-
-예시:
-- `rtk git status`
-- `rtk rg "pattern" docs`
-- `rtk pytest -q`
-
 ## Codex 스킬
 
 프로젝트 로컬 Codex 스킬은 `.codex/skills/rp-*/SKILL.md`에 둔다.
@@ -41,8 +32,8 @@
 - 원본은 `docs/skills/rp-*.md`
 - 변환본은 `scripts/sync-codex-skills.py`로 생성
 - Claude hook은 `docs/skills/rp-*.md` 변경 시 `.claude/commands/`와 `.codex/skills/`를 함께 갱신
-- Codex에서 직접 수정했다면 `rtk python3 scripts/sync-codex-skills.py --check`로 동기화 확인
-- 로컬 Codex discovery가 필요하면 `rtk python3 scripts/sync-codex-skills.py --install-user`로 `$CODEX_HOME/skills`에 심링크 설치
+- Codex에서 직접 수정했다면 `python3 scripts/sync-codex-skills.py --check`로 동기화 확인
+- 로컬 Codex discovery가 필요하면 `python3 scripts/sync-codex-skills.py --install-user`로 `$CODEX_HOME/skills`에 심링크 설치
 
 ## 기준 문서
 

@@ -117,7 +117,7 @@ claude  # Claude Code 실행 — CLAUDE.md + Codex 플러그인 자동 제안
 4. 신규 프로젝트는 `/rp-workflow [기능 설명]`, 기존 프로젝트 수정은 `/rp-amend [변경 설명]`
 5. 서비스 레포는 `repositories/{프로젝트명}/`에 위치 — **하네스 문서에서 서브레포 내부 파일을 직접 링크 참조 금지** (필요 시 발췌본을 `docs/research/`에 작성)
 
-**Codex CLI에서 직접 진입할 경우** 루트 [`AGENTS.md`](AGENTS.md)가 Claude 중심 규칙을 Codex 실행 규칙으로 번역합니다. 로컬 Codex 스킬 설치는 `rtk python3 scripts/sync-codex-skills.py --install-user`.
+**Codex CLI에서 직접 진입할 경우** 루트 [`AGENTS.md`](AGENTS.md)가 Claude 중심 규칙을 Codex 실행 규칙으로 번역합니다. 로컬 Codex 스킬 설치는 `python3 scripts/sync-codex-skills.py --install-user`.
 
 ### Codex 플러그인
 
