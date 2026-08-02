@@ -123,6 +123,7 @@
 | 파일 | 변경 |
 |------|------|
 | `docs/harness-codex-review.md` | **삭제** (외부 Codex 리뷰 SSOT 전체) |
+| `docs/prd/harness-codex-review/prd.md` | 이력 문서 — 삭제 파일을 가리키던 **링크만** 텍스트 참조로 전환 (CI `lint-docs` 대응). 본문 내용은 보존 |
 | `docs/harness-absolute-rules.md` | 리뷰 매트릭스 외부 추가 리뷰 열 제거, `[4][5][9] Codex 추가 리뷰` 절 삭제, 재시도 한도 표([4][5]=3 / [9]=5), `-Lead` |
 | `docs/skills/rp-plan-review.md`·`rp-eng-review.md` | Codex 병렬 발사·매트릭스 판정·비정상 종료 분기 제거, 절차 단일화, `-Lead` |
 | `docs/skills/rp-code-review.md` | 위 + 재시도 5회 |
@@ -148,13 +149,15 @@
 
 ## 검증
 
-대상 = 활성 문서(`docs/skills/`·`docs/harness-*.md`·`CLAUDE.md`·`AGENTS.md`·`README.md`·`.codex/`·`scripts/`). `docs/prd/`·`docs/research/` 는 이력 보존 대상이라 제외.
+대상 = 활성 문서(`docs/skills/`·`docs/harness-*.md`·`CLAUDE.md`·`AGENTS.md`·`README.md`·`.codex/`·`scripts/`). `docs/prd/`·`docs/research/` 는 **내용**은 이력 보존 대상이라 수정하지 않는다.
+
+> **단, 링크 무결성은 예외** — CI(`.github/workflows/ci.yml`)의 `lint-docs` 는 `docs/` **전체**(templates 제외)를 검사한다. 이력 문서라도 삭제된 파일을 마크다운 링크로 가리키면 CI FAIL. 초기 검증에서 `docs/prd/` 를 제외해 `docs/prd/harness-codex-review/prd.md → ../../harness-codex-review.md` 1건을 놓쳤고 **CI 가 잡았다**(PR #62 r1). 링크만 텍스트 참조로 전환해 해소.
 
 | 항목 | 방법 | 결과 |
 |------|------|------|
 | Codex 리뷰 규칙 잔존 | `grep -rn "codex:review\|codex review\|harness-codex-review"` | **0건 PASS** |
 | `-led` 잔존 | `grep -rn "Claude-led\|Codex-led"` (`.py` 포함) | **0건 PASS** — 110건 전부 `-Lead` 치환 |
-| 링크 무결성 | 삭제된 `harness-codex-review.md` 참조 링크 전수 검색 | **0건 PASS** (`docs/prd/` 이력 언급만 잔존) |
+| 링크 무결성 | **CI 와 동일 범위**(`docs/` 전체 + `CLAUDE.md`, templates 제외)로 마크다운 링크 target 존재 검사 | **PASS** — `docs/prd/harness-codex-review/prd.md` 1건을 텍스트 참조로 전환 후 0건 |
 | 회차 표기 정합성 | `grep -rn "최대 3회\|3회 미달" docs/skills/rp-code-review.md docs/harness-code-review.md` | **0건 PASS** ([9] 문맥) |
 | Codex 스킬 동기화 | `python3 scripts/sync-codex-skills.py --check` | **PASS** (13개 in sync) |
 | settings.json 범위 격리 | `git diff --cached --stat -- .claude/settings.json` | **PASS** — 인덱스 `11 deletions(-)` 단독, 추가 0줄. codex 2블록 외 유입 없음. `permissions`·`hooks` 는 HEAD 와 내용 동일 |

@@ -8,7 +8,9 @@
 
 ## 조치
 
-원본 PRD 가 남아있지 않아 placeholder 로 archive. 본 변경 자체의 실 PRD 는 [`docs/harness-codex-review.md`](../../harness-codex-review.md) (코덱스 리뷰 SSOT) + [`docs/prd/audit-C-mid-low/prd.md`](../audit-C-mid-low/prd.md) (감사 정리 PRD) 가 담당.
+원본 PRD 가 남아있지 않아 placeholder 로 archive. 본 변경 자체의 실 PRD 는 `docs/harness-codex-review.md` (코덱스 리뷰 SSOT) + [`docs/prd/audit-C-mid-low/prd.md`](../audit-C-mid-low/prd.md) (감사 정리 PRD) 가 담당했다.
+
+**갱신 (drop-cross-runtime-review):** 교차 런타임 추가 리뷰 폐지로 `docs/harness-codex-review.md` 는 삭제됐다. 링크가 아닌 텍스트 참조로 남긴다 — 이력 문서이므로 내용은 보존.
 
 ## 후속
 
