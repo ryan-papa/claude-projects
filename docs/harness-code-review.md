@@ -2,7 +2,7 @@
 
 ## ⛔ 실행 주체
 
-본 기준의 코드 리뷰는 **반드시 메인 런타임의 서브에이전트**(Claude-led=Agent 툴 `subagent_type=general-purpose` / Codex-led=`spawn_agent`)가 수행한다. 메인 에이전트가 본인이 작성한 코드를 자체 채점하는 행위 **금지**. SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
+본 기준의 코드 리뷰는 **반드시 메인 런타임의 서브에이전트**(Claude-Lead=Agent 툴 `subagent_type=general-purpose` / Codex-Lead=`spawn_agent`)가 수행한다. 메인 에이전트가 본인이 작성한 코드를 자체 채점하는 행위 **금지**. SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
 ## 평가 항목 (7개, 각 10점)
 
@@ -164,7 +164,9 @@
 | 1b self-invocation 금지 | FAIL형 | 피호출자 어드바이스 보유 + 같은 빈 `this.xxx()` 호출 1건이라도 발견 → **전체 FAIL 고정** |
 | Coding Principles 위반 | 감점형 | Think 위반 → 1 정확성 -1, Simplicity 위반 → 2 설계 -1, Surgical 위반 → 7 유지보수성 -1 (CLAUDE.md `## Coding Principles` 참조) |
 
-**재시도:** 미통과 → Dev Agent 재투입 (최대 3회). **3회 미달 시 자동 중단 + 사용자 결정 요청** (강행/재설계/중단). 임계 완화 금지 — SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "재시도 한도".
+**재시도:** 미통과 → Dev Agent 재투입 (**최대 5회** — [9] 단계 한정). **5회 미달 시 자동 중단 + 사용자 결정 요청** (강행/재설계/중단). 임계 완화 금지 — SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "재시도 한도".
+
+> **5회는 잠정값** (관측 데이터 없이 채택). **4회 이상 소진 사례 3건 누적 시 적정성 재검토** — 소진 발생 시 회고[12] 또는 해당 PR 에서 회차·사유를 `docs/research/` 에 1줄 기록. 기록 없이 추가 완화 금지.
 
 **이슈 처리:** High/Mid → Dev Agent 자동 수정. Low → 테이블 제시, 사용자 선택.
 

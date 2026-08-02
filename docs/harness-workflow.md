@@ -11,9 +11,9 @@
   ↓
 ▶ [3] PRD 작성                     → /rp-prd
   ↓
-▶ [4] 기획 리뷰 ← 단계당 최대 3회   → /rp-plan-review  [Claude-led 시 + /codex:review --wait (1회)]
+▶ [4] 기획 리뷰 ← 단계당 최대 3회   → /rp-plan-review
   ↓
-▶ [5] 엔지니어링 리뷰 ← 단계당 최대 3회 → /rp-eng-review [Claude-led 시 + /codex:review --wait (1회)]
+▶ [5] 엔지니어링 리뷰 ← 단계당 최대 3회 → /rp-eng-review
   ↓ 점수 만족 시 바로 개발 진입 (사용자 승인 생략)
 ▶ [6] 태스크 분해                   → /rp-task
   ↓
@@ -21,7 +21,7 @@
   ↓
 ▶ [8] QA / 콘텐츠 검수              → /rp-qa
   ↓
-▶ [9] 코드 리뷰 (7항목) ← 단계당 최대 3회 → /rp-code-review [Claude-led 시 + /codex:review --wait --base main (1회)]
+▶ [9] 코드 리뷰 (7항목) ← 단계당 최대 5회 → /rp-code-review
   ↓
 ▶ [10] 산출물 보고 (자동 진행)
   ↓
@@ -30,7 +30,7 @@
 (선택) [12] 회고 — 사용자 명시 명령 시에만 실행 → /rp-retro
 ```
 
-**작성 모드 분기:** 리뷰 단계 서브에이전트·외부 추가 리뷰 구성은 SSOT [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스" 참조. 메인 런타임이 Claude면 Claude-led, Codex면 Codex-led. 메인 셀프 채점 절대 금지 — 모든 채점은 해당 런타임 서브에이전트가 수행.
+**작성 모드 분기:** 메인 런타임이 Claude면 Claude-Lead, Codex면 Codex-Lead. **런타임 = 리뷰어** — 진입 런타임의 서브에이전트만 채점하며 교차 런타임 추가 리뷰는 전면 금지. 메인 셀프 채점 절대 금지. SSOT [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
 **상태 메시지:** 진입 `▶ [N] 단계명...`, 완료 `✓ [N] 단계명 완료`
 
@@ -61,7 +61,6 @@
 → 개발 상세: [`harness-dev.md`](harness-dev.md)
 → QA + 콘텐츠 검수: [`harness-qa.md`](harness-qa.md)
 → 코드리뷰 상세: [`harness-code-review.md`](harness-code-review.md)
-→ Codex 추가 리뷰: [`harness-codex-review.md`](harness-codex-review.md)
 → 산출물 + 배포: [`harness-ship.md`](harness-ship.md)
 → 스킬 목록: [`skills/`](skills/)
 
@@ -69,10 +68,10 @@
 
 | 구간 | 자동 진입 조건 | 중단 조건 |
 |------|--------------|----------|
-| [4]→[5] 리뷰 | 서브에이전트 점수 통과 (Claude-led: + Codex High/Critical 반영 완료) 시 자동 | 단계당 서브에이전트 3회 미달 시 자동 중단 + **사용자 결정 요청** (강행/재설계/중단) |
+| [4]→[5] 리뷰 | 서브에이전트 점수 통과 시 자동 | 단계당 서브에이전트 3회 미달 시 자동 중단 + **사용자 결정 요청** (강행/재설계/중단) |
 | [7]→[8] 개발→QA | 전체 태스크 완료+빌드 통과 시 자동 | 빌드/테스트 실패 |
 | [8]→[9] QA→코드리뷰 | QA 통과 시 자동 | QA 3회 실패 |
-| [9]→[10] 코드리뷰→산출물 | 서브에이전트 점수 통과 (Claude-led: + Codex High/Critical 반영 완료) 시 자동 | 3회 미달 시 자동 중단 + 사용자 결정 요청 |
+| [9]→[10] 코드리뷰→산출물 | 서브에이전트 점수 통과 시 자동 | **5회** 미달 시 자동 중단 + 사용자 결정 요청 |
 | [10]→[11] 산출물→커밋·PR | 산출물 보고 후 자동 ("산출물 보고 완료, 커밋·PR 자동 진행합니다" 출력) | — |
 | [11] 커밋·PR→자동 머지 | **CI + 게이트 + base 정상 + MERGEABLE AND 충족 시 자동 머지** | 가드 1개 이상 실패 → 중단 + OPEN 유지 + 사용자 보고 |
 | [11]→[12] 배포→회고 | **자동 진입 없음**. 사용자 `/rp-retro` 명령 시에만 실행 | — |
@@ -137,7 +136,7 @@
 | 역할 정의 | 에이전트 역할 명시 |
 | 파일 경로 | 읽기·쓰기 대상 경로 |
 | 요구사항 요약 | 수집된 내용 |
-| 작성 규칙 | 200줄 이하, 테이블/리스트 우선 |
+| 작성 규칙 | 300줄 이하, 테이블/리스트 우선 |
 
 **리서치 결과 저장:**
 - 경로: `repositories/[project]/docs/research/YYYYMMDD_[topic].md`

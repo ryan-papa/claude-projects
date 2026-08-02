@@ -11,7 +11,8 @@ description: "[12] 회고. 단계별 평가 + 규칙 개선 제안. 사용자 �
 - Resolve copied relative links against the source file under `docs/skills/` when needed.
 - Do not record Claude-only `.claude` hooks or slash commands as executed unless they actually ran.
 - Use Codex `spawn_agent` for independent review when a review step requires role separation.
-- Reflect Codex-led review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.
+- Runtime is the reviewer: never call Claude for an extra cross-runtime review.
+- Reflect Codex-Lead review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.
 
 
 # rp-retro
@@ -29,7 +30,6 @@ description: "[12] 회고. 단계별 평가 + 규칙 개선 제안. 사용자 �
 | 절차 준수 | 각 단계 스킵 여부, 순서 위반, 규칙 미준수 |
 | 효율성 | 병목 구간, 불필요한 반복, 더 나은 방법 |
 | 규칙 개선 | 하네스 규칙 자체의 개선 필요성 |
-| Codex 스킵 발생 | 단계 [4][5][9] 또는 메타 단일 리뷰에서 `/codex:review` 토큰/기능 스킵이 발생했다면 **단계명 + 매칭 패턴 #** 한 줄 언급 (별도 트렌드 분석·임계 조치 없음) |
 
 ## 절차
 
