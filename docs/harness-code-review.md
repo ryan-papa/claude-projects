@@ -146,6 +146,8 @@
 
 ## 판정
 
+[9]는 **2축 병렬**이다 — `[9-코드]`(본 문서) ∥ `[9-인프라]`([`harness-infra-review.md`](harness-infra-review.md)). 통과는 두 축 AND 결합이며, 중복 지적·상반 판정 조정은 인프라 문서의 "관할 경계" 절이 SSOT.
+
 **통과 조건 (모두 충족):**
 
 | 조건 | 기준 |
@@ -153,6 +155,7 @@
 | 평균 | ≥ 8.0 |
 | 각 항목 최저 | ≥ 7 |
 | 1b FAIL 조건 (self-invocation) | 미적중 |
+| 인프라 축 | BLOCK 0건 + 미해결 ASK 0건 |
 
 최저 미달 시 평균 8.0 이상이어도 **미통과**. **1b 적중 시 점수와 무관하게 전체 FAIL (우회 불가)** — 재시도 카운트는 소비.
 
@@ -164,7 +167,7 @@
 | 1b self-invocation 금지 | FAIL형 | 피호출자 어드바이스 보유 + 같은 빈 `this.xxx()` 호출 1건이라도 발견 → **전체 FAIL 고정** |
 | Coding Principles 위반 | 감점형 | Think 위반 → 1 정확성 -1, Simplicity 위반 → 2 설계 -1, Surgical 위반 → 7 유지보수성 -1 (CLAUDE.md `## Coding Principles` 참조) |
 
-**재시도:** 미통과 → Dev Agent 재투입 (**최대 5회** — [9] 단계 한정). **5회 미달 시 자동 중단 + 사용자 결정 요청** (강행/재설계/중단). 임계 완화 금지 — SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "재시도 한도".
+**재시도:** 미통과 → Dev Agent 재투입 (**최대 5회** — [9] 단계 한정, **코드+인프라 공통 카운터, 사이클 단위 소비**). **5회 미달 시 자동 중단 + 사용자 결정 요청** (강행/재설계/중단). 임계 완화 금지 — SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "재시도 한도".
 
 > **5회는 잠정값** (관측 데이터 없이 채택). **4회 이상 소진 사례 3건 누적 시 적정성 재검토** — 소진 발생 시 회고[12] 또는 해당 PR 에서 회차·사유를 `docs/research/` 에 1줄 기록. 기록 없이 추가 완화 금지.
 
@@ -184,3 +187,4 @@
 린트·포맷팅·빌드 → **CI 자동화**. 리뷰어 시간은 설계·정확성·테스트 품질에 집중.
 
 **관련 스킬:** [`skills/rp-code-review.md`](skills/rp-code-review.md)
+**병렬 축:** [`harness-infra-review.md`](harness-infra-review.md) · [`skills/rp-infra-review.md`](skills/rp-infra-review.md)

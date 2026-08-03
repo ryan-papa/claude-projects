@@ -90,17 +90,23 @@ repositories/[project]/docs/prd/YYYYMMDD_HHMMSS_[feature]_[8자리랜덤].md
 
 **파일명:** `docs/prd/[feature]/prd.md` (하네스 루트 기준)
 
-## PRD 리뷰 (Full flow 2단계 순차 실행)
+## PRD 리뷰 (Full flow 2관점 병렬 실행)
 
 ```
 Doc Agent 작성 완료
   ↓
-[1단계] 기획 리뷰 (Planning Review Sub-Agent, 메인 런타임의 서브에이전트)
-  ↓ 통과 (평균 ≥ 8.0)
-[2단계] 엔지니어링 리뷰 (Engineering Review Sub-Agent, 메인 런타임의 서브에이전트)
-  ↓ 통과 (평균 ≥ 8.0)
+┌─────────────────────────────┬─────────────────────────────┐
+│ [4] 기획 리뷰                │ [5] 엔지니어링 리뷰           │
+│ Planning Review Sub-Agent    │ Engineering Review Sub-Agent │
+│ (메인 런타임의 서브에이전트)   │ (메인 런타임의 서브에이전트)    │
+└─────────────────────────────┴─────────────────────────────┘
+  ↓ 동일 메시지에서 동시 발사, 컨텍스트 미공유 독립 판정
+양축 통과 (각 평균 ≥ 8.0 + 각 항목 ≥ 7)
+  ↓
 다음 단계 자동 진입
 ```
+
+한 축만 미달이면 **미달 축만 재실행**(축별 독립 카운터 3회). 수정이 상대 관점 영역을 건드리거나 PRD 전면 개작 시 통과한 축도 재검증 — SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "리뷰 단계 = 관점 분리".
 
 **⛔ 실행 주체**: 각 리뷰 단계는 **반드시 메인 런타임의 서브에이전트(Claude-Lead=Agent 툴 / Codex-Lead=`spawn_agent`)** 가 수행한다. 메인 에이전트의 셀프 채점 금지. SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
@@ -137,10 +143,10 @@ Lite track은 [`harness-workflow.md`](harness-workflow.md) 의 간이 PRD + 통�
 | 상태 | 조건 |
 |------|------|
 | `Draft` | 최초 작성 |
-| `Planning Review` | 기획 리뷰 진행 중 |
-| `Engineering Review` | 엔지니어링 리뷰 진행 중 |
-| `Approved` | 두 리뷰 모두 통과 → 바로 개발 진입 |
-| `Max retry reached` | 3회 후 미달 |
+| `In Review` | [4]·[5] 병렬 리뷰 진행 중 |
+| `Partial Pass` | 한 축만 통과 — 미달 축 재실행 중 |
+| `Approved` | 두 축 모두 통과 → 바로 개발 진입 |
+| `Max retry reached` | 축별 3회 후 미달 |
 
 → 템플릿: [`prd-template.md`](prd-template.md)
 

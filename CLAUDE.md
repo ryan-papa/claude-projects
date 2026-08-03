@@ -36,8 +36,8 @@
 |------|------|
 | 문체 | 구어체 금지, 간결·명료 |
 | 구조 | 테이블/리스트 우선, 산문 지양 |
-| 분량 | 파일당 300줄 이하 |
-| 초과 시 | **역할/책임 단위로 파일 분리** (텍스트 압축이 아닌 영역 분리) |
+| 분량 | 파일당 **기본 300줄 이하**, 분리가 부적절한 경우에 한해 **최대 500줄** (CI: 300 초과 경고 / 500 초과 실패) |
+| 초과 시 | **역할/책임 단위로 파일 분리** 우선 (텍스트 압축이 아닌 영역 분리). 분리 시 SSOT가 쪼개져 참조가 흩어지는 경우에만 500줄까지 허용 |
 | 코드 | 코드 직접 작성 금지, 파일 링크 참조로 대체 |
 | **자동 정합성** | docs/ 변경 시 서브에이전트가 CLAUDE.md 트리+링크 자동 동기화 (사용자에게 변경 요약만 출력) |
 | **하네스 동기화** | 하네스 문서(원본) 변경 시 관련 스킬(`docs/skills/`) + CLAUDE.md를 즉시 갱신. **예외**: `rp-workflow`·`rp-amend`(오케스트레이터)·`rp-init`·`rp-specify`·`rp-retro`는 스킬-단독 운영(원본 `harness-*.md` 없음) — 스킬 파일이 SSOT |
@@ -54,6 +54,7 @@ workflow-agent-harness/
 │   ├── harness-dev.md          # 개발 (브랜치·태스크·테스트)
 │   ├── harness-qa.md           # QA + 콘텐츠 검수
 │   ├── harness-code-review.md  # 코드리뷰 상세 기준 (7항목)
+│   ├── harness-infra-review.md # 인프라 리뷰 기준 ([9] 병렬 축, BLOCK/ASK/WARN)
 │   ├── harness-ship.md         # 산출물 보고 + 배포
 │   ├── harness-design.md       # UI 디자인 원칙
 │   ├── harness-readme.md       # README 작성 규칙
@@ -84,7 +85,8 @@ workflow-agent-harness/
 │       ├── rp-task.md          # [6] 태스크 분해
 │       ├── rp-dev.md           # [7] 개발
 │       ├── rp-qa.md            # [8] QA / 콘텐츠 검수
-│       ├── rp-code-review.md   # [9] 코드 리뷰
+│       ├── rp-code-review.md   # [9-코드] 코드 리뷰
+│       ├── rp-infra-review.md  # [9-인프라] 인프라 리뷰 (코드 리뷰와 병렬)
 │       ├── rp-ship.md          # [11] 커밋→PR→배포
 │       └── rp-retro.md         # [12] 회고
 ├── repositories/               # 프로젝트별 레포 (git 제외)
@@ -115,15 +117,17 @@ workflow-agent-harness/
 
 | 단계 | 스킬 | 내용 |
 |:----:|------|------|
-| 1~5 | `rp-init` ~ `rp-eng-review` | 초기화 → 구체화 → PRD → 기획리뷰(기획 관점 서브에이전트) → 엔지리뷰(기술 관점 서브에이전트) | [`harness-prd.md`](docs/harness-prd.md) |
+| 1~5 | `rp-init` ~ `rp-eng-review` | 초기화 → 구체화 → PRD → **기획리뷰 ∥ 엔지리뷰 병렬**(각각 독립 서브에이전트, 동시 발사) | [`harness-prd.md`](docs/harness-prd.md) |
 | 6~7 | `rp-task`, `rp-dev` | 태스크 분해 → 개발 | [`harness-dev.md`](docs/harness-dev.md) |
 | 8 | `rp-qa` | QA / 콘텐츠 검수 | [`harness-qa.md`](docs/harness-qa.md) |
-| 9 | `rp-code-review` | 코드 리뷰 (7항목, 최저 점수제, 코드 관점 서브에이전트, **최대 5회**) | [`harness-code-review.md`](docs/harness-code-review.md) |
+| 9 | `rp-code-review` ∥ `rp-infra-review` | **코드 리뷰(7항목 점수제) ∥ 인프라 리뷰(SQL·Redis·비동기·직렬화·배포, 무점수 BLOCK/ASK/WARN)** 병렬. 공통 **최대 5회** | [`harness-code-review.md`](docs/harness-code-review.md) · [`harness-infra-review.md`](docs/harness-infra-review.md) |
 | 10 | — | 산출물 보고 → 커밋·PR 자동 진행 | [`harness-ship.md`](docs/harness-ship.md) |
 | 11 | `rp-ship` | 커밋 → PR → CI → 머지 → 배포 | [`harness-ship.md`](docs/harness-ship.md) |
 | 12 | `rp-retro` | 회고 (절차 준수 + 효율성 + 규칙 개선) | [`rp-retro.md`](docs/skills/rp-retro.md) |
 
-**메인 셀프 리뷰 절대 금지:** 4·5·9 단계 모두 메인 런타임의 서브에이전트(Claude-Lead=Agent 툴 / Codex-Lead=`spawn_agent`)가 채점. 재시도는 **[4]·[5] 최대 3회 / [9] 최대 5회**, 한도 미달 시 자동 중단 + 사용자 결정 요청.
+**메인 셀프 리뷰 절대 금지:** 4·5·9 단계 모두 메인 런타임의 서브에이전트(Claude-Lead=Agent 툴 / Codex-Lead=`spawn_agent`)가 채점. 재시도는 **[4]·[5] 최대 3회(축별 독립) / [9] 최대 5회(코드+인프라 공통, 사이클 단위)**, 한도 미달 시 자동 중단 + 사용자 결정 요청.
+
+**리뷰 병렬 실행:** `[4] ∥ [5]`, `[9-코드] ∥ [9-인프라]` 를 동일 메시지에서 동시 발사(컨텍스트 미공유 독립 판정). 미달 축만 재실행하되 상대 관점 영역 변경 시 통과 축도 1회 재검증. Codex-Lead 는 동시 발사 불가 시 순차 fallback 허용(통과 조건 동일). **인프라 축은 정적 분석 전용 — 실인프라 조회·접속 금지.**
 
 **⛔ 교차 런타임 추가 리뷰 금지:** 런타임 = 리뷰어. Claude-Lead 에서 `codex`·`/codex:*` 호출 금지, Codex-Lead 에서 Claude 호출 금지. 통과 판정은 서브에이전트 점수 단일 기준.
 
@@ -145,6 +149,7 @@ workflow-agent-harness/
 - **⛔ auto-memory 시스템 비활성** — `~/.claude/projects/<proj>/memory/` 읽기·쓰기 금지, 사용자 "기억해" 요청 시 CLAUDE.md 직접 추가. 상세: SSOT §메모리 시스템 비활성
 
 **코드리뷰 상세:** [`harness-code-review.md`](docs/harness-code-review.md)
+**인프라 리뷰 상세:** [`harness-infra-review.md`](docs/harness-infra-review.md) — SQL(방언·실행계획·타입 정밀도·대량 쓰기)·Redis·비동기 점유·직렬화 호환·배포 전략/pub-sub
 **디자인 원칙:** [`harness-design.md`](docs/harness-design.md)
 **README 규칙:** [`harness-readme.md`](docs/harness-readme.md)
 **시크릿 관리:** [`security-guide.md`](docs/security-guide.md) / [`security/secrets-management.md`](docs/security/secrets-management.md)

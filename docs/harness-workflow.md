@@ -11,17 +11,17 @@
   ↓
 ▶ [3] PRD 작성                     → /rp-prd
   ↓
-▶ [4] 기획 리뷰 ← 단계당 최대 3회   → /rp-plan-review
-  ↓
-▶ [5] 엔지니어링 리뷰 ← 단계당 최대 3회 → /rp-eng-review
-  ↓ 점수 만족 시 바로 개발 진입 (사용자 승인 생략)
+▶ [4] 기획 리뷰 ∥ [5] 엔지니어링 리뷰  → /rp-plan-review ∥ /rp-eng-review
+     (병렬 동시 발사, 축별 최대 3회)
+  ↓ 양축 통과 시 바로 개발 진입 (사용자 승인 생략)
 ▶ [6] 태스크 분해                   → /rp-task
   ↓
 ▶ [7] 개발 (태스크별 반복)           → /rp-dev
   ↓
 ▶ [8] QA / 콘텐츠 검수              → /rp-qa
   ↓
-▶ [9] 코드 리뷰 (7항목) ← 단계당 최대 5회 → /rp-code-review
+▶ [9-코드] 코드 리뷰(7항목) ∥ [9-인프라] 인프라 리뷰(BLOCK/ASK/WARN)
+     (병렬 동시 발사, 공통 최대 5회)  → /rp-code-review ∥ /rp-infra-review
   ↓
 ▶ [10] 산출물 보고 (자동 진행)
   ↓
@@ -41,12 +41,13 @@
 | 1 | 프로젝트 초기화 | [`skills/rp-init.md`](skills/rp-init.md) |
 | 2 | 구체화 | [`skills/rp-specify.md`](skills/rp-specify.md) |
 | 3 | PRD 작성 | [`skills/rp-prd.md`](skills/rp-prd.md) |
-| 4 | 기획 리뷰 | [`skills/rp-plan-review.md`](skills/rp-plan-review.md) |
-| 5 | 엔지니어링 리뷰 | [`skills/rp-eng-review.md`](skills/rp-eng-review.md) |
+| 4 | 기획 리뷰 (∥ 5) | [`skills/rp-plan-review.md`](skills/rp-plan-review.md) |
+| 5 | 엔지니어링 리뷰 (∥ 4) | [`skills/rp-eng-review.md`](skills/rp-eng-review.md) |
 | 6 | 태스크 분해 | [`skills/rp-task.md`](skills/rp-task.md) |
 | 7 | 개발 | [`skills/rp-dev.md`](skills/rp-dev.md) |
 | 8 | QA / 콘텐츠 검수 | [`skills/rp-qa.md`](skills/rp-qa.md) |
-| 9 | 코드 리뷰 | [`skills/rp-code-review.md`](skills/rp-code-review.md) |
+| 9 | 코드 리뷰 (∥ 인프라) | [`skills/rp-code-review.md`](skills/rp-code-review.md) |
+| 9 | 인프라 리뷰 (∥ 코드) | [`skills/rp-infra-review.md`](skills/rp-infra-review.md) |
 | 10 | 산출물 보고 | — (스킬 없음, 자동 진행) |
 | 11 | 커밋·PR·머지·배포 | [`skills/rp-ship.md`](skills/rp-ship.md) |
 | 12 | 회고 | [`skills/rp-retro.md`](skills/rp-retro.md) |
@@ -61,6 +62,7 @@
 → 개발 상세: [`harness-dev.md`](harness-dev.md)
 → QA + 콘텐츠 검수: [`harness-qa.md`](harness-qa.md)
 → 코드리뷰 상세: [`harness-code-review.md`](harness-code-review.md)
+→ 인프라 리뷰 상세: [`harness-infra-review.md`](harness-infra-review.md)
 → 산출물 + 배포: [`harness-ship.md`](harness-ship.md)
 → 스킬 목록: [`skills/`](skills/)
 
@@ -68,10 +70,10 @@
 
 | 구간 | 자동 진입 조건 | 중단 조건 |
 |------|--------------|----------|
-| [4]→[5] 리뷰 | 서브에이전트 점수 통과 시 자동 | 단계당 서브에이전트 3회 미달 시 자동 중단 + **사용자 결정 요청** (강행/재설계/중단) |
+| [4]∥[5] 리뷰→[6] | **양축** 점수 통과 시 자동 | 축별 3회 미달 시 자동 중단 + **사용자 결정 요청** (강행/재설계/중단) |
 | [7]→[8] 개발→QA | 전체 태스크 완료+빌드 통과 시 자동 | 빌드/테스트 실패 |
 | [8]→[9] QA→코드리뷰 | QA 통과 시 자동 | QA 3회 실패 |
-| [9]→[10] 코드리뷰→산출물 | 서브에이전트 점수 통과 시 자동 | **5회** 미달 시 자동 중단 + 사용자 결정 요청 |
+| [9]→[10] 코드∥인프라 리뷰→산출물 | **양축** 통과(코드 점수 + 인프라 BLOCK·미해결 ASK 0건) 시 자동 | 공통 **5회** 미달 시 자동 중단 + 사용자 결정 요청. 인프라 **ASK 발생 시 중단 + 사용자 결정** |
 | [10]→[11] 산출물→커밋·PR | 산출물 보고 후 자동 ("산출물 보고 완료, 커밋·PR 자동 진행합니다" 출력) | — |
 | [11] 커밋·PR→자동 머지 | **CI + 게이트 + base 정상 + MERGEABLE AND 충족 시 자동 머지** | 가드 1개 이상 실패 → 중단 + OPEN 유지 + 사용자 보고 |
 | [11]→[12] 배포→회고 | **자동 진입 없음**. 사용자 `/rp-retro` 명령 시에만 실행 | — |
@@ -99,6 +101,7 @@
 | 태스크 분해 | 생략 (단일 태스크) |
 | QA | **필수 유지** — E2E + axe 규칙 그대로 적용 |
 | 코드 리뷰 | **필수 유지** — 7항목 최저점수제 그대로 |
+| 인프라 리뷰 | **필수 유지** — 코드 축과 병렬. 5영역 무해당 시 N/A 1줄 |
 | 산출물 보고·ship | 필수 유지 |
 | 회고 | 사용자 명시 명령 시에만 실행 (자동 진입 없음) |
 
