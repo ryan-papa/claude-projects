@@ -36,7 +36,7 @@
 |------|------|
 | 문체 | 구어체 금지, 간결·명료 |
 | 구조 | 테이블/리스트 우선, 산문 지양 |
-| 분량 | 파일당 200줄 이하 |
+| 분량 | 파일당 300줄 이하 |
 | 초과 시 | **역할/책임 단위로 파일 분리** (텍스트 압축이 아닌 영역 분리) |
 | 코드 | 코드 직접 작성 금지, 파일 링크 참조로 대체 |
 | **자동 정합성** | docs/ 변경 시 서브에이전트가 CLAUDE.md 트리+링크 자동 동기화 (사용자에게 변경 요약만 출력) |
@@ -54,7 +54,6 @@ workflow-agent-harness/
 │   ├── harness-dev.md          # 개발 (브랜치·태스크·테스트)
 │   ├── harness-qa.md           # QA + 콘텐츠 검수
 │   ├── harness-code-review.md  # 코드리뷰 상세 기준 (7항목)
-│   ├── harness-codex-review.md # Codex 추가 리뷰 규칙 (4·5·9, 1회, High/Critical 반영)
 │   ├── harness-ship.md         # 산출물 보고 + 배포
 │   ├── harness-design.md       # UI 디자인 원칙
 │   ├── harness-readme.md       # README 작성 규칙
@@ -112,19 +111,21 @@ workflow-agent-harness/
 
 → [`docs/harness-workflow.md`](docs/harness-workflow.md)
 
-**작성 모드:** Claude Code 진입 = Claude-led, Codex CLI 진입 = Codex-led. 리뷰 매트릭스 SSOT [`harness-absolute-rules.md`](docs/harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
+**작성 모드:** Claude Code 진입 = Claude-Lead, Codex CLI 진입 = Codex-Lead. 리뷰 매트릭스 SSOT [`harness-absolute-rules.md`](docs/harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
 | 단계 | 스킬 | 내용 |
 |:----:|------|------|
-| 1~5 | `rp-init` ~ `rp-eng-review` | 초기화 → 구체화 → PRD → 기획리뷰(기획 관점 서브에이전트) → 엔지리뷰(기술 관점 서브에이전트). Claude-led 시 **4·5 Codex 추가 리뷰 1회** | [`harness-prd.md`](docs/harness-prd.md) |
+| 1~5 | `rp-init` ~ `rp-eng-review` | 초기화 → 구체화 → PRD → 기획리뷰(기획 관점 서브에이전트) → 엔지리뷰(기술 관점 서브에이전트) | [`harness-prd.md`](docs/harness-prd.md) |
 | 6~7 | `rp-task`, `rp-dev` | 태스크 분해 → 개발 | [`harness-dev.md`](docs/harness-dev.md) |
 | 8 | `rp-qa` | QA / 콘텐츠 검수 | [`harness-qa.md`](docs/harness-qa.md) |
-| 9 | `rp-code-review` | 코드 리뷰 (7항목, 최저 점수제, 코드 관점 서브에이전트). Claude-led 시 **Codex 추가 리뷰 1회** | [`harness-code-review.md`](docs/harness-code-review.md) |
+| 9 | `rp-code-review` | 코드 리뷰 (7항목, 최저 점수제, 코드 관점 서브에이전트, **최대 5회**) | [`harness-code-review.md`](docs/harness-code-review.md) |
 | 10 | — | 산출물 보고 → 커밋·PR 자동 진행 | [`harness-ship.md`](docs/harness-ship.md) |
 | 11 | `rp-ship` | 커밋 → PR → CI → 머지 → 배포 | [`harness-ship.md`](docs/harness-ship.md) |
 | 12 | `rp-retro` | 회고 (절차 준수 + 효율성 + 규칙 개선) | [`rp-retro.md`](docs/skills/rp-retro.md) |
 
-**메인 셀프 리뷰 절대 금지:** 4·5·9 단계 모두 메인 런타임의 서브에이전트(Claude-led=Agent 툴 / Codex-led=`spawn_agent`)가 채점. 단계당 최대 3회 재시도, 3회 미달 시 자동 중단 + 사용자 결정 요청.
+**메인 셀프 리뷰 절대 금지:** 4·5·9 단계 모두 메인 런타임의 서브에이전트(Claude-Lead=Agent 툴 / Codex-Lead=`spawn_agent`)가 채점. 재시도는 **[4]·[5] 최대 3회 / [9] 최대 5회**, 한도 미달 시 자동 중단 + 사용자 결정 요청.
+
+**⛔ 교차 런타임 추가 리뷰 금지:** 런타임 = 리뷰어. Claude-Lead 에서 `codex`·`/codex:*` 호출 금지, Codex-Lead 에서 Claude 호출 금지. 통과 판정은 서브에이전트 점수 단일 기준.
 
 **오케스트레이터:**
 - `rp-workflow` — 신규 프로젝트·기능 (init부터 전 단계)
@@ -144,7 +145,6 @@ workflow-agent-harness/
 - **⛔ auto-memory 시스템 비활성** — `~/.claude/projects/<proj>/memory/` 읽기·쓰기 금지, 사용자 "기억해" 요청 시 CLAUDE.md 직접 추가. 상세: SSOT §메모리 시스템 비활성
 
 **코드리뷰 상세:** [`harness-code-review.md`](docs/harness-code-review.md)
-**Codex 추가 리뷰:** [`harness-codex-review.md`](docs/harness-codex-review.md) — 플러그인 `openai/codex-plugin-cc` (루트에 1회 설치, settings.json 선언)
 **디자인 원칙:** [`harness-design.md`](docs/harness-design.md)
 **README 규칙:** [`harness-readme.md`](docs/harness-readme.md)
 **시크릿 관리:** [`security-guide.md`](docs/security-guide.md) / [`security/secrets-management.md`](docs/security/secrets-management.md)

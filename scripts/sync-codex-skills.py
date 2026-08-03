@@ -46,12 +46,6 @@ def split_frontmatter(path: Path) -> tuple[dict[str, str], str]:
 
 
 def codex_description(name: str, original: str) -> str:
-    original = original.replace(" + Codex /codex:review 1회. AND 진행", " 독립 리뷰")
-    original = original.replace(" + Codex /codex:review 1회", " 독립 리뷰")
-    original = original.replace("Codex /codex:review 1회", "Codex-led 독립 리뷰")
-    original = original.replace("Claude 7항목 + Codex 1회", "Codex-led 7항목 독립 리뷰")
-    original = original.replace("Claude 5항목", "Codex-led 5항목")
-    original = original.replace("Claude 9항목", "Codex-led 9항목")
     suffix = (
         f" Use when Codex should run or follow the harness {name} stage, "
         f"or when the user invokes /{name}, ${name}, or asks for this workflow step."
@@ -61,34 +55,7 @@ def codex_description(name: str, original: str) -> str:
 
 def adapt_body_for_codex(body: str) -> str:
     replacements = {
-        "`/codex:review --wait --base main`": "`Codex-led findings-first code review against main`",
-        "`/codex:review --wait`": "`Codex-led findings-first review`",
-        "/codex:review --wait --base main": "Codex-led findings-first code review against main",
-        "/codex:review --wait": "Codex-led findings-first review",
         "Agent 툴의 서브에이전트": "`spawn_agent` 서브에이전트",
-        "Claude 채점만 수행. Codex 실행·저장 금지": "Codex-led 독립 채점만 수행. Claude 전용 명령 실행·저장 금지",
-        "Claude 채점만. Codex 실행·저장 금지": "Codex-led 독립 채점만 수행. Claude 전용 명령 실행·저장 금지",
-        "Claude 리뷰는": "Codex-led 리뷰는",
-        "Claude 코드 리뷰는": "Codex-led 코드 리뷰는",
-        "Claude 기획 리뷰는": "Codex-led 기획 리뷰는",
-        "Claude 엔지 리뷰는": "Codex-led 엔지 리뷰는",
-        "Claude 통과 + Codex High/Critical 반영 완료": "Codex-led 리뷰 통과 + High/Critical 반영 완료",
-        "Claude 통과 후": "Codex-led 리뷰 통과 후",
-        "Claude 통과": "Codex-led 리뷰 통과",
-        "Claude 통과 후 Codex 추가 리뷰": "Codex-led 추가 리뷰",
-        "Claude 코드 리뷰 통과 후 수행": "Codex-led 코드 리뷰로 수행",
-        "Claude 3회 실패": "Codex-led 리뷰 3회 실패",
-        "Claude + Codex 1회": "Codex-led 독립 리뷰",
-        "Claude 7항목 + Codex 1회": "Codex-led 7항목 독립 리뷰",
-        "review-claude-plan-r{N}.md": "review-codex-plan.md",
-        "review-claude-eng-r{N}.md": "review-codex-eng.md",
-        "review-claude-code-r{N}.md": "review-codex-code.md",
-        "review-claude-meta-r{N}.md": "review-codex-meta.md",
-        "review-claude-*-r*.md": "review-codex-*.md",
-        "review-claude-${stage}-r*.md": "review-codex-${stage}.md",
-        "review-claude-meta-r*.md": "review-codex-meta.md",
-        "review-claude-{plan,eng,code,meta}-r{N}.md": "review-codex-{plan,eng,code,meta}.md",
-        "Claude 회차 파일은 단계별로 최소 1개": "Codex-led 리뷰 파일은 단계별로 1개",
         "Agent 툴 오류": "spawn_agent 오류",
         "Doc Agent가 PRD 본문 갱신": "문서 작성자가 PRD 본문 갱신",
         "Doc Agent 재투입": "문서 작성자 재투입",
@@ -102,22 +69,6 @@ def adapt_body_for_codex(body: str) -> str:
     for before, after in replacements.items():
         adapted = adapted.replace(before, after)
 
-    adapted = adapted.replace(
-        "| 일반 기능 | `review-codex-plan.md` + `review-codex-plan.md` + `review-codex-eng.md` + `review-codex-eng.md` + `review-codex-code.md` + `review-codex-code.md` |",
-        "| 일반 기능 | `review-codex-plan.md` + `review-codex-eng.md` + `review-codex-code.md` |",
-    )
-    adapted = adapted.replace(
-        "| 하네스 메타 변경 | `review-codex-meta.md` + `review-codex-meta.md` |",
-        "| 하네스 메타 변경 | `review-codex-meta.md` |",
-    )
-    adapted = adapted.replace(
-        "# 일반 기능 — 6개 전부 존재해야 통과 (단, review-codex-*.md는 최소 1개 이상 회차)",
-        "# 일반 기능 — 3개 전부 존재해야 통과",
-    )
-    adapted = adapted.replace(
-        "# 하네스 메타 변경 — 2종 존재 필수",
-        "# 하네스 메타 변경 — 1종 존재 필수",
-    )
     return adapted
 
 
@@ -145,7 +96,8 @@ def render_skill(source: Path) -> str:
         "- Resolve copied relative links against the source file under `docs/skills/` when needed.\n"
         "- Do not record Claude-only `.claude` hooks or slash commands as executed unless they actually ran.\n"
         "- Use Codex `spawn_agent` for independent review when a review step requires role separation.\n"
-        "- Reflect Codex-led review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.\n\n"
+        "- Runtime is the reviewer: never call Claude for an extra cross-runtime review.\n"
+        "- Reflect Codex-Lead review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.\n\n"
         + adapted_body
     )
 

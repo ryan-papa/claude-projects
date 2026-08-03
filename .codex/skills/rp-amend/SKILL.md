@@ -11,7 +11,8 @@ description: "기존 프로젝트 기능 수정·추가. Lite 판별 후 Full am
 - Resolve copied relative links against the source file under `docs/skills/` when needed.
 - Do not record Claude-only `.claude` hooks or slash commands as executed unless they actually ran.
 - Use Codex `spawn_agent` for independent review when a review step requires role separation.
-- Reflect Codex-led review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.
+- Runtime is the reviewer: never call Claude for an extra cross-runtime review.
+- Reflect Codex-Lead review findings into the PRD body itself; do not write `review-codex-*.md` or `review-claude-*.md` evidence files.
 
 
 # rp-amend

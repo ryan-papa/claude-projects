@@ -1,5 +1,5 @@
 ---
-description: '[9] 코드 리뷰. 7항목 최저 점수제 + Codex /codex:review 1회. High/Critical 반영'
+description: '[9] 코드 리뷰. 진입 런타임 서브에이전트가 7항목 최저 점수제 채점 (최대 5회)'
 argument-hint: '[대상 PR·브랜치]'
 ---
 
@@ -11,10 +11,10 @@ argument-hint: '[대상 PR·브랜치]'
 
 | 모드 | 채점 주체 | 외부 추가 리뷰 |
 |------|---------|-------------|
-| Claude-led (Claude Code) | Claude Agent 툴 서브에이전트 | Codex 1회 병렬 |
-| Codex-led (Codex CLI) | Codex `spawn_agent` 서브에이전트 | **N/A** — 메인=Codex이므로 외부 추가 리뷰 없음 |
+| Claude-Lead (Claude Code) | Claude Agent 툴 서브에이전트 | **없음** — Codex 호출 금지 |
+| Codex-Lead (Codex CLI) | Codex `spawn_agent` 서브에이전트 | **없음** — Claude 호출 금지 |
 
-SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
+**런타임 = 리뷰어.** 교차 런타임 추가 리뷰 전면 금지. SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
 ## 트리거
 
@@ -49,13 +49,13 @@ git diff --cached | grep -iE \
 
 ## ⛔ 실행 주체 (서브에이전트 필수)
 
-코드 리뷰는 **반드시 메인 런타임의 서브에이전트로 실행** (Claude-led=Agent 툴 `subagent_type=general-purpose` / Codex-led=`spawn_agent`). 메인 에이전트 셀프 채점 **금지**.
+코드 리뷰는 **반드시 메인 런타임의 서브에이전트로 실행** (Claude-Lead=Agent 툴 `subagent_type=general-purpose` / Codex-Lead=`spawn_agent`). 메인 에이전트 셀프 채점 **금지**.
 
 **서브에이전트 프롬프트** 4 필수 항목 (a)~(d) → SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "[리뷰 단계 서브에이전트 필수]" 절. 본 단계 적용값: (a) 리뷰 대상 diff·브랜치·파일 경로 (b) 7항목 + PR 유형별 포커스 (c)·(d) SSOT 그대로.
 
 **결과 처리**: 별도 파일 저장 없음. 서브에이전트 점수·지적은 인-메모리에서 메인이 수신 후 코드·PRD 본문에 반영.
 
-**재시도**: PRD 본문 갱신 + 코드 수정 후 새 서브에이전트로 재실행. 회차 추적 없음.
+**재시도**: PRD 본문 갱신 + 코드 수정 후 새 서브에이전트로 재실행. 회차별 별도 파일·점수 보존 없음 (한도는 아래 판정 절).
 
 **기술 실패 Fallback**: SSOT [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "재시도 한도" 적용. 메인 셀프 채점 우회 금지.
 
@@ -81,20 +81,8 @@ git diff --cached | grep -iE \
 최저 미달 시 평균 8.0 이상이어도 **미통과**.
 
 **재시도:**
-- < 8.0 → Dev Agent 재투입 (인-메모리 최대 3회)
-- **3회 미달 (평균 <8.0 또는 최저 <7) → 자동 중단 + 사용자 결정 요청** (강행/재설계/중단). 임계 완화 금지 — SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "재시도 한도"
-
-## Codex 추가 리뷰 (Claude-led 전용, 1차 병렬 1회)
-
-> Codex-led 모드에서는 본 절 N/A — 메인이 Codex이므로 추가 외부 리뷰 없음. Codex 서브에이전트 결과만으로 판정.
-
-Claude 코드 리뷰 서브에이전트와 **동시** 발사 (메인이 동일 메시지에서 두 tool_use):
-
-1. **사전 `SAVED_CWD=$(pwd)` 캡처** + PRD 루트로 `cd`
-2. `codex review --base main` 실행 (wall-clock 300초 타임아웃). 종료 후 `cd "$SAVED_CWD"`
-3. **매트릭스 판정**: [`../harness-codex-review.md`](../harness-codex-review.md) "1차 결과 매트릭스" SSOT 참조. Codex 결과는 별도 파일 저장 없이 인-메모리에서 코드·PRD 본문에 반영
-4. **통과**: Claude 점수제 통과 AND Codex High/Critical 반영 완료 → 산출물 보고[10] 진입
-5. **미달**: 통합 반영 → Claude만 재실행 (Codex 재호출 금지, 최대 2회 추가)
+- < 8.0 → Dev Agent 재투입 (인-메모리 **최대 5회** — 본 [9] 단계 한정. [4]·[5]는 3회)
+- **5회 미달 (평균 <8.0 또는 최저 <7) → 자동 중단 + 사용자 결정 요청** (강행/재설계/중단). 임계 완화 금지 — SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "재시도 한도"
 
 ## 이슈 처리
 
@@ -117,10 +105,8 @@ Claude 코드 리뷰 서브에이전트와 **동시** 발사 (메인이 동일 �
 
 ## ▶ 자동 전환
 
-- Claude-led: Claude 서브에이전트 통과 + (Codex High/Critical 반영 완료 OR Codex 토큰/기능 SKIPPED) 시 `✓ [9] 코드리뷰 통과 (Claude+Codex)` (스킵 시 `(Claude+Codex SKIPPED)`) 출력 후 **산출물 보고[10] 자동 진입**
-- Codex-led: Codex 서브에이전트 통과 시 `✓ [9] 코드리뷰 통과 (Codex-led)` 출력 후 **산출물 보고[10] 자동 진입** (외부 Codex 추가 리뷰 N/A)
+서브에이전트 통과 시 `✓ [9] 코드리뷰 통과 (Claude-Lead)` 또는 `✓ [9] 코드리뷰 통과 (Codex-Lead)` 출력 후 **산출물 보고[10] 자동 진입**.
 
 산출물 보고 후 `rp-ship`이 커밋·PR·자동 머지 가드·배포를 이어서 진행한다. 자동 머지 가드 실패 시 중단·보고.
 
 → 리뷰 기준 상세: [`../harness-code-review.md`](../harness-code-review.md)
-→ Codex 리뷰 규칙: [`../harness-codex-review.md`](../harness-codex-review.md)

@@ -86,7 +86,7 @@ repositories/[project]/docs/prd/YYYYMMDD_HHMMSS_[feature]_[8자리랜덤].md
 | 변경 이유 | 왜 이 메타 변경이 필요한가 |
 | 영향 파일 | 변경되는 파일 목록과 역할 |
 | 롤백 전략 | 문제 발생 시 원복 방법 |
-| 검증 | CI·Claude 자체 점검·Codex 1회 리뷰 |
+| 검증 | CI·서브에이전트 리뷰 |
 
 **파일명:** `docs/prd/[feature]/prd.md` (하네스 루트 기준)
 
@@ -102,7 +102,7 @@ Doc Agent 작성 완료
 다음 단계 자동 진입
 ```
 
-**⛔ 실행 주체**: 각 리뷰 단계는 **반드시 메인 런타임의 서브에이전트(Claude-led=Agent 툴 / Codex-led=`spawn_agent`)** 가 수행한다. 메인 에이전트의 셀프 채점 금지. SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
+**⛔ 실행 주체**: 각 리뷰 단계는 **반드시 메인 런타임의 서브에이전트(Claude-Lead=Agent 툴 / Codex-Lead=`spawn_agent`)** 가 수행한다. 메인 에이전트의 셀프 채점 금지. SSOT: [`harness-absolute-rules.md`](harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스".
 
 Lite track은 [`harness-workflow.md`](harness-workflow.md) 의 간이 PRD + 통합 plan/engineering 리뷰 예외를 따른다.
 
