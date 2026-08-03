@@ -67,6 +67,6 @@ Dev Agent 재투입 → 수정 → QA 재실행 (최대 3회, 실패 시 사용�
 
 ## ▶ 자동 전환
 
-통과 즉시 `✓ [8] QA 통과` 출력 후 **`/rp-code-review` 자동 진입**.
+통과 즉시 `✓ [8] QA 통과` 출력 후 **`/rp-code-review` ∥ `/rp-infra-review` 자동 진입** (2축 동시 발사).
 
 → QA 상세: [`../harness-qa.md`](../harness-qa.md)

@@ -27,7 +27,7 @@ argument-hint: '[브랜치명] [변경 요약]'
    - PRD 유형별 추출 섹션:
      - Full PRD: `## 개요·목적` + `## 기능 요구사항`
      - 간소 PRD (메타): `## 변경 이유` + `## 영향 파일` + `## 검증` — `## 롤백 전략`은 PRD 원본에 보존하되 PR 본문 추출 제외(의도, 운영자 내부 자료). SSOT: [`../harness-ship.md`](../harness-ship.md) "PR 생성 시 PRD 요약 본문 포함" 표
-   - **인프라 리뷰 노트**: 인프라 축 실행 시 PR 본문에 별도 섹션 추가 — (1) 판정 요약(BLOCK/ASK/WARN 건수) (2) 자문 지적 (3) 인프라 선행 작업 체크리스트 (4) 관측 기록. **식별 정보 일반화 의무**(호스트·계정·내부 IP 금지, 인덱스·토픽명은 역할 기술로 치환) — SSOT: [`../harness-infra-review.md`](../harness-infra-review.md) "PR 본문 인프라 리뷰 노트"
+   - **인프라 리뷰 노트**: 인프라 축 실행 시 PR 본문에 별도 섹션 추가 — (1) 판정 요약(BLOCK/ASK/WARN 건수) (2) 자문 지적 (3) 인프라 선행 작업 체크리스트. **식별 정보 일반화 의무**(호스트·계정·내부 IP 금지, 인덱스·토픽명은 역할 기술로 치환) — SSOT: [`../harness-infra-review.md`](../harness-infra-review.md) "PR 본문 인프라 리뷰 노트"
    - 추출 검증: 필수 섹션 중 하나라도 PRD에서 누락 시 PR 생성 차단 + 사용자 보고
    - **재사용 PR**: 단계 4 에서 OPEN PR 재사용 시, 기존 본문에 PRD 요약 `<details>` 블록 부재면 `gh pr edit <num> --body` 로 보강 (정책 변경 이전에 생성된 PR 대응). 보강 실패 시 ship 중단
    - PRD 디렉토리 main 영구 보존 — 별도 정리 commit 금지 (CI 재실행 비용 차단)
@@ -173,7 +173,6 @@ PR 생성 시점에 .github/workflows/ 확인
 - **머지 전략**: `--merge` 고정 (squash/rebase 금지)
 - **동일 브랜치 재PR**: MERGED/CLOSED된 PR이 있어도 신규 PR 생성 (OPEN PR만 재사용)
 - **QA·코드리뷰·인프라리뷰 이수 확인**: PR 생성 직전 `rp-qa`·`rp-code-review`·`rp-infra-review` 완료 상태 체크. 미완이면 ship 중단 후 해당 단계 복귀 (메타 단축 경로는 본 규칙 적용 외). **인프라 축의 정당한 skip(콘텐츠·메타 변경·N/A 반환)은 이수로 간주**
-- **인프라 리뷰 관측 기록**: 인프라 축이 실행된 경우 PR 본문 "인프라 리뷰 노트"에 관측 필드(오탐 건수·[9] 카운트 소진 회차·인프라 축 단독 검출 건수·[4]∥[5] wall-clock)를 기재하고, 머지 후 `docs/research/<date>_infra-review-observation.md` 에 append. 미기재 시 다음 ship 에서 경고 출력 — SSOT: [`../harness-infra-review.md`](../harness-infra-review.md)
 
 ## 머지 후 검증
 

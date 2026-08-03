@@ -13,7 +13,7 @@ jobs:
       - name: Check markdown files exist
         run: |
           echo "Checking required files..."
-          for f in CLAUDE.md README.md docs/harness-workflow.md docs/harness-dev.md docs/harness-qa.md docs/harness-ship.md docs/harness-code-review.md; do
+          for f in CLAUDE.md README.md AGENTS.md docs/harness-absolute-rules.md docs/harness-workflow.md docs/harness-dev.md docs/harness-qa.md docs/harness-ship.md docs/harness-code-review.md docs/harness-infra-review.md; do
             if [ ! -f "$f" ]; then
               echo "❌ Missing: $f"
               exit 1
@@ -31,7 +31,7 @@ jobs:
               echo "❌ $f: ${lines} lines (hard max 500)"
               failed=1
             elif [ "$lines" -gt 300 ]; then
-              echo "⚠️  $f: ${lines} lines (soft limit 300 — 역할/책임 단위 분리 검토)"
+              echo "::warning file=$f::${lines} lines — soft limit 300 초과. 역할/책임 단위 분리 검토 (hard limit 500)"
             else
               echo "✅ $f: ${lines} lines"
             fi
@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "Checking internal links..."
           failed=0
-          for f in $(find docs/ CLAUDE.md -name '*.md' -not -path '*/templates/*'); do
+          for f in $(find docs/ CLAUDE.md AGENTS.md README.md -name '*.md' -not -path '*/templates/*'); do
             links=$(grep -oP '\[.*?\]\(\K[^)]+' "$f" 2>/dev/null | grep -v '^http' | grep -v '^#' || true)
             dir=$(dirname "$f")
             for link in $links; do
