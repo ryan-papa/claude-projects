@@ -57,12 +57,12 @@ workflow-agent-harness/
 | 1 | 초기화 | 새 프로젝트 골격 생성 |
 | 2 | 구체화 | "무엇을 만들지" 질문·리서치로 결정 잠금 |
 | 3 | PRD 작성 | 요구사항을 문서(PRD = Product Requirements Doc)로 정리 |
-| 4 | 기획 리뷰 | PRD의 사용자 가치·경계 채점 (최대 3회) |
-| 5 | 엔지니어링 리뷰 | 기술·확장성·운영성 채점 (최대 3회) |
+| 4 | 기획 리뷰 | PRD의 사용자 가치·경계 채점 (**[5]와 병렬**, 축별 최대 3회) |
+| 5 | 엔지니어링 리뷰 | 기술·확장성·운영성 채점 (**[4]와 병렬**, 축별 최대 3회) |
 | 6 | 태스크 분해 | 작업을 작은 단위로 쪼개기 |
 | 7 | 개발 | 태스크별 코딩·테스트·커밋 |
 | 8 | QA | 시나리오 테스트 + 콘텐츠 검수 |
-| 9 | 코드 리뷰 | 7항목 채점 (정확성·설계·가독성·테스트·보안·성능·유지보수성, 최대 5회) |
+| 9 | 코드 리뷰 ∥ 인프라 리뷰 | 코드 축 7항목 채점 + **인프라 축 병렬**(SQL·Redis·비동기·직렬화·배포, BLOCK/ASK/WARN 무점수). 공통 최대 5회 |
 | 10 | 산출물 보고 | 결과 정리 + 자동 진입 |
 | 11 | 배포 (`rp-ship`) | PR 생성 → CI → 자동 머지 가드 3종 → 머지 → 배포 |
 | 12 | 회고 | 절차 준수·효율·규칙 개선 평가 (**사용자 명령 시에만**) |
@@ -85,6 +85,7 @@ workflow-agent-harness/
 | [`harness-dev.md`](docs/harness-dev.md) | 개발·태스크·테스트 |
 | [`harness-qa.md`](docs/harness-qa.md) | QA + 콘텐츠 검수 |
 | [`harness-code-review.md`](docs/harness-code-review.md) | 7항목 코드리뷰 |
+| [`harness-infra-review.md`](docs/harness-infra-review.md) | 인프라 리뷰 (SQL·Redis·비동기·직렬화·배포, [9] 병렬 축) |
 | [`harness-ship.md`](docs/harness-ship.md) | 산출물 보고 + 배포 |
 | [`security-guide.md`](docs/security-guide.md) | 시크릿·자격증명 (sops+age) |
 

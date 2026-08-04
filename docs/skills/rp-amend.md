@@ -31,10 +31,10 @@ argument-hint: '[프로젝트명] [기능 수정·추가 설명]'
 | 1 | `rp-init` **스킵** (프로젝트 이미 존재) |
 | 2 | Full amend는 `/rp-specify` 를 **기능 단위**로 5단계 질문 전체 실행. Lite는 [`../harness-workflow.md`](../harness-workflow.md) Lite 질문 규칙 적용 |
 | 3 | Full amend는 `/rp-prd` **Full PRD** 사용. Lite는 간이 1쪽 PRD 사용 |
-| 4·5 | Full amend는 rp-workflow 분리 리뷰 적용. Lite는 통합 plan/engineering 리뷰 1회 |
+| 4·5 | Full amend는 rp-workflow 분리 리뷰를 **병렬 동시 발사**로 적용. Lite는 통합 plan/engineering 리뷰 1회 |
 | 6 | Full amend는 `/rp-task` 로 기능 변경분만 분해. Lite는 태스크 분해 생략 |
 | 7 | Full amend는 `/rp-dev` 로 feat 브랜치 구현. Lite는 단일 태스크 구현 |
-| 8·9·10·11·12 | rp-workflow 와 동일. 추가 리뷰 조합은 작성 모드 매트릭스 적용 |
+| 8·9·10·11·12 | rp-workflow 와 동일. [9]는 **코드∥인프라 2축 병렬**(Lite 포함 필수 유지). 추가 리뷰 조합은 작성 모드 매트릭스 적용 |
 
 ## 절차
 

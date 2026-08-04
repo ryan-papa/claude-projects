@@ -20,6 +20,8 @@
 
 핵심:
 - 사용자가 진입한 런타임이 메인
+- **리뷰 병렬**: `[4] ∥ [5]`, `[9-코드] ∥ [9-인프라]` 동시 발사 (컨텍스트 미공유 독립 판정). Codex-Lead 는 `spawn_agent` 동시 발사 불가 시 **순차 fallback 허용** — 판정 규칙·통과 조건 동일, 병렬 여부는 통과 조건 아님
+- **[9-인프라]**: SQL·Redis·비동기·직렬화·배포 5영역, **무점수 BLOCK/ASK/WARN** 판정, **정적 분석 전용(실인프라 접근 금지)**. SSOT: [`docs/harness-infra-review.md`](./docs/harness-infra-review.md)
 - 메인 셀프 채점 절대 금지 — 모든 채점은 해당 런타임의 서브에이전트가 수행
 - **런타임 = 리뷰어**: 교차 런타임 추가 리뷰 전면 금지 (Claude-Lead 에서 Codex 호출 금지, Codex-Lead 에서 Claude 호출 금지)
 - 한도 미달 시 자동 중단 + 사용자 결정 요청 (강행/재설계/중단)
@@ -77,7 +79,7 @@ Codex도 `spawn_agent` 기반 서브에이전트 실행은 가능하다. 단, Cl
 - Claude가 작성·구현
 - **Claude 서브에이전트**(Agent 툴, `subagent_type=general-purpose`)가 plan / engineering / code review 수행 — 메인 셀프 채점 금지
 - 외부 추가 리뷰 없음 — `codex` 명령·`/codex:*` 호출 금지
-- 재시도 [4]·[5] 최대 3회 / [9] 최대 5회, 한도 미달 시 사용자 결정 요청
+- 재시도 [4]·[5] 최대 3회(축별 독립) / [9] 최대 5회(코드+인프라 공통, 사이클 단위), 한도 미달 시 사용자 결정 요청
 
 ### Codex-Lead Mode
 
@@ -85,13 +87,14 @@ Codex가 주 작성자이고 메인 런타임이 Codex CLI인 경우:
 
 - **Codex 서브에이전트**(`spawn_agent` 별도 컨텍스트)가 plan / engineering / code review 수행 — 메인 셀프 채점 금지
 - 외부 추가 리뷰 없음 · **Claude 리뷰 호출 금지** (런타임 = 리뷰어)
-- 재시도 [4]·[5] 최대 3회 / [9] 최대 5회, 한도 미달 시 사용자 결정 요청
+- 재시도 [4]·[5] 최대 3회(축별 독립) / [9] 최대 5회(코드+인프라 공통, 사이클 단위), 한도 미달 시 사용자 결정 요청
 - 세 리뷰 단계는 별도 관점·별도 판정으로 처리 — "같은 리뷰 3회 반복"으로 해석 금지
 
 관점 분리:
-- plan review: PRD를 기획 관점으로 검토
-- engineering review: PRD를 기술 관점으로 검토
-- code review: 구현 diff를 코드 관점으로 검토
+- plan review: PRD를 기획 관점으로 검토 (engineering review와 병렬)
+- engineering review: PRD를 기술 관점으로 검토 (plan review와 병렬)
+- code review: 구현 diff를 코드 관점으로 검토 (infra review와 병렬)
+- infra review: 구현 diff를 인프라 접점 관점으로 검토 — 무점수 BLOCK/ASK/WARN, 정적 분석 전용
 
 동일 변경을 나중에 Claude에서 다시 열면 Claude 리뷰는 기존 증거 대체가 아니라 추가 독립 검토로 기록한다 — 모드 전환·재채점 금지.
 
@@ -183,5 +186,5 @@ Codex-Lead Mode의 리뷰 결과에는 독립성을 명시한다.
 사용자가 Claude 없이 Codex로 진행하라고 하면:
 - Codex가 변경 작성, Codex 서브에이전트가 plan / engineering / code 세 관점으로 분리 채점
 - 메인 셀프 채점 절대 금지 — 모든 채점은 `spawn_agent` 서브에이전트가 수행
-- 재시도 [4]·[5] 최대 3회 / [9] 최대 5회, 한도 미달 시 사용자 결정 요청
+- 재시도 [4]·[5] 최대 3회(축별 독립) / [9] 최대 5회(코드+인프라 공통, 사이클 단위), 한도 미달 시 사용자 결정 요청
 - 추후 Claude 리뷰는 동일 변경의 재채점이 아닌 추가 독립 검토로만 기록

@@ -44,12 +44,11 @@ description: "하네스 전체 워크플로우 오케스트레이터. 신규 프
 | 1 | `/rp-init` | → [2] | — |
 | 2 | `/rp-specify` | → [3] | — |
 | 3 | `/rp-prd` | → [4] | — |
-| 4 | `/rp-plan-review` | → [5] | 서브에이전트 3회 미달 → 사용자 결정 요청 |
-| 5 | `/rp-eng-review` | → [6] | 서브에이전트 3회 미달 → 사용자 결정 요청 |
+| 4∥5 | `/rp-plan-review` ∥ `/rp-eng-review` (**동시 발사**) | 양축 통과 → [6] | 축별 3회 미달 → 사용자 결정 요청 |
 | 6 | `/rp-task` | → [7] | — |
 | 7 | `/rp-dev` | → [8] | 빌드/테스트 실패 |
 | 8 | `/rp-qa` | → [9] | 3회 실패 → 사용자 보고 |
-| 9 | `/rp-code-review` | → [10] | 서브에이전트 **5회** 미달 → 사용자 결정 요청 |
+| 9 | `/rp-code-review` ∥ `/rp-infra-review` (**동시 발사**) | 양축 통과 → [10] | 공통 **5회** 미달 → 사용자 결정 요청 / 인프라 ASK → 사용자 결정 |
 | 10 | 산출물 보고 | → [11] 커밋·PR | — |
 | 11 | `/rp-ship` (**필수 호출**, 수동 git/gh 우회 금지) | 커밋·PR·자동 머지 가드·배포 | CI 실패·자동 머지 가드 실패 |
 | 12 | `/rp-retro` (사용자 명시 명령 시에만) | 종료 | 자동 진입 없음 |
@@ -67,7 +66,8 @@ description: "하네스 전체 워크플로우 오케스트레이터. 신규 프
 - **신규 `rp-*` 스킬 추가 시 심링크 자동 동기화** — `docs/skills/rp-*.md` 생성 감지 시 `PostToolUse` 훅이 `.claude/commands/rp-*.md` 심링크 자동 생성. 훅 실패 시 수동 fallback: `cd .claude/commands && ln -s ../../docs/skills/rp-새이름.md rp-새이름.md`
 - **전 단계 자동 연결** — 각 스킬 완료 시 다음 스킬 자동 호출
 - **기본 경로 승인 대기 없음** — 산출물 보고 후 `rp-ship`이 커밋·PR·자동 머지 가드·배포를 진행. 자동 머지 가드 실패 시 OPEN 유지 + 사용자 보고
-- QA([8]), 코드리뷰([9]) **생략 불가**
+- QA([8]), 코드리뷰·인프라리뷰([9] 2축) **생략 불가** — 인프라 축의 정당한 skip(콘텐츠·메타 변경·N/A)은 이수로 간주
+- **리뷰 병렬 발사** — [4]∥[5], [9-코드]∥[9-인프라]를 동일 메시지에서 동시 호출. 미달 축만 재실행하되 상대 관점 영역 변경 시 통과 축도 1회 재검증. SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "리뷰 단계 = 관점 분리"
 - **[4][5][9] 교차 런타임 추가 리뷰 금지** — 진입 런타임의 서브에이전트 채점만으로 판정. Claude-Lead 에서 `codex`·`/codex:*` 호출 금지, Codex-Lead 에서 Claude 호출 금지. SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "작성 모드 및 리뷰 매트릭스"
 - 산출물 보고([10]) 없이 배포([11]) 진행 **금지**
 - 회고([12]) — **사용자 명시 명령(`/rp-retro`) 시에만 실행, 자동 진입 없음** (SSOT: [`../harness-absolute-rules.md`](../harness-absolute-rules.md) "단축 경로·예외")
