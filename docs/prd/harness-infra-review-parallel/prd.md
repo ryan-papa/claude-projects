@@ -42,8 +42,8 @@
 | **실인프라 접근** | **전면 금지** — 인프라 리뷰 서브에이전트는 정적 분석 전용. DB·Redis·k8s·MCP DB 도구 등 실행 중 인프라 조회·접속 금지. 위반 감지 시 결과 폐기 + 재발사(카운트 미소비) |
 | 스택 | 스택 독립 원칙(1a·1b 선례) — 기본 예시 Kotlin/JVM·MySQL/StarRocks, 타 스택 동치 치환, 개념 부재 시 `N/A: 사유` |
 | 임계값 | 본 문서 값은 **잠정 기본 권고값**. 프로젝트 `CLAUDE.md` `## 인프라 리뷰 임계값` 섹션에서 **수치 4종(1MB·2MB·배치 건수·슬립)만** 오버라이드 가능. BLOCK 부여 조건·등급 체계 오버라이드 **금지** |
-| 등급 승격 | WARN→BLOCK 승격은 (i) 정탐 3건 이상 + 오탐 0건 관측 기록 (ii) 정적 확정 조건표 작성 (iii) 메타 변경 PRD 경유 — 3요건 충족 시에만. 임의 승격 금지 |
-| 결과 보존 | 리뷰 결과 파일 생성 금지(기존 SSOT 유지). 자문은 PR 본문 "인프라 리뷰 노트". §검증의 관측 로그는 **메타 관측 기록이며 리뷰 증거 파일이 아님**을 신규 SSOT에 명시 |
+| 등급 승격 | WARN→BLOCK 승격은 (i) 정탐 3건 이상 + 오탐 0건 근거 (ii) 정적 확정 조건표 작성 (iii) 메타 변경 PRD 경유 — 3요건 충족 시에만. 임의 승격 금지 |
+| 결과 보존 | 리뷰 결과 파일 생성 금지(기존 SSOT 유지). 자문은 PR 본문 "인프라 리뷰 노트"에 반영 |
 | 단계 표기 | `[9-코드]` / `[9-인프라]` |
 
 ### 인프라 리뷰 5영역
@@ -111,7 +111,7 @@
 
 ### PR 본문 "인프라 리뷰 노트"
 
-- 구성: (1) 판정 요약(BLOCK/ASK/WARN 건수) (2) 자문 지적 (3) **인프라 선행 작업** 체크리스트 (4) 관측 기록 필드(§검증)
+- 구성: (1) 판정 요약(BLOCK/ASK/WARN 건수) (2) 자문 지적 (3) **인프라 선행 작업** 체크리스트
 - **식별 정보 일반화 의무**: 호스트·계정·내부 IP·인증서 경로 기재 금지. 인덱스명·토픽·컨슈머그룹·테이블명은 역할 기술로 일반화(`주문 조회용 복합 인덱스`)
 - `rp-ship` 배포 전 체크에 **인프라 축 이수 확인** 추가. **정당한 skip(콘텐츠·메타 변경·N/A 반환)은 이수로 간주** — 기존 `rp-ship.md` QA·코드리뷰 이수 확인의 메타 단축 경로 예외와 동일 처리. 선행 작업 항목은 미이행이어도 차단하지 않음(인프라 상태 확인 불가 원칙)
 
@@ -119,15 +119,15 @@
 
 | 파일 | 변경 내용 |
 |------|----------|
-| `docs/harness-infra-review.md` | **신규**. 인프라 리뷰 기준 SSOT — 5영역, BLOCK·ASK 부여 조건표 + 제외 + 인용 의무·해제 경로, 실인프라 접근 금지, 지적 후처리, 임계값 오버라이드·등급 승격 절차, **관할 경계 표(SSOT)**, PR 노트 규칙, 관측 로그≠증거 파일 명시 |
+| `docs/harness-infra-review.md` | **신규**. 인프라 리뷰 기준 SSOT — 5영역, BLOCK·ASK 부여 조건표 + 제외 + 인용 의무·해제 경로, 실인프라 접근 금지, 지적 후처리, 임계값 오버라이드·등급 승격 절차, **관할 경계 표(SSOT)**, PR 노트 규칙 |
 | `docs/skills/rp-infra-review.md` | **신규**. 스킬 — frontmatter(`description` 필수) + 트리거·발사 조건·N/A 저비용 경로·서브에이전트 절차(4항목 SSOT 링크 참조, 본문 중복 금지)·판정·자동 전환 |
 | `docs/harness-code-review.md` | [9] 판정에 인프라 축 합산(코드 점수제 AND BLOCK 0건 AND 미해결 ASK 0건), 공통 5회 귀속. 관할 경계는 **링크 참조만** |
 | `docs/skills/rp-code-review.md` | 코드∥인프라 동시 발사, 합산 판정, 조건부 재검증, 부분 기술 실패 분기 |
 | `docs/skills/rp-plan-review.md` · `rp-eng-review.md` | [4]∥[5] 동시 발사, 조건부 재검증, 양축 통과 시 [6] 진입 |
 | `docs/skills/rp-task.md` | 트리거 "엔지니어링 리뷰 통과 후" → "[4]·[5] 양축 통과 후" |
 | `docs/harness-prd.md` | "PRD 리뷰 (2단계 **순차** 실행)" 제목·도식 + **PRD 상태 표(순차 상태 머신)** → 병렬 모델로 교체 |
-| `docs/harness-absolute-rules.md` | 관점 분리 표에 인프라 행 / 병렬·조건부 재검증·카운트 귀속 / **L66 스킬 열거에 `/rp-infra-review` 추가** / **L67 "명시된 중단 조건"에 ASK 등재** / **L68 (b) 에 "9-인프라 = 무점수 BLOCK·ASK·WARN 판정" 형식 추가** / **L75 "점수 단일 기준" → "동일 런타임 서브에이전트의 코드 점수 + 인프라 판정 단일 기준"**(교차 런타임 금지 취지 불변) / **L82 배포 전 체크에 인프라 축 추가(정당한 skip 예외 포함)** / **L156~158 `docs/skills/` 전용 예외에 "[9] 2축 모두 적용" 명시** / 반박=결정 이관 1줄 |
-| `docs/skills/rp-ship.md` · `docs/harness-ship.md` | PR 본문 "인프라 리뷰 노트" 섹션, 배포 전 인프라 축 이수 확인(skip 예외), **머지 후 관측 기록 append 의무**(§검증) |
+| `docs/harness-absolute-rules.md` | 관점 분리 표에 인프라 행 / 병렬·조건부 재검증·카운트 귀속 / 스킬 열거에 `/rp-infra-review` 추가 / ASK 중단 조건 등재 / "9-인프라 = 무점수 BLOCK·ASK·WARN 판정" 형식 추가 / "점수 단일 기준" → "동일 런타임 서브에이전트의 코드 점수 + 인프라 판정 단일 기준"(교차 런타임 금지 취지 불변) / 배포 전 체크에 인프라 축 추가(정당한 skip 예외 포함) / `docs/skills/` 전용 예외 명확화 — 메타 변경이므로 인프라 축은 발사 skip, 코드 축만 수행 / 반박=결정 이관 1줄 |
+| `docs/skills/rp-ship.md` · `docs/harness-ship.md` | PR 본문 "인프라 리뷰 노트" 섹션, 배포 전 인프라 축 이수 확인(skip 예외) |
 | `docs/harness-workflow.md` | Full Flow `[4]∥[5]`·`[9-코드]∥[9-인프라]` 표기, 스킬 인덱스, 자동 진입 표, Lite 트랙 인프라 필수 유지 |
 | `docs/skills/rp-workflow.md` · `rp-amend.md` | 플로우 표 병렬 표기 + 인프라 축 |
 | `AGENTS.md` | Codex 어댑터 리뷰 매트릭스·재시도·관점 분리에 인프라 축 + 병렬(순차 fallback 허용) |
@@ -151,27 +151,17 @@
 
 **산출물 검증**
 
-- [ ] `harness-infra-review.md` — 5영역 + BLOCK·ASK 조건표(제외 포함) + 인용 의무·해제 경로(대칭) + **실인프라 접근 금지** + 임계값 오버라이드 범위 + 등급 승격 3요건 + 관할 경계 표(SSOT) + PR 노트 일반화 규칙 + 관측 로그≠증거 파일
+- [ ] `harness-infra-review.md` — 5영역 + BLOCK·ASK 조건표(제외 포함) + 인용 의무·해제 경로(대칭) + **실인프라 접근 금지** + 임계값 오버라이드 범위 + 등급 승격 3요건 + 관할 경계 표(SSOT) + PR 노트 일반화 규칙
 - [ ] `rp-infra-review.md` — frontmatter `description` 존재, 발사 조건·N/A 경로, 4항목 SSOT 링크 참조(본문 중복 0), 결과 파일 생성 금지
 - [ ] `rp-code-review.md`·`harness-code-review.md` — 합산 판정, 카운트 귀속, 부분 실패 분기, 관할 경계는 링크만(중복 0)
 - [ ] `rp-plan-review.md`·`rp-eng-review.md`·`rp-task.md`·`harness-prd.md` — 병렬 도식·상태 표, 조건부 재검증(사이클 내 1회, 미달 시 다음 사이클 전환), 양축 통과 시 [6]
 - [ ] `harness-absolute-rules.md` — L66·L67·L68·L75·L82·L156~158 개정 반영, 교차 런타임 금지·셀프 채점 금지·결과 파일 금지 문구 불변
-- [ ] `rp-ship.md`·`harness-ship.md` — PR 인프라 노트, 이수 확인(skip 예외), 관측 기록 append 의무
+- [ ] `rp-ship.md`·`harness-ship.md` — PR 인프라 노트, 이수 확인(skip 예외)
 - [ ] `harness-workflow.md`·`rp-workflow.md`·`rp-amend.md`·`AGENTS.md`·`README.md`·`CLAUDE.md` 반영
 - [ ] `python3 scripts/sync-codex-skills.py --check` 통과
 - [ ] 전 문서 ≤ 500줄(기본 300 초과분은 CI 경고로 노출) AND ci.yml 2단계 게이트 + 검사 범위 `docs/`·`CLAUDE.md`·`AGENTS.md`·`README.md`
 - [ ] `grep -rnE "\]\(.*repositories/[a-z-]+/[^)]+\)" docs/ CLAUDE.md AGENTS.md README.md` 0건
 
-**효과 검증 (기록 주체 = `rp-ship`, 강제 필드)**
-
-선례(`docs/prd/parallel-review-r1/`)는 "머지 후 wall-clock 1회 기록"을 약속했으나 실제 기록 0건이었다. 동일 실패를 막기 위해 **관측 기록을 `rp-ship` PR 본문 필수 필드로 강제**하고, 머지 시 `docs/research/<date>_infra-review-observation.md` 에 append 한다. 미기록 시 다음 `rp-ship` 이 경고 출력.
-
-| 관측 항목 | 재평가 트리거 |
-|-----------|-------------|
-| BLOCK·ASK 오탐(반박으로 강등된 건) | **3건 누적** → 해당 부여 조건 축소 재검토 |
-| [9] 공통 5회 중 4회 이상 소진 | **3건 누적** → 한도 적정성 재검토 (`harness-code-review.md` L169 규칙과 동일) |
-| 인프라 축이 잡고 코드 축이 놓친 결함 건수 | **3사이클 연속 0건** → 축 통합 재검토 |
-| [4]∥[5] wall-clock **및 총 토큰** | 직렬 대비 wall-clock 단축 없음 또는 토큰 1.5배 초과 → 병렬 원복 검토 |
 
 **관측 개시 조건:** 인프라 축은 하네스 메타 변경에서 skip 되므로 본 레포 사이클로는 관측이 시작되지 않는다. **머지 후 90일 내 코드 프로젝트 사이클이 1건도 발생하지 않으면 인프라 축을 기본 비활성(`/rp-infra-review` 수동 호출 전용)으로 전환**하고 병렬화만 존속시킨다.
 

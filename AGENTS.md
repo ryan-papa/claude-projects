@@ -47,6 +47,7 @@
 - [`docs/harness-prd.md`](./docs/harness-prd.md)
 - [`docs/harness-dev.md`](./docs/harness-dev.md)
 - [`docs/harness-code-review.md`](./docs/harness-code-review.md)
+- [`docs/harness-infra-review.md`](./docs/harness-infra-review.md)
 - [`docs/harness-ship.md`](./docs/harness-ship.md)
 
 우선순위:
@@ -77,7 +78,7 @@ Codex도 `spawn_agent` 기반 서브에이전트 실행은 가능하다. 단, Cl
 하네스 원문 절차를 그대로 따른다.
 
 - Claude가 작성·구현
-- **Claude 서브에이전트**(Agent 툴, `subagent_type=general-purpose`)가 plan / engineering / code review 수행 — 메인 셀프 채점 금지
+- **Claude 서브에이전트**(Agent 툴, `subagent_type=general-purpose`)가 plan / engineering / code / infra review 수행 — 메인 셀프 채점 금지
 - 외부 추가 리뷰 없음 — `codex` 명령·`/codex:*` 호출 금지
 - 재시도 [4]·[5] 최대 3회(축별 독립) / [9] 최대 5회(코드+인프라 공통, 사이클 단위), 한도 미달 시 사용자 결정 요청
 
@@ -85,10 +86,10 @@ Codex도 `spawn_agent` 기반 서브에이전트 실행은 가능하다. 단, Cl
 
 Codex가 주 작성자이고 메인 런타임이 Codex CLI인 경우:
 
-- **Codex 서브에이전트**(`spawn_agent` 별도 컨텍스트)가 plan / engineering / code review 수행 — 메인 셀프 채점 금지
+- **Codex 서브에이전트**(`spawn_agent` 별도 컨텍스트)가 plan / engineering / code / infra review 수행 — 메인 셀프 채점 금지
 - 외부 추가 리뷰 없음 · **Claude 리뷰 호출 금지** (런타임 = 리뷰어)
 - 재시도 [4]·[5] 최대 3회(축별 독립) / [9] 최대 5회(코드+인프라 공통, 사이클 단위), 한도 미달 시 사용자 결정 요청
-- 세 리뷰 단계는 별도 관점·별도 판정으로 처리 — "같은 리뷰 3회 반복"으로 해석 금지
+- 네 리뷰 축은 별도 관점·별도 판정으로 처리 — "같은 리뷰 반복"으로 해석 금지
 
 관점 분리:
 - plan review: PRD를 기획 관점으로 검토 (engineering review와 병렬)
@@ -103,13 +104,12 @@ Codex가 주 작성자이고 메인 런타임이 Codex CLI인 경우:
 기능 변경 또는 메타 변경은 아래 순서를 유지한다.
 
 1. 동작·범위·워크플로우 규칙에 영향이 있으면 PRD를 먼저 작성·수정한다.
-2. Plan review를 수행한다.
-3. Engineering review를 수행한다.
-4. 변경이 단순하지 않으면 task로 분해한다.
-5. 구현한다.
-6. 변경 성격에 맞는 테스트와 QA 증거를 남긴다.
-7. Code review를 수행한다.
-8. Ship 관련 작업 전에 결과를 보고한다.
+2. Plan review와 Engineering review를 **병렬로 동시 발사**한다 (양축 통과 시 다음 단계).
+3. 변경이 단순하지 않으면 task로 분해한다.
+4. 구현한다.
+5. 변경 성격에 맞는 테스트와 QA 증거를 남긴다.
+6. Code review와 Infra review를 **병렬로 동시 발사**한다 (코드 축 점수 + 인프라 축 BLOCK 0건·미해결 ASK 0건 AND 결합). 인프라 축은 콘텐츠·메타 변경 시 정당한 skip.
+7. Ship 관련 작업 전에 결과를 보고한다.
 
 하네스 메타 변경은 단축 경로를 허용한다.
 - `init`, `specify`, `task`, `dev` 생략 가능
@@ -118,11 +118,10 @@ Codex가 주 작성자이고 메인 런타임이 Codex CLI인 경우:
 
 Codex-Lead Mode에서도 단계 구조를 유지한다.
 - PRD update
-- plan review
-- engineering review
+- plan review ∥ engineering review (병렬)
 - implementation
 - QA / verification
-- code review
+- code review ∥ infra review (병렬)
 
 리뷰 단계 진입 시 `spawn_agent` 서브에이전트 호출은 단계 자동 실행이다. 별도 사용자 확인 지점을 추가하지 않는다.
 
@@ -136,7 +135,7 @@ Full flow에서는 같은 모델만 사용 가능하다는 이유로 plan review
 - High/Critical 지적은 PRD(또는 코드) 본문 갱신으로만 흔적을 남김
 - 회차 추적·점수표 보존·Codex 원문 저장 모두 폐기
 
-Codex-Lead Full flow에서도 plan/eng/code 세 단계는 서로 다른 관점의 리뷰임을 유지하되, 산출물은 각 단계에서 갱신된 PRD 본문 자체로 흡수된다. Lite는 SSOT 통합 plan/engineering 리뷰 예외를 따른다.
+Codex-Lead Full flow에서도 plan/eng/code/infra 네 리뷰 축은 서로 다른 관점의 판정임을 유지하되, 산출물은 PRD 또는 코드 본문 갱신 자체로 흡수된다. Lite는 SSOT 통합 plan/engineering 리뷰 예외를 따른다.
 
 ## 리뷰 기준
 
@@ -184,7 +183,7 @@ Codex-Lead Mode의 리뷰 결과에는 독립성을 명시한다.
 - 차이는 채점 서브에이전트 종류뿐 — 양쪽 모두 외부 추가 리뷰 없음
 
 사용자가 Claude 없이 Codex로 진행하라고 하면:
-- Codex가 변경 작성, Codex 서브에이전트가 plan / engineering / code 세 관점으로 분리 채점
+- Codex가 변경 작성, Codex 서브에이전트가 plan / engineering / code / infra 네 관점으로 분리 채점
 - 메인 셀프 채점 절대 금지 — 모든 채점은 `spawn_agent` 서브에이전트가 수행
 - 재시도 [4]·[5] 최대 3회(축별 독립) / [9] 최대 5회(코드+인프라 공통, 사이클 단위), 한도 미달 시 사용자 결정 요청
 - 추후 Claude 리뷰는 동일 변경의 재채점이 아닌 추가 독립 검토로만 기록
