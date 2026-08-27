@@ -34,7 +34,7 @@
 
 | 규칙 | 내용 |
 |------|------|
-| 문체 | 구어체 금지, 간결·명료 |
+| 문체 | 구어체 금지, 간결·명료. 상세 원칙 10 → [`docs/harness-writing.md`](docs/harness-writing.md) |
 | 구조 | 테이블/리스트 우선, 산문 지양 |
 | 분량 | 파일당 **기본 300줄 이하**, 분리가 부적절한 경우에 한해 **최대 500줄** (CI: 300 초과 경고 / 500 초과 실패) |
 | 초과 시 | **역할/책임 단위로 파일 분리** 우선 (텍스트 압축이 아닌 영역 분리). 분리 시 SSOT가 쪼개져 참조가 흩어지는 경우에만 500줄까지 허용 |
@@ -58,6 +58,7 @@ workflow-agent-harness/
 │   ├── harness-ship.md         # 산출물 보고 + 배포
 │   ├── harness-design.md       # UI 디자인 원칙
 │   ├── harness-readme.md       # README 작성 규칙
+│   ├── harness-writing.md      # 글쓰기 원칙 (원칙 10 + 기술 용어 보존)
 │   ├── harness-db.md           # DB 스타일 (테이블/컬럼/인덱스/ENUM COMMENT)
 │   ├── harness-backend-test-policy.md  # 백엔드 2-게이트 (단위·GET API, 실인프라 미강제)
 │   ├── tasks.md                # 태스크 인덱스 (통합 브랜치 앵커 SSOT)
@@ -152,6 +153,7 @@ workflow-agent-harness/
 **인프라 리뷰 상세:** [`harness-infra-review.md`](docs/harness-infra-review.md) — SQL(방언·실행계획·타입 정밀도·대량 쓰기)·Redis·비동기 점유·직렬화 호환·배포 전략/pub-sub
 **디자인 원칙:** [`harness-design.md`](docs/harness-design.md)
 **README 규칙:** [`harness-readme.md`](docs/harness-readme.md)
+**글쓰기 원칙:** [`harness-writing.md`](docs/harness-writing.md) — 한국어 산출물 공통 원칙 10, 기술 용어는 항시 보존
 **시크릿 관리:** [`security-guide.md`](docs/security-guide.md) / [`security/secrets-management.md`](docs/security/secrets-management.md)
 **DB 스타일:** [`harness-db.md`](docs/harness-db.md) — 테이블/컬럼/인덱스/ENUM COMMENT 규칙
 **백엔드 테스트 정책:** [`harness-backend-test-policy.md`](docs/harness-backend-test-policy.md) — 2-게이트 (단위·GET API, 실인프라 DB·Redis 미강제)
