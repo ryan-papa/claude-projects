@@ -33,6 +33,7 @@ workflow-agent-harness/
 │   ├── harness-ship.md                # 산출물 보고 + 배포
 │   ├── harness-design.md              # UI 디자인 원칙
 │   ├── harness-readme.md              # README 작성 규칙
+│   ├── harness-writing.md             # 글쓰기 원칙 (원칙 10 + 기술 용어 보존)
 │   ├── harness-db.md                  # DB 스타일 (테이블·컬럼·인덱스·ENUM)
 │   ├── harness-backend-test-policy.md # 백엔드 4-게이트 테스트 정책
 │   ├── security-guide.md              # 시크릿 관리 원칙 (sops+age)
@@ -87,6 +88,7 @@ workflow-agent-harness/
 | [`harness-code-review.md`](docs/harness-code-review.md) | 7항목 코드리뷰 |
 | [`harness-infra-review.md`](docs/harness-infra-review.md) | 인프라 리뷰 (SQL·Redis·비동기·직렬화·배포, [9] 병렬 축) |
 | [`harness-ship.md`](docs/harness-ship.md) | 산출물 보고 + 배포 |
+| [`harness-writing.md`](docs/harness-writing.md) | 글쓰기 원칙 (한국어 산출물 공통, 기술 용어 보존) |
 | [`security-guide.md`](docs/security-guide.md) | 시크릿·자격증명 (sops+age) |
 
 ---
